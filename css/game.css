@@ -31,7 +31,7 @@ button {
 
 
 /* =========================
-   TOP BAR
+   TOP
 ========================= */
 
 .topbar {
@@ -45,16 +45,16 @@ button {
 .logo {
   font-size: 34px;
   font-weight: 900;
-  line-height: 0.9;
+  line-height: .9;
   letter-spacing: -2px;
 }
 
 .level-name {
   margin-top: 5px;
-  font-size: 11px;
-  font-weight: 800;
+  font-size: 10px;
+  font-weight: 900;
   letter-spacing: 2px;
-  opacity: 0.55;
+  opacity: .55;
 }
 
 .best-box {
@@ -63,9 +63,9 @@ button {
 
 .best-box span {
   display: block;
-  font-size: 9px;
+  font-size: 8px;
   letter-spacing: 2px;
-  opacity: 0.5;
+  opacity: .45;
 }
 
 .best-box strong {
@@ -77,7 +77,7 @@ button {
 
 
 /* =========================
-   GAME AREA
+   GAME
 ========================= */
 
 .game-area {
@@ -86,13 +86,17 @@ button {
   aspect-ratio: 9 / 14;
   min-height: 420px;
   max-height: 690px;
-  border-radius: 24px;
   overflow: hidden;
+
+  border-radius: 24px;
+
   background: #080c1b;
-  border: 1px solid rgba(255, 255, 255, 0.09);
+
+  border: 1px solid rgba(255,255,255,.08);
+
   box-shadow:
-    0 18px 50px rgba(0, 0, 0, 0.45),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.025);
+    0 18px 50px rgba(0,0,0,.45),
+    inset 0 0 0 1px rgba(255,255,255,.025);
 }
 
 canvas {
@@ -111,8 +115,10 @@ canvas {
   top: 14px;
   left: 14px;
   right: 14px;
+
   display: flex;
   justify-content: space-between;
+
   pointer-events: none;
 }
 
@@ -120,24 +126,34 @@ canvas {
 .multiplier-box,
 .strike-display {
   min-width: 78px;
+
   padding: 8px 10px;
+
   border-radius: 12px;
-  background: rgba(5, 7, 17, 0.58);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  background: rgba(5,7,17,.58);
+
+  border: 1px solid rgba(255,255,255,.08);
+
   backdrop-filter: blur(8px);
 }
 
 .hud span {
   display: block;
+
   font-size: 8px;
   font-weight: 800;
+
   letter-spacing: 1.7px;
-  opacity: 0.48;
+
+  opacity: .48;
 }
 
 .hud strong {
   display: block;
+
   margin-top: 2px;
+
   font-size: 17px;
   font-weight: 900;
 }
@@ -162,157 +178,215 @@ canvas {
 .overlay {
   position: absolute;
   inset: 0;
+
   display: flex;
   flex-direction: column;
+
   align-items: center;
   justify-content: center;
+
   padding: 26px;
+
   text-align: center;
+
   background:
     radial-gradient(
       circle at center,
-      rgba(12, 19, 48, 0.55),
-      rgba(3, 5, 12, 0.88)
+      rgba(12,19,48,.55),
+      rgba(3,5,12,.88)
     );
+
   z-index: 10;
 }
 
 .overlay-label {
   margin-bottom: 8px;
+
   font-size: 10px;
   font-weight: 900;
+
   letter-spacing: 3px;
-  opacity: 0.55;
+
+  opacity: .55;
 }
 
 .overlay h1 {
   margin: 0;
-  font-size: clamp(38px, 10vw, 58px);
-  line-height: 0.95;
+
+  font-size: clamp(35px, 9vw, 56px);
+
+  line-height: .95;
+
   font-weight: 1000;
+
   letter-spacing: -2px;
 }
 
 .overlay p {
   margin: 15px 0 22px;
+
   font-size: 14px;
   line-height: 1.5;
-  opacity: 0.65;
+
+  opacity: .65;
 }
 
 
 /* =========================
-   ANIMAL SELECTOR
+   CHARACTER SELECTOR
 ========================= */
 
 .animal-chooser {
   width: 100%;
-  max-width: 390px;
+  max-width: 400px;
+
   margin: 0 auto 18px;
 }
 
 .chooser-title {
   margin-bottom: 10px;
+
   font-size: 9px;
   font-weight: 900;
+
   letter-spacing: 2px;
-  opacity: 0.5;
+
+  opacity: .5;
 }
 
-.animal-grid {
+.character-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  grid-template-columns:
+    repeat(4, minmax(0,1fr));
+
   gap: 8px;
+
   width: 100%;
 }
 
-.animal-card {
+.character-card {
   position: relative;
+
   min-width: 0;
   min-height: 88px;
-  padding: 10px 5px 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  padding: 9px 4px;
+
+  border:
+    1px solid rgba(255,255,255,.1);
+
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.045);
-  color: #ffffff;
+
+  background:
+    rgba(255,255,255,.045);
+
+  color: #fff;
+
   cursor: pointer;
+
   transition:
-    transform 0.15s ease,
-    border-color 0.15s ease,
-    background 0.15s ease;
+    transform .15s ease,
+    border-color .15s ease,
+    background .15s ease;
 }
 
-.animal-card:active {
-  transform: scale(0.95);
+.character-card:active {
+  transform: scale(.95);
 }
 
-.animal-card.selected {
+.character-card.selected {
   border-color: #4df5ff;
-  background: rgba(77, 245, 255, 0.11);
+
+  background:
+    rgba(77,245,255,.11);
+
   box-shadow:
-    0 0 0 1px rgba(77, 245, 255, 0.2),
-    0 0 24px rgba(77, 245, 255, 0.12);
+    0 0 0 1px rgba(77,245,255,.2),
+    0 0 24px rgba(77,245,255,.12);
 }
 
-.animal-icon {
+.character-icon {
   display: block;
+
   font-size: 34px;
+
   line-height: 1;
 }
 
-.animal-name {
+.character-name {
   display: block;
+
   margin-top: 7px;
+
   font-size: 8px;
   font-weight: 900;
+
   letter-spacing: 1px;
-  opacity: 0.7;
+
+  opacity: .7;
 }
 
-.animal-check {
+.character-check {
   position: absolute;
+
   top: 6px;
   right: 7px;
+
   display: none;
+
+  color: #4df5ff;
+
   font-size: 11px;
   font-weight: 900;
-  color: #4df5ff;
 }
 
-.animal-card.selected .animal-check {
+.character-card.selected .character-check {
   display: block;
 }
 
 
 /* =========================
-   START BUTTON
+   START
 ========================= */
 
 .start-button {
   width: min(100%, 280px);
+
   min-height: 60px;
+
   padding: 0 22px;
+
   border: 0;
+
   border-radius: 18px;
-  background: #ffffff;
+
+  background: #fff;
+
   color: #070912;
+
   font-size: 15px;
+
   font-weight: 1000;
+
   letter-spacing: 1px;
+
   cursor: pointer;
+
   box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.3);
+    0 10px 30px rgba(0,0,0,.3);
+
   transition:
-    transform 0.15s ease,
-    opacity 0.15s ease;
+    transform .15s ease,
+    opacity .15s ease;
 }
 
 .start-button:active {
-  transform: scale(0.96);
+  transform: scale(.96);
 }
 
 .start-button:hover {
-  opacity: 0.92;
+  opacity: .92;
 }
 
 
@@ -322,99 +396,139 @@ canvas {
 
 .instructions {
   margin-top: 15px;
+
   font-size: 9px;
+
   font-weight: 800;
+
   letter-spacing: 1.4px;
-  opacity: 0.42;
+
+  opacity: .42;
 }
 
-.instructions span {
+.instructions > span {
   display: inline-block;
+
   margin-right: 4px;
 }
 
-.instructions #attackInstruction {
+#attackInstruction {
   margin-left: 12px;
 }
 
 
 /* =========================
-   BOTTOM CONTROLS
+   CONTROLS
 ========================= */
 
 .controls {
   display: grid !important;
-  grid-template-columns: minmax(0, 1fr) 112px minmax(0, 1fr) !important;
+
+  grid-template-columns:
+    minmax(0,1fr)
+    112px
+    minmax(0,1fr) !important;
+
   gap: 10px;
+
   width: 100%;
+
   margin-top: 12px;
 }
 
 .control-button {
   width: 100% !important;
+
   min-width: 0;
+
   height: 64px;
+
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+
+  border:
+    1px solid rgba(255,255,255,.1);
+
+  color: #fff;
+
   cursor: pointer;
+
   touch-action: manipulation;
+
   user-select: none;
-  -webkit-user-select: none;
+
   transition:
-    transform 0.1s ease,
-    background 0.1s ease;
+    transform .1s ease,
+    background .1s ease;
 }
 
 .control-button:active {
-  transform: scale(0.94);
+  transform: scale(.94);
 }
 
 .move-button {
   background: #11182b;
+
   font-size: 30px;
+
   font-weight: 400;
 }
 
 .attack-button {
   display: flex;
+
   flex-direction: column;
+
   align-items: center;
+
   justify-content: center;
+
   gap: 1px;
+
   background: #2a1220;
-  border-color: rgba(255, 91, 114, 0.3);
+
+  border-color:
+    rgba(255,91,114,.3);
 }
 
 .attack-icon {
   font-size: 22px;
+
   line-height: 1;
 }
 
 .attack-label {
   font-size: 8px;
+
   font-weight: 900;
+
   letter-spacing: 1.2px;
 }
 
 .attack-button > span:last-child {
   font-size: 9px;
+
   font-weight: 900;
-  opacity: 0.65;
+
+  opacity: .65;
 }
 
 
 /* =========================
-   GAME MESSAGE
+   MESSAGE
 ========================= */
 
 .game-message {
   min-height: 18px;
+
   margin-top: 8px;
+
   text-align: center;
+
   font-size: 11px;
+
   font-weight: 800;
-  opacity: 0.65;
+
+  opacity: .65;
 }
 
 
@@ -431,19 +545,19 @@ canvas {
    SMALL PHONES
 ========================= */
 
-@media (max-width: 360px) {
+@media (max-width:360px) {
 
   .game-shell {
     padding-left: 10px;
     padding-right: 10px;
   }
 
-  .game-area {
-    border-radius: 20px;
-  }
-
   .controls {
-    grid-template-columns: minmax(0, 1fr) 96px minmax(0, 1fr) !important;
+    grid-template-columns:
+      minmax(0,1fr)
+      96px
+      minmax(0,1fr) !important;
+
     gap: 7px;
   }
 
@@ -451,26 +565,25 @@ canvas {
     height: 58px;
   }
 
-  .animal-grid {
+  .character-grid {
     gap: 6px;
   }
 
-  .animal-card {
+  .character-card {
     min-height: 80px;
   }
 
-  .animal-icon {
+  .character-icon {
     font-size: 29px;
   }
-
 }
 
 
 /* =========================
-   LANDSCAPE / SHORT SCREENS
+   SHORT SCREENS
 ========================= */
 
-@media (max-height: 650px) {
+@media (max-height:650px) {
 
   .game-area {
     min-height: 390px;
@@ -490,16 +603,15 @@ canvas {
     margin-bottom: 12px;
   }
 
-  .animal-card {
+  .character-card {
     min-height: 72px;
   }
 
-  .animal-icon {
+  .character-icon {
     font-size: 27px;
   }
 
   .start-button {
     min-height: 52px;
   }
-
 }
