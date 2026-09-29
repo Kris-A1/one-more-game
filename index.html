@@ -1,291 +1,185 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>1M — One More</title>
 
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    >
-
-    <title>1M</title>
-
-    <link
-        rel="stylesheet"
-        href="css/game.css"
-    >
-
+  <link rel="stylesheet" href="css/game.css?v=50">
 </head>
-
 
 <body>
 
-<main class="game-shell">
+  <main class="game-shell">
 
+    <header class="topbar">
+      <div>
+        <div class="logo">1M.</div>
+        <div id="levelName" class="level-name">NEON RUN</div>
+      </div>
 
-    <!-- HEADER -->
-
-    <header class="game-header">
-
-        <div>
-
-            <div class="game-name">
-                1M<span>.</span>
-            </div>
-
-            <div
-                id="levelSubtitle"
-                class="game-subtitle"
-            >
-                LEVEL 1 · NEON RUN
-            </div>
-
-        </div>
-
-
-        <div class="best-score">
-
-            <div>BEST</div>
-
-            <strong id="bestScore">
-                0
-            </strong>
-
-        </div>
-
+      <div class="best-box">
+        <span>BEST</span>
+        <strong id="bestScore">0</strong>
+      </div>
     </header>
 
 
-    <!-- GAME AREA -->
+    <section class="game-area">
 
-    <section class="game-container">
+      <canvas id="gameCanvas"></canvas>
 
-        <canvas
-            id="gameCanvas"
-            width="360"
-            height="490"
-        ></canvas>
+      <div class="hud">
 
-
-        <!-- SCORE -->
-
-        <div
-            id="scoreDisplay"
-            class="score-display"
-        >
-
-            <small>
-                SCORE
-            </small>
-
-            <strong id="score">
-                0
-            </strong>
-
+        <div class="score-box">
+          <span>SCORE</span>
+          <strong id="score">0</strong>
         </div>
 
-
-        <!-- MULTIPLIER -->
-
-        <div
-            id="multiplierDisplay"
-            class="multiplier-display"
-        >
-            ×1
+        <div class="multiplier-box">
+          <span>MULTIPLIER</span>
+          <strong id="multiplier">x1</strong>
         </div>
 
-
-        <!-- STRIKES -->
-
-        <div
-            id="strikeDisplay"
-            class="strike-display"
-        >
-            STRIKES ×3
+        <div id="strikeDisplay" class="strike-display hidden">
+          <span>STRIKES</span>
+          <strong id="strikes">×3</strong>
         </div>
 
-
-        <!-- START / GAME OVER -->
-
-        <div
-            id="gameOverlay"
-            class="game-overlay"
-        >
-
-            <div class="overlay-label">
-                JUST ONE MORE RUN
-            </div>
+      </div>
 
 
-            <h1 id="overlayTitle">
-                1M<span>.</span>
-            </h1>
+      <div id="overlay" class="overlay">
+
+        <div id="overlayLabel" class="overlay-label">
+          LEVEL 1
+        </div>
+
+        <h1 id="overlayTitle">NEON RUN</h1>
+
+        <p id="overlayText">
+          Dodge everything.<br>
+          How long can you survive?
+        </p>
 
 
-            <p id="overlayText">
-                Dodge. Survive.<br>
-                Beat your best.
-            </p>
+        <div id="animalChooser" class="animal-chooser hidden">
 
+          <div class="chooser-title">
+            CHOOSE YOUR RUNNER
+          </div>
 
-            <!-- LEVEL 3 ANIMAL SELECTOR -->
-
-            <div
-                id="animalChooser"
-                class="animal-chooser"
-            >
-
-                <div class="animal-title">
-                    CHOOSE YOUR RUNNER
-                </div>
-
-
-                <div class="animal-grid">
-
-
-                    <button
-                        type="button"
-                        class="animal-button selected"
-                        data-animal="BUNNY"
-                    >
-
-                        <span class="animal-emoji">
-                            🐰
-                        </span>
-
-                        <span class="animal-name">
-                            BUNNY
-                        </span>
-
-                    </button>
-
-
-                    <button
-                        type="button"
-                        class="animal-button"
-                        data-animal="FOX"
-                    >
-
-                        <span class="animal-emoji">
-                            🦊
-                        </span>
-
-                        <span class="animal-name">
-                            FOX
-                        </span>
-
-                    </button>
-
-
-                    <button
-                        type="button"
-                        class="animal-button"
-                        data-animal="CAT"
-                    >
-
-                        <span class="animal-emoji">
-                            🐱
-                        </span>
-
-                        <span class="animal-name">
-                            CAT
-                        </span>
-
-                    </button>
-
-
-                    <button
-                        type="button"
-                        class="animal-button"
-                        data-animal="PANDA"
-                    >
-
-                        <span class="animal-emoji">
-                            🐼
-                        </span>
-
-                        <span class="animal-name">
-                            PANDA
-                        </span>
-
-                    </button>
-
-
-                </div>
-
-            </div>
-
-
-            <!-- START -->
+          <div class="animal-grid">
 
             <button
-                id="startButton"
-                class="start-button"
+              type="button"
+              class="animal-card selected"
+              data-animal="BUNNY"
             >
-                ▶ START RUN
+              <span class="animal-icon">🐰</span>
+              <span class="animal-name">BUNNY</span>
+              <span class="animal-check">✓</span>
             </button>
 
+            <button
+              type="button"
+              class="animal-card"
+              data-animal="FOX"
+            >
+              <span class="animal-icon">🦊</span>
+              <span class="animal-name">FOX</span>
+              <span class="animal-check">✓</span>
+            </button>
 
-            <div class="instructions">
-                ← → MOVE
-            </div>
+            <button
+              type="button"
+              class="animal-card"
+              data-animal="CAT"
+            >
+              <span class="animal-icon">🐱</span>
+              <span class="animal-name">CAT</span>
+              <span class="animal-check">✓</span>
+            </button>
+
+            <button
+              type="button"
+              class="animal-card"
+              data-animal="PANDA"
+            >
+              <span class="animal-icon">🐼</span>
+              <span class="animal-name">PANDA</span>
+              <span class="animal-check">✓</span>
+            </button>
+
+          </div>
 
         </div>
+
+
+        <button
+          id="startButton"
+          type="button"
+          class="start-button"
+        >
+          ▶ START
+        </button>
+
+        <div class="instructions">
+          <span>← →</span> MOVE
+          <span id="attackInstruction" class="hidden">
+            <span>SPACE</span> STRIKE
+          </span>
+        </div>
+
+      </div>
 
     </section>
 
 
-    <!-- MOBILE CONTROLS -->
-
     <section class="controls">
 
-        <button
-            id="leftButton"
-            class="control-button move-button"
-            type="button"
-        >
-            ←
-        </button>
+      <button
+        id="leftButton"
+        type="button"
+        class="control-button move-button"
+        aria-label="Move left"
+      >
+        <span>←</span>
+      </button>
 
+      <button
+        id="attackButton"
+        type="button"
+        class="control-button attack-button hidden"
+        aria-label="Strike obstacle"
+      >
+        <span class="attack-icon">💥</span>
+        <span class="attack-label">STRIKE</span>
+        <span id="attackCount">×3</span>
+      </button>
 
-        <button
-            id="attackButton"
-            class="control-button attack-button"
-            type="button"
-        >
-            <span>💥</span>
-            <small>STRIKE ×3</small>
-        </button>
-
-
-        <button
-            id="rightButton"
-            class="control-button move-button"
-            type="button"
-        >
-            →
-        </button>
+      <button
+        id="rightButton"
+        type="button"
+        class="control-button move-button"
+        aria-label="Move right"
+      >
+        <span>→</span>
+      </button>
 
     </section>
 
 
     <div
-        id="gameMessage"
-        class="game-message"
-    >
-        Ready when you are.
-    </div>
+      id="gameMessage"
+      class="game-message"
+      aria-live="polite"
+    ></div>
+
+  </main>
 
 
-</main>
-
-
-<!-- CACHE VERSION -->
-
-<script src="js/game.js?v=41"></script>
+  <script src="js/game.js?v=50"></script>
 
 </body>
-
 </html>
