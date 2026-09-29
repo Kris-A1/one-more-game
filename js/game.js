@@ -1,60 +1,7 @@
 /* =========================================================
-   1M — ONE MORE
-   LEVELS 1–10
+   1M. — COMPLETE GAME
+   10 LEVELS
    ========================================================= */
-
-
-/* ---------------------------------------------------------
-   ELEMENTS
-   --------------------------------------------------------- */
-
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
-
-const gameContainer = document.getElementById("gameContainer");
-
-const scoreEl = document.getElementById("score");
-const bestScoreEl = document.getElementById("bestScore");
-const multiplierEl = document.getElementById("multiplier");
-const strikeDisplay = document.getElementById("strikeDisplay");
-
-const overlay = document.getElementById("overlay");
-const overlayLabel = document.getElementById("overlayLabel");
-const overlayTitle = document.getElementById("overlayTitle");
-const overlayText = document.getElementById("overlayText");
-
-const startButton = document.getElementById("startButton");
-
-const leftButton = document.getElementById("leftButton");
-const rightButton = document.getElementById("rightButton");
-const attackButton = document.getElementById("attackButton");
-
-const attackInstruction =
-    document.getElementById("attackInstruction");
-
-const animalChooser =
-    document.getElementById("animalChooser");
-
-const animalCards =
-    document.querySelectorAll(".animal-button");
-
-const gameMessage =
-    document.getElementById("gameMessage");
-
-
-/* ---------------------------------------------------------
-   LEVEL
-   --------------------------------------------------------- */
-
-const params =
-    new URLSearchParams(window.location.search);
-
-let level =
-    Number(params.get("level")) || 1;
-
-if (level < 1 || level > 10) {
-    level = 1;
-}
 
 
 /* ---------------------------------------------------------
@@ -65,1115 +12,730 @@ const LEVELS = {
 
     1: {
         name: "NEON RUN",
-        label: "LEVEL 1",
-
-        background: "#080d22",
-
-        playerColor: "#42f5ff",
-        obstacleColor: "#ff3b81",
-
-        speed: 175,
-        maxSpeed: 245,
-
-        attack: false,
-        strikes: 0,
-
-        world: "neon"
+        theme: "neon",
+        target: 350,
+        startSpeed: 175,
+        maxSpeed: 195,
+        strikes: false,
+        obstacle: "barrier"
     },
-
 
     2: {
         name: "NEON RUSH",
-        label: "LEVEL 2",
-
-        background: "#12081e",
-
-        playerColor: "#64a8ff",
-        obstacleColor: "#ff4d65",
-
-        speed: 205,
-        maxSpeed: 275,
-
-        attack: true,
-        strikes: 3,
-
-        world: "neonRush"
+        theme: "rush",
+        target: 500,
+        startSpeed: 200,
+        maxSpeed: 225,
+        strikes: false,
+        obstacle: "diamond"
     },
-
 
     3: {
         name: "ANIMAL RUN",
-        label: "LEVEL 3",
-
-        background: "#0a1912",
-
-        playerColor: "#ffe66b",
-        obstacleColor: "#b77b46",
-
-        speed: 220,
-        maxSpeed: 295,
-
-        attack: true,
-        strikes: 3,
-
-        world: "forest"
+        theme: "animal",
+        target: 650,
+        startSpeed: 215,
+        maxSpeed: 245,
+        strikes: false,
+        obstacle: "rock"
     },
-
 
     4: {
-        name: "ANIMAL RUSH",
-        label: "LEVEL 4",
-
-        background: "#081a10",
-
-        playerColor: "#ffe66b",
-        obstacleColor: "#805532",
-
-        speed: 235,
-        maxSpeed: 315,
-
-        attack: true,
-        strikes: 6,
-
-        world: "animalRush"
+        name: "OCEAN RUN",
+        theme: "ocean",
+        target: 800,
+        startSpeed: 225,
+        maxSpeed: 260,
+        strikes: true,
+        obstacle: "coral"
     },
-
 
     5: {
-        name: "FRUIT RUN",
-        label: "LEVEL 5",
-
-        background: "#17100b",
-
-        playerColor: "#ffdf72",
-        obstacleColor: "#f28c38",
-
-        speed: 250,
-        maxSpeed: 330,
-
-        attack: true,
-        strikes: 6,
-
-        world: "fruit"
+        name: "DESERT RUN",
+        theme: "desert",
+        target: 950,
+        startSpeed: 235,
+        maxSpeed: 275,
+        strikes: true,
+        obstacle: "sand"
     },
-
 
     6: {
-        name: "OCEAN",
-        label: "LEVEL 6",
-
-        background: "#061722",
-
-        playerColor: "#70efff",
-        obstacleColor: "#ff6d82",
-
-        speed: 265,
-        maxSpeed: 345,
-
-        attack: true,
-        strikes: 6,
-
-        world: "ocean"
+        name: "FOREST RUN",
+        theme: "forest",
+        target: 1100,
+        startSpeed: 245,
+        maxSpeed: 290,
+        strikes: true,
+        obstacle: "tree"
     },
-
 
     7: {
-        name: "DESERT",
-        label: "LEVEL 7",
-
-        background: "#24160a",
-
-        playerColor: "#ffe27a",
-        obstacleColor: "#bd7942",
-
-        speed: 280,
-        maxSpeed: 360,
-
-        attack: true,
-        strikes: 6,
-
-        world: "desert"
+        name: "SPACE RUN",
+        theme: "space",
+        target: 1250,
+        startSpeed: 255,
+        maxSpeed: 305,
+        strikes: true,
+        obstacle: "comet"
     },
-
 
     8: {
-        name: "FOREST",
-        label: "LEVEL 8",
-
-        background: "#09170d",
-
-        playerColor: "#91ff87",
-        obstacleColor: "#5f7b45",
-
-        speed: 295,
-        maxSpeed: 375,
-
-        attack: true,
-        strikes: 6,
-
-        world: "forestDeep"
+        name: "ICE RUN",
+        theme: "ice",
+        target: 1400,
+        startSpeed: 265,
+        maxSpeed: 320,
+        strikes: true,
+        obstacle: "iceberg"
     },
-
 
     9: {
-        name: "SPACE",
-        label: "LEVEL 9",
-
-        background: "#070b1c",
-
-        playerColor: "#c8d9ff",
-        obstacleColor: "#d5a2ff",
-
-        speed: 310,
-        maxSpeed: 395,
-
-        attack: true,
-        strikes: 6,
-
-        world: "space"
+        name: "FRUIT RUN",
+        theme: "fruit",
+        target: 1550,
+        startSpeed: 275,
+        maxSpeed: 335,
+        strikes: true,
+        obstacle: "fruit"
     },
 
-
     10: {
-        name: "ANTARCTICA",
-        label: "LEVEL 10",
-
-        background: "#101c29",
-
-        playerColor: "#e8fbff",
-        obstacleColor: "#7ed7ff",
-
-        speed: 325,
-        maxSpeed: 415,
-
-        attack: true,
-        strikes: 6,
-
-        world: "ice"
+        name: "CHAOS RUN",
+        theme: "chaos",
+        target: 1800,
+        startSpeed: 290,
+        maxSpeed: 355,
+        strikes: true,
+        obstacle: "chaos"
     }
 
 };
 
 
-const settings = LEVELS[level];
+/* ---------------------------------------------------------
+   URL / LEVEL
+   --------------------------------------------------------- */
+
+const params =
+    new URLSearchParams(
+        window.location.search
+    );
+
+
+let level =
+    Math.min(
+        10,
+        Math.max(
+            1,
+            Number(
+                params.get("level")
+            ) || 1
+        )
+    );
+
+
+const currentLevel =
+    LEVELS[level];
 
 
 /* ---------------------------------------------------------
-   STATE
+   DOM
    --------------------------------------------------------- */
 
-const canvasWidth = 360;
-const canvasHeight = 490;
+const canvas =
+    document.getElementById(
+        "gameCanvas"
+    );
+
+const ctx =
+    canvas.getContext("2d");
+
+
+const scoreElement =
+    document.getElementById("score");
+
+const bestElement =
+    document.getElementById("bestScore");
+
+const levelSubtitle =
+    document.getElementById(
+        "levelSubtitle"
+    );
+
+const multiplierDisplay =
+    document.getElementById(
+        "multiplierDisplay"
+    );
+
+const strikeDisplay =
+    document.getElementById(
+        "strikeDisplay"
+    );
+
+const gameOverlay =
+    document.getElementById(
+        "gameOverlay"
+    );
+
+const overlayLabel =
+    document.getElementById(
+        "overlayLabel"
+    );
+
+const overlayTitle =
+    document.getElementById(
+        "overlayTitle"
+    );
+
+const overlayText =
+    document.getElementById(
+        "overlayText"
+    );
+
+const startButton =
+    document.getElementById(
+        "startButton"
+    );
+
+const nextButton =
+    document.getElementById(
+        "nextButton"
+    );
+
+const retryButton =
+    document.getElementById(
+        "retryButton"
+    );
+
+const animalChooser =
+    document.getElementById(
+        "animalChooser"
+    );
+
+const animalButtons =
+    document.querySelectorAll(
+        ".animal-button"
+    );
+
+const leftButton =
+    document.getElementById(
+        "leftButton"
+    );
+
+const rightButton =
+    document.getElementById(
+        "rightButton"
+    );
+
+const attackButton =
+    document.getElementById(
+        "attackButton"
+    );
+
+const controls =
+    document.getElementById(
+        "controls"
+    );
+
+const gameMessage =
+    document.getElementById(
+        "gameMessage"
+    );
+
+const attackInstruction =
+    document.getElementById(
+        "attackInstruction"
+    );
+
+
+/* ---------------------------------------------------------
+   GAME STATE
+   --------------------------------------------------------- */
+
+const WIDTH = 360;
+const HEIGHT = 490;
 
 let running = false;
+
 let gameOver = false;
+
+let completed = false;
 
 let score = 0;
 
-const bestKey =
-    `1M_best_level_${level}`;
-
 let bestScore =
-    Number(localStorage.getItem(bestKey)) || 0;
+    Number(
+        localStorage.getItem(
+            `1M_best_${level}`
+        )
+    ) || 0;
+
+let strikes =
+    currentLevel.strikes
+        ? 3
+        : 0;
 
 let multiplier = 1;
 
-let strikes =
-    settings.strikes;
+let elapsed = 0;
 
-let selectedAnimal = "BUNNY";
-
-let lane = 1;
-let targetLane = 1;
-
-let obstacles = [];
-let particles = [];
-
-let spawnTimer = 0;
+let speed =
+    currentLevel.startSpeed;
 
 let lastTime = 0;
 
-let elapsed = 0;
+let spawnTimer = 0;
 
-let currentSpeed =
-    settings.speed;
+let particles = [];
 
-let animationId = null;
+let obstacles = [];
 
 
 /* ---------------------------------------------------------
-   SINGLE CHARACTER LEVELS
+   PLAYER
    --------------------------------------------------------- */
 
-const SINGLE_CHARACTERS = {
+const player = {
 
-    6: {
-        name: "FISH",
-        emoji: "🐟"
+    x: WIDTH / 2,
+
+    y: HEIGHT - 82,
+
+    width: 30,
+
+    height: 30,
+
+    moveSpeed: 280
+
+};
+
+
+let selectedAnimal =
+    localStorage.getItem(
+        "1M_selected_animal"
+    ) || "BUNNY";
+
+
+/* ---------------------------------------------------------
+   UNLOCKED LEVEL
+   --------------------------------------------------------- */
+
+let unlockedLevel =
+    Number(
+        localStorage.getItem(
+            "1M_unlocked_level"
+        )
+    ) || 1;
+
+
+/*
+   For testing:
+   ?level=2, ?level=3, etc.
+   will still open the requested level.
+
+   Normal progression is controlled by
+   the NEXT LEVEL button and saved progress.
+*/
+
+
+/* ---------------------------------------------------------
+   THEME COLORS
+   --------------------------------------------------------- */
+
+const THEMES = {
+
+    neon: {
+        background: "#071426",
+        road: "#0a1830",
+        grid: "#15385b",
+        player: "#55e8ff",
+        obstacle: "#ff3f91",
+        accent: "#55e8ff"
     },
 
-    7: {
-        name: "SUN",
-        emoji: "☀️"
+    rush: {
+        background: "#180a26",
+        road: "#210d34",
+        grid: "#4d205f",
+        player: "#55b9ff",
+        obstacle: "#ff405d",
+        accent: "#ff4d8d"
     },
 
-    8: {
-        name: "FLOWER",
-        emoji: "🌸"
+    animal: {
+        background: "#0a1b11",
+        road: "#0d2416",
+        grid: "#214b2e",
+        player: "#ffe45c",
+        obstacle: "#9b6035",
+        accent: "#9dff77"
     },
 
-    9: {
-        name: "ROBOT",
-        emoji: "🤖"
+    ocean: {
+        background: "#041b29",
+        road: "#06283a",
+        grid: "#0b526b",
+        player: "#65f2ff",
+        obstacle: "#ff6b9d",
+        accent: "#38d9ff"
     },
 
-    10: {
-        name: "ICECUBE",
-        emoji: "🧊"
+    desert: {
+        background: "#291609",
+        road: "#3b1e0c",
+        grid: "#75401d",
+        player: "#fff0a5",
+        obstacle: "#e79a45",
+        accent: "#ffbd55"
+    },
+
+    forest: {
+        background: "#07180d",
+        road: "#0c2614",
+        grid: "#1d4a28",
+        player: "#8cff7a",
+        obstacle: "#75502e",
+        accent: "#6aff8a"
+    },
+
+    space: {
+        background: "#050516",
+        road: "#080824",
+        grid: "#25255b",
+        player: "#ffffff",
+        obstacle: "#dca7ff",
+        accent: "#bd8cff"
+    },
+
+    ice: {
+        background: "#061b27",
+        road: "#082b3d",
+        grid: "#1a5870",
+        player: "#ffffff",
+        obstacle: "#79dcff",
+        accent: "#8ee9ff"
+    },
+
+    fruit: {
+        background: "#210817",
+        road: "#300b1f",
+        grid: "#5e1838",
+        player: "#ffe86a",
+        obstacle: "#ff537c",
+        accent: "#ffcb55"
+    },
+
+    chaos: {
+        background: "#120714",
+        road: "#21091f",
+        grid: "#572047",
+        player: "#ffffff",
+        obstacle: "#ff4f75",
+        accent: "#55e8ff"
     }
 
 };
 
 
 /* ---------------------------------------------------------
-   RESIZE
+   INITIAL UI
    --------------------------------------------------------- */
 
-function resizeCanvas() {
+function setupUI() {
 
-    const ratio =
-        Math.min(window.devicePixelRatio || 1, 2);
+    const theme =
+        THEMES[currentLevel.theme];
 
-    canvas.width =
-        canvasWidth * ratio;
+    document.body.style.background =
+        theme.background;
 
-    canvas.height =
-        canvasHeight * ratio;
+    levelSubtitle.textContent =
+        `LEVEL ${level} · ${currentLevel.name}`;
 
-    canvas.style.width =
-        "100%";
+    bestElement.textContent =
+        Math.floor(bestScore);
 
-    canvas.style.height =
-        "100%";
+    scoreElement.textContent =
+        "0";
 
-    ctx.setTransform(
-        ratio,
-        0,
-        0,
-        ratio,
-        0,
-        0
-    );
-}
+    multiplierDisplay.textContent =
+        "×1";
 
+    if (currentLevel.strikes) {
 
-/* ---------------------------------------------------------
-   LEVEL UI
-   --------------------------------------------------------- */
+        strikeDisplay.style.display =
+            "block";
 
-function setupLevelUI() {
+        attackButton.style.display =
+            "flex";
 
-    gameContainer.className =
-        `game-container level-${level}`;
+        attackInstruction.style.display =
+            "inline";
 
+    } else {
 
-    overlayLabel.textContent =
-        settings.label;
-
-
-    /* ---------------------------------------------
-       LEVEL 1
-       --------------------------------------------- */
-
-    if (level === 1) {
-
-        overlayTitle.innerHTML =
-            `NEON <span>RUN</span>`;
-
-        overlayText.innerHTML =
-            `Dodge everything.<br>How long can you survive?`;
-
-        animalChooser.classList.add("hidden");
-
-        strikeDisplay.classList.add("hidden");
-
-        attackButton.classList.add("hidden");
-
-        attackInstruction.classList.add("hidden");
-
-        startButton.textContent =
-            "▶ START";
-    }
-
-
-    /* ---------------------------------------------
-       LEVEL 2
-       --------------------------------------------- */
-
-    else if (level === 2) {
-
-        overlayTitle.innerHTML =
-            `NEON <span>RUSH</span>`;
-
-        overlayText.innerHTML =
-            `Dodge or destroy obstacles.<br>You have 3 strikes.`;
-
-        animalChooser.classList.add("hidden");
-
-        strikeDisplay.classList.remove("hidden");
-
-        attackButton.classList.remove("hidden");
-
-        attackInstruction.classList.remove("hidden");
-
-        startButton.textContent =
-            "▶ START";
-    }
-
-
-    /* ---------------------------------------------
-       LEVEL 3
-       --------------------------------------------- */
-
-    else if (level === 3) {
-
-        overlayTitle.innerHTML =
-            `ANIMAL <span>RUN</span>`;
-
-        overlayText.innerHTML =
-            `Choose your runner.<br>Dodge or destroy obstacles.`;
-
-        animalChooser.classList.remove("hidden");
-
-        strikeDisplay.classList.remove("hidden");
-
-        attackButton.classList.remove("hidden");
-
-        attackInstruction.classList.remove("hidden");
-
-        startButton.textContent =
-            `▶ START AS ${selectedAnimal}`;
-    }
-
-
-    /* ---------------------------------------------
-       LEVEL 4
-       --------------------------------------------- */
-
-    else if (level === 4) {
-
-        overlayTitle.innerHTML =
-            `ANIMAL <span>RUSH</span>`;
-
-        overlayText.innerHTML =
-            `Faster and harder.<br>You have 6 strikes.`;
-
-        animalChooser.classList.remove("hidden");
-
-        strikeDisplay.classList.remove("hidden");
-
-        attackButton.classList.remove("hidden");
-
-        attackInstruction.classList.remove("hidden");
-
-        startButton.textContent =
-            `▶ START AS ${selectedAnimal}`;
-    }
-
-
-    /* ---------------------------------------------
-       LEVEL 5
-       --------------------------------------------- */
-
-    else if (level === 5) {
-
-        overlayTitle.innerHTML =
-            `FRUIT <span>RUN</span>`;
-
-        overlayText.innerHTML =
-            `Dodge the fruit hazards.<br>You have 6 strikes.`;
-
-        animalChooser.classList.remove("hidden");
-
-        strikeDisplay.classList.remove("hidden");
-
-        attackButton.classList.remove("hidden");
-
-        attackInstruction.classList.remove("hidden");
-
-        startButton.textContent =
-            "▶ START";
-    }
-
-
-    /* ---------------------------------------------
-       LEVELS 6–10
-       --------------------------------------------- */
-
-    else {
-
-        const character =
-            SINGLE_CHARACTERS[level];
-
-        overlayTitle.innerHTML =
-            `${settings.name.split(" ")[0]} <span>RUN</span>`;
-
-        overlayText.innerHTML =
-            `Dodge the hazards.<br>You have 6 strikes.`;
-
-        animalChooser.classList.remove("hidden");
-
-        strikeDisplay.classList.remove("hidden");
-
-        attackButton.classList.remove("hidden");
-
-        attackInstruction.classList.remove("hidden");
-
-        startButton.textContent =
-            `▶ START AS ${character.name}`;
-    }
-
-
-    configureCharacterCards();
-
-    updateStrikeUI();
-}
-
-
-/* ---------------------------------------------------------
-   CHARACTER CARDS
-   --------------------------------------------------------- */
-
-function configureCharacterCards() {
-
-    animalCards.forEach(card => {
-
-        card.style.display = "";
-
-    });
-
-
-    /* Level 3 and 4 = animals */
-
-    if (level === 3 || level === 4) {
-
-        const animals = [
-            ["BUNNY", "🐰"],
-            ["FOX", "🦊"],
-            ["CAT", "🐱"],
-            ["PANDA", "🐼"]
-        ];
-
-        animalCards.forEach((card, index) => {
-
-            const emoji =
-                card.querySelector(".animal-emoji");
-
-            const name =
-                card.querySelector(".animal-name");
-
-            emoji.textContent =
-                animals[index][1];
-
-            name.textContent =
-                animals[index][0];
-
-            card.dataset.animal =
-                animals[index][0];
-
-            card.style.display =
-                "flex";
-        });
-
-        return;
-    }
-
-
-    /* Level 5 = fruits */
-
-    if (level === 5) {
-
-        const fruits = [
-            ["WATERMELON", "🍉"],
-            ["PINEAPPLE", "🍍"],
-            ["STRAWBERRY", "🍓"],
-            ["PEACH", "🍑"]
-        ];
-
-        animalCards.forEach((card, index) => {
-
-            const emoji =
-                card.querySelector(".animal-emoji");
-
-            const name =
-                card.querySelector(".animal-name");
-
-            emoji.textContent =
-                fruits[index][1];
-
-            name.textContent =
-                fruits[index][0];
-
-            card.dataset.animal =
-                fruits[index][0];
-
-            card.style.display =
-                "flex";
-        });
-
-        return;
-    }
-
-
-    /* Levels 6–10 = one character */
-
-    const character =
-        SINGLE_CHARACTERS[level];
-
-    if (!character) {
-        return;
-    }
-
-    const first =
-        animalCards[0];
-
-    first.querySelector(".animal-emoji").textContent =
-        character.emoji;
-
-    first.querySelector(".animal-name").textContent =
-        character.name;
-
-    first.dataset.animal =
-        character.name;
-
-    first.style.display =
-        "flex";
-
-
-    for (let i = 1; i < animalCards.length; i++) {
-        animalCards[i].style.display =
+        strikeDisplay.style.display =
             "none";
+
+        attackButton.style.display =
+            "none";
+
+        attackInstruction.style.display =
+            "none";
+
     }
+
+
+    if (level === 3) {
+
+        animalChooser.style.display =
+            "block";
+
+        updateAnimalSelection();
+
+    } else {
+
+        animalChooser.style.display =
+            "none";
+
+    }
+
+
+    if (level >= 4) {
+
+        overlayText.innerHTML =
+            `Dodge. Destroy.<br>Reach ${currentLevel.target}.`;
+
+    } else {
+
+        overlayText.innerHTML =
+            `Dodge. Survive.<br>Reach ${currentLevel.target}.`;
+
+    }
+
+
+    startButton.style.display =
+        "block";
+
+    nextButton.style.display =
+        "none";
+
+    retryButton.style.display =
+        "none";
+
+
+    if (level === 3) {
+
+        startButton.textContent =
+            `▶ START AS ${selectedAnimal}`;
+
+    } else {
+
+        startButton.textContent =
+            "▶ START RUN";
+
+    }
+
+
+    gameMessage.textContent =
+        `Target ${currentLevel.target}`;
 
 }
 
 
-/* ---------------------------------------------------------
-   CHARACTER SELECTION
-   --------------------------------------------------------- */
-
-animalCards.forEach(card => {
-
-    card.addEventListener("click", () => {
-
-        if (running) {
-            return;
-        }
-
-
-        if (
-            level !== 3 &&
-            level !== 4 &&
-            level !== 5
-        ) {
-            return;
-        }
-
-
-        animalCards.forEach(c => {
-            c.classList.remove("selected");
-        });
-
-
-        card.classList.add("selected");
-
-
-        selectedAnimal =
-            card.dataset.animal;
-
-
-        if (level === 3 || level === 4) {
-
-            startButton.textContent =
-                `▶ START AS ${selectedAnimal}`;
-        }
-
-
-        draw();
-    });
-
-});
+setupUI();
 
 
 /* ---------------------------------------------------------
-   STRIKE UI
+   ANIMAL SELECTION
    --------------------------------------------------------- */
 
-function updateStrikeUI() {
+function updateAnimalSelection() {
 
-    if (!settings.attack) {
+    animalButtons.forEach(
+        button => {
 
-        strikeDisplay.classList.add("hidden");
+            const animal =
+                button.dataset.animal;
 
-        return;
-    }
+            button.classList.toggle(
+                "selected",
+                animal === selectedAnimal
+            );
+
+        }
+    );
 
 
-    strikeDisplay.classList.remove("hidden");
+    startButton.textContent =
+        `▶ START AS ${selectedAnimal}`;
 
 
-    strikeDisplay.textContent =
-        `STRIKES ${strikes}`;
+    localStorage.setItem(
+        "1M_selected_animal",
+        selectedAnimal
+    );
 
-
-    attackButton.style.opacity =
-        strikes > 0 ? "1" : "0.4";
 }
 
 
+animalButtons.forEach(
+    button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                selectedAnimal =
+                    button.dataset.animal;
+
+                updateAnimalSelection();
+
+            }
+        );
+
+    }
+);
+
+
 /* ---------------------------------------------------------
-   START
+   START GAME
    --------------------------------------------------------- */
 
 function startGame() {
 
     running = true;
+
     gameOver = false;
+
+    completed = false;
 
     score = 0;
 
     multiplier = 1;
 
-    strikes =
-        settings.strikes;
+    elapsed = 0;
 
-    lane = 1;
-    targetLane = 1;
-
-    obstacles = [];
-    particles = [];
+    speed =
+        currentLevel.startSpeed;
 
     spawnTimer = 0;
 
-    elapsed = 0;
+    particles = [];
 
-    currentSpeed =
-        settings.speed;
+    obstacles = [];
+
+    strikes =
+        currentLevel.strikes
+            ? 3
+            : 0;
+
+
+    player.x =
+        WIDTH / 2;
+
+
+    scoreElement.textContent =
+        "0";
+
+    multiplierDisplay.textContent =
+        "×1";
+
+
+    if (currentLevel.strikes) {
+
+        strikeDisplay.style.display =
+            "block";
+
+        strikeDisplay.textContent =
+            "💥 ×3";
+
+    }
+
+
+    gameOverlay.style.display =
+        "none";
+
+
+    controls.style.display =
+        "grid";
+
+
+    gameMessage.textContent =
+        level >= 4
+            ? "Dodge or destroy."
+            : "Stay alive.";
+
 
     lastTime =
         performance.now();
 
 
-    overlay.style.display =
-        "none";
-
-
-    gameMessage.textContent =
-        "ONE MORE.";
-
-
-    updateHUD();
-
-    updateStrikeUI();
-
-
-    cancelAnimationFrame(animationId);
-
-    animationId =
-        requestAnimationFrame(gameLoop);
-}
-
-
-/* ---------------------------------------------------------
-   GAME LOOP
-   --------------------------------------------------------- */
-
-function gameLoop(timestamp) {
-
-    if (!running) {
-        return;
-    }
-
-
-    let delta =
-        (timestamp - lastTime) / 1000;
-
-
-    lastTime =
-        timestamp;
-
-
-    delta =
-        Math.min(delta, 0.035);
-
-
-    update(delta);
-
-    draw();
-
-
-    animationId =
-        requestAnimationFrame(gameLoop);
-}
-
-
-/* ---------------------------------------------------------
-   UPDATE
-   --------------------------------------------------------- */
-
-function update(delta) {
-
-    elapsed += delta;
-
-
-    /* gradual difficulty */
-
-    const difficulty =
-        Math.min(elapsed / 70, 1);
-
-
-    currentSpeed =
-        settings.speed +
-        (settings.maxSpeed - settings.speed) *
-        difficulty;
-
-
-    /* multiplier */
-
-    multiplier =
-        Math.min(
-            1 + Math.floor(elapsed / 10),
-            9
-        );
-
-
-    /* score */
-
-    score +=
-        delta * 10 * multiplier;
-
-
-    /* lane movement */
-
-    lane +=
-        (targetLane - lane) *
-        Math.min(delta * 13, 1);
-
-
-    /* spawn */
-
-    spawnTimer -= delta;
-
-
-    /*
-       The original rhythm remains the foundation.
-       Higher levels simply tighten the timing.
-    */
-
-    const levelPressure =
-        Math.min(
-            Math.max(level - 3, 0) * 0.025,
-            0.15
-        );
-
-
-    const spawnInterval =
-        Math.max(
-            0.36,
-            0.88 -
-            elapsed * 0.004 -
-            levelPressure
-        );
-
-
-    if (spawnTimer <= 0) {
-
-        spawnObstacle();
-
-        spawnTimer =
-            spawnInterval;
-    }
-
-
-    /* obstacles */
-
-    for (let i = obstacles.length - 1; i >= 0; i--) {
-
-        const obstacle =
-            obstacles[i];
-
-
-        obstacle.y +=
-            currentSpeed * delta;
-
-
-        if (!obstacle.passed &&
-            obstacle.y > canvasHeight - 60) {
-
-            obstacle.passed = true;
-
-            score +=
-                10 * multiplier;
-        }
-
-
-        /*
-           Collision zone
-        */
-
-        if (
-            obstacle.y >
-                canvasHeight - 155 &&
-            obstacle.y <
-                canvasHeight - 70 &&
-            Math.abs(
-                obstacle.lane - lane
-            ) < 0.34
-        ) {
-
-            endGame();
-
-            return;
-        }
-
-
-        if (
-            obstacle.y >
-            canvasHeight + 70
-        ) {
-
-            obstacles.splice(i, 1);
-        }
-
-    }
-
-
-    /* particles */
-
-    for (
-        let i = particles.length - 1;
-        i >= 0;
-        i--
-    ) {
-
-        const p =
-            particles[i];
-
-        p.x += p.vx * delta;
-        p.y += p.vy * delta;
-
-        p.life -= delta;
-
-        p.vy +=
-            90 * delta;
-
-
-        if (p.life <= 0) {
-            particles.splice(i, 1);
-        }
-    }
-
-
-    updateHUD();
-}
-
-
-/* ---------------------------------------------------------
-   SPAWN OBSTACLE
-   --------------------------------------------------------- */
-
-function spawnObstacle() {
-
-    const laneIndex =
-        Math.floor(Math.random() * 3);
-
-
-    obstacles.push({
-
-        lane: laneIndex,
-
-        y: -45,
-
-        size:
-            30 + Math.random() * 8,
-
-        passed: false,
-
-        variant:
-            Math.floor(
-                Math.random() * 3
-            )
-
-    });
-
-
-    /*
-       Keep the original double-obstacle
-       idea, but only after the game has
-       had time to build up.
-    */
-
-    if (
-        elapsed > 22 &&
-        Math.random() < (
-            0.16 +
-            Math.min(
-                Math.max(level - 3, 0) * 0.015,
-                0.08
-            )
-        )
-    ) {
-
-        let secondLane =
-            Math.floor(Math.random() * 3);
-
-
-        while (
-            secondLane === laneIndex
-        ) {
-
-            secondLane =
-                Math.floor(Math.random() * 3);
-        }
-
-
-        obstacles.push({
-
-            lane: secondLane,
-
-            y: -120,
-
-            size:
-                30 + Math.random() * 8,
-
-            passed: false,
-
-            variant:
-                Math.floor(
-                    Math.random() * 3
-                )
-
-        });
-
-    }
-
-}
-
-
-/* ---------------------------------------------------------
-   ATTACK
-   --------------------------------------------------------- */
-
-function attack() {
-
-    if (!running) {
-        return;
-    }
-
-
-    if (!settings.attack) {
-        return;
-    }
-
-
-    if (strikes <= 0) {
-        return;
-    }
-
-
-    let closest = null;
-    let closestDistance = Infinity;
-
-
-    for (const obstacle of obstacles) {
-
-        if (
-            obstacle.lane !==
-            Math.round(lane)
-        ) {
-            continue;
-        }
-
-
-        const distance =
-            Math.abs(
-                obstacle.y -
-                (canvasHeight - 112)
-            );
-
-
-        if (
-            obstacle.y >
-                canvasHeight - 330 &&
-            obstacle.y <
-                canvasHeight - 45 &&
-            distance <
-                closestDistance
-        ) {
-
-            closest =
-                obstacle;
-
-            closestDistance =
-                distance;
-        }
-
-    }
-
-
-    if (!closest) {
-
-        gameMessage.textContent =
-            "MISS.";
-
-        return;
-    }
-
-
-    const perfect =
-        closestDistance < 65;
-
-
-    createExplosion(
-        laneX(closest.lane),
-        closest.y
+    requestAnimationFrame(
+        gameLoop
     );
 
-
-    const index =
-        obstacles.indexOf(closest);
-
-
-    if (index !== -1) {
-        obstacles.splice(index, 1);
-    }
-
-
-    strikes--;
-
-
-    if (perfect) {
-
-        score +=
-            70 * multiplier;
-
-        gameMessage.textContent =
-            "PERFECT HIT!";
-    }
-
-    else {
-
-        score +=
-            40 * multiplier;
-
-        gameMessage.textContent =
-            "HIT!";
-    }
-
-
-    updateStrikeUI();
-    updateHUD();
 }
+
+
+/* ---------------------------------------------------------
+   START BUTTON
+   --------------------------------------------------------- */
+
+startButton.addEventListener(
+    "click",
+    startGame
+);
+
+
+/* ---------------------------------------------------------
+   RETRY
+   --------------------------------------------------------- */
+
+retryButton.addEventListener(
+    "click",
+    () => {
+
+        setupUI();
+
+        startGame();
+
+    }
+);
+
+
+/* ---------------------------------------------------------
+   NEXT LEVEL
+   --------------------------------------------------------- */
+
+nextButton.addEventListener(
+    "click",
+    () => {
+
+        if (level >= 10) {
+
+            level = 1;
+
+            unlockedLevel = 1;
+
+            localStorage.setItem(
+                "1M_unlocked_level",
+                "1"
+            );
+
+        } else {
+
+            level++;
+
+        }
+
+
+        window.location.href =
+            `?level=${level}`;
+
+    }
+);
 
 
 /* ---------------------------------------------------------
@@ -1182,2551 +744,44 @@ function attack() {
 
 function moveLeft() {
 
-    if (!running) {
-        return;
-    }
+    if (!running) return;
 
-    targetLane =
-        Math.max(
-            0,
-            targetLane - 1
-        );
+    player.x -=
+        player.moveSpeed * 0.08;
+
+    clampPlayer();
+
 }
 
 
 function moveRight() {
 
-    if (!running) {
-        return;
-    }
+    if (!running) return;
 
-    targetLane =
-        Math.min(
-            2,
-            targetLane + 1
-        );
-}
+    player.x +=
+        player.moveSpeed * 0.08;
 
-
-/* ---------------------------------------------------------
-   END GAME
-   --------------------------------------------------------- */
-
-function endGame() {
-
-    if (!running) {
-        return;
-    }
-
-
-    running = false;
-
-    gameOver = true;
-
-
-    const finalScore =
-        Math.floor(score);
-
-
-    if (finalScore > bestScore) {
-
-        bestScore =
-            finalScore;
-
-        localStorage.setItem(
-            bestKey,
-            bestScore
-        );
-    }
-
-
-    bestScoreEl.textContent =
-        bestScore;
-
-
-    createExplosion(
-        laneX(lane),
-        canvasHeight - 112
-    );
-
-
-    overlay.style.display =
-        "flex";
-
-
-    overlayLabel.textContent =
-        settings.label;
-
-
-    overlayTitle.innerHTML =
-        `RUN <span>OVER</span>`;
-
-
-    overlayText.innerHTML =
-        `SCORE ${finalScore}<br>
-         BEST ${bestScore}<br>
-         Ready for one more?`;
-
-
-    if (level === 3 || level === 4) {
-
-        startButton.textContent =
-            `▶ RUN AS ${selectedAnimal}`;
-    }
-
-    else if (level >= 6) {
-
-        startButton.textContent =
-            `▶ RUN AS ${SINGLE_CHARACTERS[level].name}`;
-    }
-
-    else {
-
-        startButton.textContent =
-            "▶ TRY AGAIN";
-    }
-
-
-    gameMessage.textContent =
-        "ONE MORE.";
-
-
-    updateHUD();
-
-
-    /*
-       Level progression message
-    */
-
-    if (
-        level < 10 &&
-        finalScore >= 500
-    ) {
-
-        gameMessage.textContent =
-            `LEVEL ${level + 1} AWAITS.`;
-    }
+    clampPlayer();
 
 }
 
 
-/* ---------------------------------------------------------
-   HUD
-   --------------------------------------------------------- */
+function clampPlayer() {
 
-function updateHUD() {
+    const half =
+        player.width / 2;
 
-    scoreEl.textContent =
-        Math.floor(score);
-
-
-    multiplierEl.textContent =
-        `x${multiplier}`;
-
-
-    if (settings.attack) {
-
-        strikeDisplay.textContent =
-            `STRIKES ${strikes}`;
-    }
+    player.x =
+        Math.max(
+            half + 12,
+            Math.min(
+                WIDTH - half - 12,
+                player.x
+            )
+        );
 
 }
 
-
-/* ---------------------------------------------------------
-   DRAW
-   --------------------------------------------------------- */
-
-function draw() {
-
-    ctx.clearRect(
-        0,
-        0,
-        canvasWidth,
-        canvasHeight
-    );
-
-
-    ctx.fillStyle =
-        settings.background;
-
-    ctx.fillRect(
-        0,
-        0,
-        canvasWidth,
-        canvasHeight
-    );
-
-
-    drawBackground();
-
-    drawTrack();
-
-
-    for (const obstacle of obstacles) {
-
-        drawObstacle(obstacle);
-    }
-
-
-    drawPlayer();
-
-
-    for (const p of particles) {
-
-        ctx.save();
-
-        ctx.globalAlpha =
-            Math.max(
-                p.life / p.maxLife,
-                0
-            );
-
-        ctx.fillStyle =
-            p.color;
-
-        ctx.beginPath();
-
-        ctx.arc(
-            p.x,
-            p.y,
-            p.size,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-        ctx.restore();
-    }
-
-}
-
-
-/* ---------------------------------------------------------
-   BACKGROUND
-   --------------------------------------------------------- */
-
-function drawBackground() {
-
-    if (settings.world === "neon") {
-
-        drawNeonCity(
-            18,
-            "#132b4f",
-            "#21133c"
-        );
-
-        return;
-    }
-
-
-    if (settings.world === "neonRush") {
-
-        drawNeonCity(
-            22,
-            "#45144d",
-            "#162c54"
-        );
-
-        return;
-    }
-
-
-    if (
-        settings.world === "forest" ||
-        settings.world === "animalRush"
-    ) {
-
-        drawForest(
-            settings.world === "animalRush"
-                ? 16
-                : 12
-        );
-
-        return;
-    }
-
-
-    if (settings.world === "fruit") {
-
-        drawFruitWorld();
-
-        return;
-    }
-
-
-    if (settings.world === "ocean") {
-
-        drawOcean();
-
-        return;
-    }
-
-
-    if (settings.world === "desert") {
-
-        drawDesert();
-
-        return;
-    }
-
-
-    if (settings.world === "forestDeep") {
-
-        drawDeepForest();
-
-        return;
-    }
-
-
-    if (settings.world === "space") {
-
-        drawSpace();
-
-        return;
-    }
-
-
-    if (settings.world === "ice") {
-
-        drawIce();
-
-        return;
-    }
-
-}
-
-
-/* ---------------------------------------------------------
-   NEON CITY
-   --------------------------------------------------------- */
-
-function drawNeonCity(
-    count,
-    colorA,
-    colorB
-) {
-
-    const buildingWidth =
-        canvasWidth / count;
-
-
-    for (let i = 0; i < count; i++) {
-
-        const height =
-            70 +
-            ((i * 37) % 100);
-
-
-        ctx.fillStyle =
-            i % 2 === 0
-                ? colorA
-                : colorB;
-
-
-        ctx.globalAlpha =
-            0.25;
-
-
-        ctx.fillRect(
-            i * buildingWidth,
-            100 - height / 3,
-            buildingWidth + 2,
-            height
-        );
-
-
-        ctx.globalAlpha =
-            1;
-    }
-
-}
-
-
-/* ---------------------------------------------------------
-   FOREST
-   --------------------------------------------------------- */
-
-function drawForest(count) {
-
-    for (let i = 0; i < count; i++) {
-
-        const x =
-            (i + 0.5) *
-            (canvasWidth / count);
-
-
-        const y =
-            145 +
-            ((i * 19) % 75);
-
-
-        drawTree(
-            x,
-            y,
-            0.7 +
-            ((i % 3) * 0.12)
-        );
-    }
-
-}
-
-
-/* ---------------------------------------------------------
-   DEEP FOREST
-   --------------------------------------------------------- */
-
-function drawDeepForest() {
-
-    drawForest(18);
-
-
-    ctx.strokeStyle =
-        "rgba(67,125,72,0.28)";
-
-    ctx.lineWidth = 3;
-
-
-    for (let i = 0; i < 7; i++) {
-
-        const x =
-            20 +
-            i * 55;
-
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            x,
-            0
-        );
-
-        ctx.quadraticCurveTo(
-            x - 15,
-            70,
-            x + 5,
-            140
-        );
-
-        ctx.stroke();
-    }
-
-}
-
-
-/* ---------------------------------------------------------
-   FRUIT WORLD
-   --------------------------------------------------------- */
-
-function drawFruitWorld() {
-
-    ctx.fillStyle =
-        "rgba(72,38,18,0.28)";
-
-    ctx.fillRect(
-        0,
-        100,
-        canvasWidth,
-        150
-    );
-
-
-    for (let i = 0; i < 9; i++) {
-
-        const x =
-            20 +
-            ((i * 43) % 320);
-
-        const y =
-            110 +
-            ((i * 31) % 90);
-
-
-        ctx.font =
-            "24px Arial";
-
-        ctx.globalAlpha =
-            0.25;
-
-        ctx.fillText(
-            ["🍃", "🍉", "🍓"][i % 3],
-            x,
-            y
-        );
-
-        ctx.globalAlpha =
-            1;
-    }
-
-}
-
-
-/* ---------------------------------------------------------
-   OCEAN
-   --------------------------------------------------------- */
-
-function drawOcean() {
-
-    ctx.fillStyle =
-        "rgba(35,135,165,0.12)";
-
-    for (let i = 0; i < 6; i++) {
-
-        ctx.beginPath();
-
-        ctx.arc(
-            40 + i * 70,
-            150 + (i % 2) * 30,
-            55,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-    }
-
-
-    ctx.strokeStyle =
-        "rgba(90,220,240,0.15)";
-
-    ctx.lineWidth = 2;
-
-
-    for (let i = 0; i < 8; i++) {
-
-        const y =
-            120 + i * 28;
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            0,
-            y
-        );
-
-        ctx.quadraticCurveTo(
-            80,
-            y - 12,
-            180,
-            y
-        );
-
-        ctx.quadraticCurveTo(
-            260,
-            y + 12,
-            360,
-            y
-        );
-
-        ctx.stroke();
-    }
-
-}
-
-
-/* ---------------------------------------------------------
-   DESERT
-   --------------------------------------------------------- */
-
-function drawDesert() {
-
-    ctx.fillStyle =
-        "rgba(220,150,65,0.12)";
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        0,
-        190
-    );
-
-    ctx.quadraticCurveTo(
-        80,
-        135,
-        170,
-        190
-    );
-
-    ctx.quadraticCurveTo(
-        270,
-        245,
-        360,
-        175
-    );
-
-    ctx.lineTo(
-        360,
-        260
-    );
-
-    ctx.lineTo(
-        0,
-        260
-    );
-
-    ctx.closePath();
-
-    ctx.fill();
-
-
-    for (let i = 0; i < 6; i++) {
-
-        const x =
-            25 + i * 65;
-
-        ctx.fillStyle =
-            "rgba(244,194,100,0.35)";
-
-        ctx.fillRect(
-            x,
-            105 + (i % 3) * 25,
-            3,
-            32
-        );
-    }
-
-}
-
-
-/* ---------------------------------------------------------
-   SPACE
-   --------------------------------------------------------- */
-
-function drawSpace() {
-
-    ctx.fillStyle =
-        "rgba(255,255,255,0.7)";
-
-
-    for (let i = 0; i < 55; i++) {
-
-        const x =
-            (i * 71) % canvasWidth;
-
-        const y =
-            (i * 37) % 280;
-
-        const size =
-            i % 5 === 0
-                ? 2
-                : 1;
-
-
-        ctx.fillRect(
-            x,
-            y,
-            size,
-            size
-        );
-    }
-
-
-    ctx.strokeStyle =
-        "rgba(100,130,255,0.12)";
-
-    ctx.lineWidth = 1;
-
-
-    ctx.beginPath();
-
-    ctx.arc(
-        280,
-        100,
-        55,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.stroke();
-
-}
-
-
-/* ---------------------------------------------------------
-   ICE
-   --------------------------------------------------------- */
-
-function drawIce() {
-
-    ctx.fillStyle =
-        "rgba(180,230,255,0.12)";
-
-
-    for (let i = 0; i < 8; i++) {
-
-        const x =
-            i * 52;
-
-        const height =
-            45 + (i % 3) * 25;
-
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            x,
-            220
-        );
-
-        ctx.lineTo(
-            x + 25,
-            220 - height
-        );
-
-        ctx.lineTo(
-            x + 48,
-            220
-        );
-
-        ctx.closePath();
-
-        ctx.fill();
-    }
-
-
-    ctx.fillStyle =
-        "rgba(255,255,255,0.55)";
-
-
-    for (let i = 0; i < 30; i++) {
-
-        const x =
-            (i * 53) % canvasWidth;
-
-        const y =
-            (i * 29) % 260;
-
-
-        ctx.beginPath();
-
-        ctx.arc(
-            x,
-            y,
-            1.3,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-    }
-
-}
-
-
-/* ---------------------------------------------------------
-   TRACK
-   --------------------------------------------------------- */
-
-function drawTrack() {
-
-    const trackTop =
-        canvasHeight - 205;
-
-
-    ctx.fillStyle =
-        "rgba(255,255,255,0.025)";
-
-    ctx.fillRect(
-        0,
-        trackTop,
-        canvasWidth,
-        205
-    );
-
-
-    ctx.strokeStyle =
-        "rgba(255,255,255,0.07)";
-
-    ctx.lineWidth = 1;
-
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        canvasWidth / 3,
-        trackTop
-    );
-
-    ctx.lineTo(
-        canvasWidth / 3,
-        canvasHeight
-    );
-
-    ctx.moveTo(
-        canvasWidth * 2 / 3,
-        trackTop
-    );
-
-    ctx.lineTo(
-        canvasWidth * 2 / 3,
-        canvasHeight
-    );
-
-    ctx.stroke();
-
-}
-
-
-/* ---------------------------------------------------------
-   PLAYER
-   --------------------------------------------------------- */
-
-function drawPlayer() {
-
-    const x =
-        laneX(lane);
-
-    const y =
-        canvasHeight - 112;
-
-
-    /*
-       Levels 3–10 use character runners.
-    */
-
-    if (level >= 3) {
-
-        drawCharacter(
-            x,
-            y
-        );
-
-        return;
-    }
-
-
-    /*
-       Original neon runner.
-    */
-
-    ctx.save();
-
-
-    ctx.shadowColor =
-        settings.playerColor;
-
-    ctx.shadowBlur =
-        16;
-
-
-    ctx.fillStyle =
-        settings.playerColor;
-
-
-    roundedRect(
-        x - 20,
-        y - 25,
-        40,
-        50,
-        13
-    );
-
-
-    ctx.fill();
-
-
-    ctx.shadowBlur = 0;
-
-
-    ctx.fillStyle =
-        "#071018";
-
-
-    ctx.beginPath();
-
-    ctx.arc(
-        x - 7,
-        y - 5,
-        3,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.arc(
-        x + 7,
-        y - 5,
-        3,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    ctx.strokeStyle =
-        settings.playerColor;
-
-    ctx.lineWidth = 4;
-
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        x - 8,
-        y + 25
-    );
-
-    ctx.lineTo(
-        x - 12,
-        y + 35
-    );
-
-    ctx.moveTo(
-        x + 8,
-        y + 25
-    );
-
-    ctx.lineTo(
-        x + 12,
-        y + 35
-    );
-
-    ctx.stroke();
-
-
-    ctx.restore();
-
-}
-
-
-/* ---------------------------------------------------------
-   CHARACTER
-   --------------------------------------------------------- */
-
-function drawCharacter(
-    x,
-    y
-) {
-
-    if (level === 3 || level === 4) {
-
-        drawAnimal(
-            x,
-            y,
-            selectedAnimal
-        );
-
-        return;
-    }
-
-
-    if (level === 5) {
-
-        drawFruitCharacter(
-            x,
-            y,
-            selectedAnimal
-        );
-
-        return;
-    }
-
-
-    if (level === 6) {
-
-        drawFish(
-            x,
-            y
-        );
-
-        return;
-    }
-
-
-    if (level === 7) {
-
-        drawSun(
-            x,
-            y
-        );
-
-        return;
-    }
-
-
-    if (level === 8) {
-
-        drawFlower(
-            x,
-            y
-        );
-
-        return;
-    }
-
-
-    if (level === 9) {
-
-        drawRobot(
-            x,
-            y
-        );
-
-        return;
-    }
-
-
-    if (level === 10) {
-
-        drawIceCube(
-            x,
-            y
-        );
-
-        return;
-    }
-
-}
-
-
-/* ---------------------------------------------------------
-   ANIMALS
-   --------------------------------------------------------- */
-
-function drawAnimal(
-    x,
-    y,
-    animal
-) {
-
-    ctx.save();
-
-
-    ctx.shadowColor =
-        "#ffe66b";
-
-    ctx.shadowBlur =
-        14;
-
-
-    ctx.fillStyle =
-        "#ffe66b";
-
-
-    ctx.beginPath();
-
-    ctx.arc(
-        x,
-        y,
-        23,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    ctx.shadowBlur = 0;
-
-
-    /* ears */
-
-    ctx.fillStyle =
-        "#ffe66b";
-
-
-    if (animal === "BUNNY") {
-
-        ctx.beginPath();
-
-        ctx.ellipse(
-            x - 10,
-            y - 29,
-            7,
-            18,
-            -0.15,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.ellipse(
-            x + 10,
-            y - 29,
-            7,
-            18,
-            0.15,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-    }
-
-
-    if (animal === "FOX") {
-
-        triangle(
-            x - 20,
-            y - 20,
-            x - 8,
-            y - 38,
-            x,
-            y - 20
-        );
-
-        triangle(
-            x + 20,
-            y - 20,
-            x + 8,
-            y - 38,
-            x,
-            y - 20
-        );
-    }
-
-
-    if (animal === "CAT") {
-
-        triangle(
-            x - 20,
-            y - 20,
-            x - 9,
-            y - 38,
-            x,
-            y - 20
-        );
-
-        triangle(
-            x + 20,
-            y - 20,
-            x + 9,
-            y - 38,
-            x,
-            y - 20
-        );
-    }
-
-
-    if (animal === "PANDA") {
-
-        ctx.fillStyle =
-            "#171717";
-
-
-        ctx.beginPath();
-
-        ctx.arc(
-            x - 14,
-            y - 14,
-            8,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.arc(
-            x + 14,
-            y - 14,
-            8,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-    }
-
-
-    /* eyes */
-
-    ctx.fillStyle =
-        "#111";
-
-
-    ctx.beginPath();
-
-    ctx.arc(
-        x - 8,
-        y - 3,
-        3,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.arc(
-        x + 8,
-        y - 3,
-        3,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    /* nose */
-
-    ctx.beginPath();
-
-    ctx.arc(
-        x,
-        y + 6,
-        3,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    /* legs */
-
-    ctx.strokeStyle =
-        "#ffe66b";
-
-    ctx.lineWidth = 5;
-
-    ctx.lineCap =
-        "round";
-
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        x - 10,
-        y + 20
-    );
-
-    ctx.lineTo(
-        x - 14,
-        y + 33
-    );
-
-    ctx.moveTo(
-        x + 10,
-        y + 20
-    );
-
-    ctx.lineTo(
-        x + 14,
-        y + 33
-    );
-
-    ctx.stroke();
-
-
-    ctx.restore();
-
-}
-
-
-/* ---------------------------------------------------------
-   FRUIT CHARACTER
-   --------------------------------------------------------- */
-
-function drawFruitCharacter(
-    x,
-    y,
-    fruit
-) {
-
-    const colors = {
-
-        WATERMELON: "#ff5f75",
-        PINEAPPLE: "#ffd45a",
-        STRAWBERRY: "#ff405c",
-        PEACH: "#ff9b6a"
-
-    };
-
-
-    const color =
-        colors[fruit] ||
-        "#ff6b6b";
-
-
-    ctx.save();
-
-
-    ctx.shadowColor =
-        color;
-
-    ctx.shadowBlur =
-        18;
-
-
-    ctx.fillStyle =
-        color;
-
-
-    ctx.beginPath();
-
-    ctx.arc(
-        x,
-        y,
-        23,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    ctx.shadowBlur = 0;
-
-
-    if (fruit === "PINEAPPLE") {
-
-        ctx.fillStyle =
-            "#72c85a";
-
-
-        for (let i = 0; i < 5; i++) {
-
-            triangle(
-                x - 12 + i * 6,
-                y - 18,
-                x - 8 + i * 6,
-                y - 34,
-                x - 2 + i * 6,
-                y - 18
-            );
-        }
-    }
-
-
-    if (fruit === "WATERMELON") {
-
-        ctx.strokeStyle =
-            "#4cae62";
-
-        ctx.lineWidth = 3;
-
-        ctx.beginPath();
-
-        ctx.arc(
-            x,
-            y,
-            18,
-            0.2,
-            Math.PI - 0.2
-        );
-
-        ctx.stroke();
-    }
-
-
-    ctx.fillStyle =
-        "#171717";
-
-
-    ctx.beginPath();
-
-    ctx.arc(
-        x - 7,
-        y - 3,
-        3,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.arc(
-        x + 7,
-        y - 3,
-        3,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    ctx.restore();
-
-}
-
-
-/* ---------------------------------------------------------
-   FISH
-   --------------------------------------------------------- */
-
-function drawFish(x, y) {
-
-    ctx.save();
-
-    ctx.shadowColor =
-        "#70efff";
-
-    ctx.shadowBlur =
-        16;
-
-
-    ctx.fillStyle =
-        "#70efff";
-
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-        x,
-        y,
-        25,
-        17,
-        0,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    triangle(
-        x - 22,
-        y,
-        x - 40,
-        y - 15,
-        x - 40,
-        y + 15
-    );
-
-
-    ctx.shadowBlur = 0;
-
-
-    ctx.fillStyle =
-        "#07151d";
-
-
-    ctx.beginPath();
-
-    ctx.arc(
-        x + 10,
-        y - 4,
-        3,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    ctx.restore();
-
-}
-
-
-/* ---------------------------------------------------------
-   SUN
-   --------------------------------------------------------- */
-
-function drawSun(x, y) {
-
-    ctx.save();
-
-    ctx.shadowColor =
-        "#ffe66b";
-
-    ctx.shadowBlur =
-        20;
-
-
-    ctx.strokeStyle =
-        "#ffe66b";
-
-    ctx.lineWidth = 5;
-
-
-    for (let i = 0; i < 8; i++) {
-
-        const a =
-            i * Math.PI / 4;
-
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            x + Math.cos(a) * 27,
-            y + Math.sin(a) * 27
-        );
-
-        ctx.lineTo(
-            x + Math.cos(a) * 36,
-            y + Math.sin(a) * 36
-        );
-
-        ctx.stroke();
-    }
-
-
-    ctx.fillStyle =
-        "#ffe66b";
-
-
-    ctx.beginPath();
-
-    ctx.arc(
-        x,
-        y,
-        23,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    ctx.restore();
-
-}
-
-
-/* ---------------------------------------------------------
-   FLOWER
-   --------------------------------------------------------- */
-
-function drawFlower(x, y) {
-
-    ctx.save();
-
-    ctx.shadowColor =
-        "#ff8ad8";
-
-    ctx.shadowBlur =
-        16;
-
-
-    const petalColors =
-        [
-            "#ff82d0",
-            "#a98cff",
-            "#ff9bc8",
-            "#7fe7ff"
-        ];
-
-
-    for (let i = 0; i < 8; i++) {
-
-        const a =
-            i * Math.PI / 4;
-
-
-        ctx.fillStyle =
-            petalColors[i % 4];
-
-
-        ctx.beginPath();
-
-        ctx.arc(
-            x + Math.cos(a) * 15,
-            y + Math.sin(a) * 15,
-            11,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-    }
-
-
-    ctx.fillStyle =
-        "#ffe66b";
-
-
-    ctx.beginPath();
-
-    ctx.arc(
-        x,
-        y,
-        11,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    ctx.restore();
-
-}
-
-
-/* ---------------------------------------------------------
-   ROBOT
-   --------------------------------------------------------- */
-
-function drawRobot(x, y) {
-
-    ctx.save();
-
-    ctx.shadowColor =
-        "#c8d9ff";
-
-    ctx.shadowBlur =
-        16;
-
-
-    ctx.fillStyle =
-        "#c8d9ff";
-
-
-    roundedRect(
-        x - 22,
-        y - 24,
-        44,
-        45,
-        8
-    );
-
-
-    ctx.fill();
-
-
-    ctx.shadowBlur = 0;
-
-
-    ctx.fillStyle =
-        "#151b30";
-
-
-    ctx.beginPath();
-
-    ctx.arc(
-        x - 8,
-        y - 5,
-        4,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.arc(
-        x + 8,
-        y - 5,
-        4,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    ctx.strokeStyle =
-        "#c8d9ff";
-
-    ctx.lineWidth = 4;
-
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        x - 10,
-        y + 21
-    );
-
-    ctx.lineTo(
-        x - 14,
-        y + 34
-    );
-
-    ctx.moveTo(
-        x + 10,
-        y + 21
-    );
-
-    ctx.lineTo(
-        x + 14,
-        y + 34
-    );
-
-    ctx.stroke();
-
-
-    ctx.restore();
-
-}
-
-
-/* ---------------------------------------------------------
-   ICE CUBE
-   --------------------------------------------------------- */
-
-function drawIceCube(x, y) {
-
-    ctx.save();
-
-    ctx.shadowColor =
-        "#7ed7ff";
-
-    ctx.shadowBlur =
-        18;
-
-
-    ctx.fillStyle =
-        "#bcefff";
-
-
-    roundedRect(
-        x - 23,
-        y - 23,
-        46,
-        46,
-        9
-    );
-
-
-    ctx.fill();
-
-
-    ctx.strokeStyle =
-        "rgba(255,255,255,0.7)";
-
-    ctx.lineWidth = 2;
-
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        x - 12,
-        y - 15
-    );
-
-    ctx.lineTo(
-        x - 3,
-        y + 15
-    );
-
-    ctx.moveTo(
-        x + 10,
-        y - 18
-    );
-
-    ctx.lineTo(
-        x + 3,
-        y + 12
-    );
-
-    ctx.stroke();
-
-
-    ctx.restore();
-
-}
-
-
-/* ---------------------------------------------------------
-   OBSTACLES
-   --------------------------------------------------------- */
-
-function drawObstacle(obstacle) {
-
-    const x =
-        laneX(obstacle.lane);
-
-    const y =
-        obstacle.y;
-
-    const size =
-        obstacle.size;
-
-
-    /* ---------------------------------------------
-       LEVEL 1
-       --------------------------------------------- */
-
-    if (level === 1) {
-
-        ctx.save();
-
-        ctx.shadowColor =
-            settings.obstacleColor;
-
-        ctx.shadowBlur =
-            14;
-
-        ctx.fillStyle =
-            settings.obstacleColor;
-
-
-        roundedRect(
-            x - size / 2,
-            y - size / 2,
-            size,
-            size,
-            8
-        );
-
-
-        ctx.fill();
-
-        ctx.restore();
-
-        return;
-    }
-
-
-    /* ---------------------------------------------
-       LEVEL 2
-       --------------------------------------------- */
-
-    if (level === 2) {
-
-        ctx.save();
-
-        ctx.translate(
-            x,
-            y
-        );
-
-        ctx.rotate(
-            Math.PI / 4
-        );
-
-
-        ctx.fillStyle =
-            settings.obstacleColor;
-
-
-        ctx.shadowColor =
-            settings.obstacleColor;
-
-        ctx.shadowBlur =
-            12;
-
-
-        ctx.fillRect(
-            -size / 2,
-            -size / 2,
-            size,
-            size
-        );
-
-
-        ctx.restore();
-
-        return;
-    }
-
-
-    /* ---------------------------------------------
-       LEVEL 3 + 4
-       ROCK / LOG
-       --------------------------------------------- */
-
-    if (
-        level === 3 ||
-        level === 4 ||
-        level === 8
-    ) {
-
-        drawRockObstacle(
-            x,
-            y,
-            size
-        );
-
-        return;
-    }
-
-
-    /* ---------------------------------------------
-       LEVEL 5
-       FRUIT
-       --------------------------------------------- */
-
-    if (level === 5) {
-
-        drawFruitObstacle(
-            x,
-            y,
-            size,
-            obstacle.variant
-        );
-
-        return;
-    }
-
-
-    /* ---------------------------------------------
-       LEVEL 6
-       CORAL
-       --------------------------------------------- */
-
-    if (level === 6) {
-
-        drawCoralObstacle(
-            x,
-            y,
-            size
-        );
-
-        return;
-    }
-
-
-    /* ---------------------------------------------
-       LEVEL 7
-       SAND
-       --------------------------------------------- */
-
-    if (level === 7) {
-
-        drawSandObstacle(
-            x,
-            y,
-            size
-        );
-
-        return;
-    }
-
-
-    /* ---------------------------------------------
-       LEVEL 9
-       COMET
-       --------------------------------------------- */
-
-    if (level === 9) {
-
-        drawCometObstacle(
-            x,
-            y,
-            size
-        );
-
-        return;
-    }
-
-
-    /* ---------------------------------------------
-       LEVEL 10
-       ICEBERG
-       --------------------------------------------- */
-
-    if (level === 10) {
-
-        drawIcebergObstacle(
-            x,
-            y,
-            size
-        );
-
-    }
-
-}
-
-
-/* ---------------------------------------------------------
-   ROCK / LOG
-   --------------------------------------------------------- */
-
-function drawRockObstacle(
-    x,
-    y,
-    size
-) {
-
-    ctx.save();
-
-
-    ctx.fillStyle =
-        settings.obstacleColor;
-
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        x - size / 2,
-        y + size / 3
-    );
-
-    ctx.lineTo(
-        x - size / 3,
-        y - size / 2
-    );
-
-    ctx.lineTo(
-        x + size / 4,
-        y - size / 2
-    );
-
-    ctx.lineTo(
-        x + size / 2,
-        y
-    );
-
-    ctx.lineTo(
-        x + size / 3,
-        y + size / 2
-    );
-
-    ctx.lineTo(
-        x - size / 3,
-        y + size / 2
-    );
-
-    ctx.closePath();
-
-    ctx.fill();
-
-
-    if (level === 4) {
-
-        ctx.strokeStyle =
-            "rgba(45,25,10,0.55)";
-
-        ctx.lineWidth = 3;
-
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            x - size / 3,
-            y
-        );
-
-        ctx.lineTo(
-            x + size / 3,
-            y
-        );
-
-        ctx.stroke();
-    }
-
-
-    ctx.restore();
-
-}
-
-
-/* ---------------------------------------------------------
-   FRUIT OBSTACLE
-   --------------------------------------------------------- */
-
-function drawFruitObstacle(
-    x,
-    y,
-    size,
-    variant
-) {
-
-    const fruits =
-        ["🍉", "🍍", "🍓", "🍑"];
-
-
-    ctx.font =
-        `${Math.round(size + 12)}px Arial`;
-
-    ctx.textAlign =
-        "center";
-
-    ctx.textBaseline =
-        "middle";
-
-
-    ctx.fillText(
-        fruits[variant % fruits.length],
-        x,
-        y
-    );
-
-}
-
-
-/* ---------------------------------------------------------
-   CORAL OBSTACLE
-   --------------------------------------------------------- */
-
-function drawCoralObstacle(
-    x,
-    y,
-    size
-) {
-
-    ctx.save();
-
-    ctx.fillStyle =
-        "#ff718c";
-
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        x - size / 2,
-        y + size / 2
-    );
-
-    ctx.lineTo(
-        x - size / 3,
-        y - size / 3
-    );
-
-    ctx.lineTo(
-        x - size / 8,
-        y - size / 8
-    );
-
-    ctx.lineTo(
-        x,
-        y - size / 2
-    );
-
-    ctx.lineTo(
-        x + size / 8,
-        y - size / 8
-    );
-
-    ctx.lineTo(
-        x + size / 3,
-        y - size / 3
-    );
-
-    ctx.lineTo(
-        x + size / 2,
-        y + size / 2
-    );
-
-    ctx.closePath();
-
-    ctx.fill();
-
-
-    ctx.restore();
-
-}
-
-
-/* ---------------------------------------------------------
-   SAND OBSTACLE
-   --------------------------------------------------------- */
-
-function drawSandObstacle(
-    x,
-    y,
-    size
-) {
-
-    ctx.save();
-
-    ctx.fillStyle =
-        "#c88b4b";
-
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-        x,
-        y + 5,
-        size / 2,
-        size / 3,
-        0,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    ctx.fillStyle =
-        "rgba(255,220,140,0.35)";
-
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-        x - 5,
-        y,
-        size / 4,
-        size / 7,
-        0,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    ctx.restore();
-
-}
-
-
-/* ---------------------------------------------------------
-   COMET
-   --------------------------------------------------------- */
-
-function drawCometObstacle(
-    x,
-    y,
-    size
-) {
-
-    ctx.save();
-
-
-    ctx.strokeStyle =
-        "rgba(180,150,255,0.55)";
-
-    ctx.lineWidth =
-        size / 2;
-
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        x - size * 1.5,
-        y - size * 0.7
-    );
-
-    ctx.lineTo(
-        x,
-        y
-    );
-
-    ctx.stroke();
-
-
-    ctx.fillStyle =
-        "#d6a8ff";
-
-
-    ctx.shadowColor =
-        "#d6a8ff";
-
-    ctx.shadowBlur =
-        18;
-
-
-    ctx.beginPath();
-
-    ctx.arc(
-        x,
-        y,
-        size / 2,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    ctx.restore();
-
-}
-
-
-/* ---------------------------------------------------------
-   ICEBERG
-   --------------------------------------------------------- */
-
-function drawIcebergObstacle(
-    x,
-    y,
-    size
-) {
-
-    ctx.save();
-
-
-    ctx.fillStyle =
-        "#7ed7ff";
-
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        x - size / 2,
-        y + size / 2
-    );
-
-    ctx.lineTo(
-        x - size / 4,
-        y - size / 2
-    );
-
-    ctx.lineTo(
-        x + size / 8,
-        y - size / 5
-    );
-
-    ctx.lineTo(
-        x + size / 3,
-        y - size / 2
-    );
-
-    ctx.lineTo(
-        x + size / 2,
-        y + size / 2
-    );
-
-    ctx.closePath();
-
-    ctx.fill();
-
-
-    ctx.fillStyle =
-        "rgba(255,255,255,0.45)";
-
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        x - size / 4,
-        y - size / 2
-    );
-
-    ctx.lineTo(
-        x,
-        y - size / 10
-    );
-
-    ctx.lineTo(
-        x + size / 8,
-        y - size / 5
-    );
-
-    ctx.closePath();
-
-    ctx.fill();
-
-
-    ctx.restore();
-
-}
-
-
-/* ---------------------------------------------------------
-   EXPLOSION
-   --------------------------------------------------------- */
-
-function createExplosion(
-    x,
-    y
-) {
-
-    const count =
-        level >= 6
-            ? 20
-            : 15;
-
-
-    for (let i = 0; i < count; i++) {
-
-        const angle =
-            Math.random() *
-            Math.PI * 2;
-
-
-        const speed =
-            70 +
-            Math.random() * 150;
-
-
-        const color =
-            level === 10
-                ? "#bdefff"
-                : level === 9
-                    ? "#d3a6ff"
-                    : settings.playerColor;
-
-
-        particles.push({
-
-            x,
-            y,
-
-            vx:
-                Math.cos(angle) *
-                speed,
-
-            vy:
-                Math.sin(angle) *
-                speed,
-
-            size:
-                2 +
-                Math.random() * 4,
-
-            life:
-                0.35 +
-                Math.random() * 0.35,
-
-            maxLife:
-                0.7,
-
-            color
-
-        });
-    }
-
-}
-
-
-/* ---------------------------------------------------------
-   TREE
-   --------------------------------------------------------- */
-
-function drawTree(
-    x,
-    y,
-    scale
-) {
-
-    ctx.save();
-
-    ctx.globalAlpha =
-        0.35;
-
-
-    ctx.fillStyle =
-        "#4b3522";
-
-
-    ctx.fillRect(
-        x - 5 * scale,
-        y,
-        10 * scale,
-        75 * scale
-    );
-
-
-    ctx.fillStyle =
-        "#315a38";
-
-
-    ctx.beginPath();
-
-    ctx.arc(
-        x,
-        y - 15 * scale,
-        30 * scale,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.arc(
-        x - 20 * scale,
-        y + 5 * scale,
-        22 * scale,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.arc(
-        x + 20 * scale,
-        y + 5 * scale,
-        22 * scale,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    ctx.globalAlpha =
-        1;
-
-    ctx.restore();
-
-}
-
-
-/* ---------------------------------------------------------
-   HELPERS
-   --------------------------------------------------------- */
-
-function laneX(laneValue) {
-
-    return (
-        canvasWidth / 6 +
-        laneValue *
-        (canvasWidth / 3)
-    );
-}
-
-
-function roundedRect(
-    x,
-    y,
-    width,
-    height,
-    radius
-) {
-
-    const r =
-        Math.min(
-            radius,
-            width / 2,
-            height / 2
-        );
-
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        x + r,
-        y
-    );
-
-    ctx.arcTo(
-        x + width,
-        y,
-        x + width,
-        y + height,
-        r
-    );
-
-    ctx.arcTo(
-        x + width,
-        y + height,
-        x,
-        y + height,
-        r
-    );
-
-    ctx.arcTo(
-        x,
-        y + height,
-        x,
-        y,
-        r
-    );
-
-    ctx.arcTo(
-        x,
-        y,
-        x + width,
-        y,
-        r
-    );
-
-    ctx.closePath();
-}
-
-
-function triangle(
-    x1,
-    y1,
-    x2,
-    y2,
-    x3,
-    y3
-) {
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        x1,
-        y1
-    );
-
-    ctx.lineTo(
-        x2,
-        y2
-    );
-
-    ctx.lineTo(
-        x3,
-        y3
-    );
-
-    ctx.closePath();
-
-    ctx.fill();
-
-}
-
-
-/* ---------------------------------------------------------
-   BUTTON EVENTS
-   --------------------------------------------------------- */
 
 leftButton.addEventListener(
     "pointerdown",
@@ -3735,6 +790,7 @@ leftButton.addEventListener(
         event.preventDefault();
 
         moveLeft();
+
     }
 );
 
@@ -3746,26 +802,7 @@ rightButton.addEventListener(
         event.preventDefault();
 
         moveRight();
-    }
-);
 
-
-attackButton.addEventListener(
-    "pointerdown",
-    event => {
-
-        event.preventDefault();
-
-        attack();
-    }
-);
-
-
-startButton.addEventListener(
-    "click",
-    () => {
-
-        startGame();
     }
 );
 
@@ -3774,7 +811,7 @@ startButton.addEventListener(
    KEYBOARD
    --------------------------------------------------------- */
 
-document.addEventListener(
+window.addEventListener(
     "keydown",
     event => {
 
@@ -3783,9 +820,8 @@ document.addEventListener(
             event.key.toLowerCase() === "a"
         ) {
 
-            event.preventDefault();
-
             moveLeft();
+
         }
 
 
@@ -3794,9 +830,8 @@ document.addEventListener(
             event.key.toLowerCase() === "d"
         ) {
 
-            event.preventDefault();
-
             moveRight();
+
         }
 
 
@@ -3808,15 +843,7 @@ document.addEventListener(
             event.preventDefault();
 
             attack();
-        }
 
-
-        if (
-            event.key === "Enter" &&
-            !running
-        ) {
-
-            startGame();
         }
 
     }
@@ -3824,31 +851,23 @@ document.addEventListener(
 
 
 /* ---------------------------------------------------------
-   TOUCH SWIPE
+   SWIPE
    --------------------------------------------------------- */
 
 let touchStartX = 0;
-let touchStartY = 0;
 
 
 canvas.addEventListener(
     "touchstart",
     event => {
 
-        if (!event.touches.length) {
-            return;
-        }
-
+        if (!event.touches.length) return;
 
         touchStartX =
             event.touches[0].clientX;
 
-        touchStartY =
-            event.touches[0].clientY;
     },
-    {
-        passive: true
-    }
+    { passive: true }
 );
 
 
@@ -3856,76 +875,1644 @@ canvas.addEventListener(
     "touchend",
     event => {
 
-        if (!event.changedTouches.length) {
+        if (!event.changedTouches.length)
             return;
-        }
+
+        const endX =
+            event.changedTouches[0].clientX;
+
+        const delta =
+            endX - touchStartX;
 
 
-        const touch =
-            event.changedTouches[0];
-
-
-        const dx =
-            touch.clientX -
-            touchStartX;
-
-        const dy =
-            touch.clientY -
-            touchStartY;
-
-
-        if (Math.abs(dx) > 35) {
-
-            if (dx < 0) {
-                moveLeft();
-            }
-
-            else {
-                moveRight();
-            }
-
+        if (Math.abs(delta) < 20)
             return;
-        }
 
 
-        /*
-           Tap = attack
-        */
+        if (delta < 0) {
 
-        if (
-            Math.abs(dx) < 20 &&
-            Math.abs(dy) < 20
-        ) {
+            moveLeft();
 
-            attack();
+        } else {
+
+            moveRight();
+
         }
 
     },
-    {
-        passive: true
+    { passive: true }
+);
+
+
+/* ---------------------------------------------------------
+   ATTACK
+   --------------------------------------------------------- */
+
+attackButton.addEventListener(
+    "pointerdown",
+    event => {
+
+        event.preventDefault();
+
+        attack();
+
+    }
+);
+
+
+function attack() {
+
+    if (!running) return;
+
+    if (!currentLevel.strikes)
+        return;
+
+    if (strikes <= 0) {
+
+        gameMessage.textContent =
+            "No strikes left — dodge!";
+
+        return;
+
+    }
+
+
+    let target = null;
+
+    let bestDistance =
+        Infinity;
+
+
+    obstacles.forEach(
+        obstacle => {
+
+            const vertical =
+                obstacle.y > 220 &&
+                obstacle.y < 420;
+
+            const horizontal =
+                Math.abs(
+                    obstacle.x - player.x
+                ) < 65;
+
+
+            if (
+                vertical &&
+                horizontal
+            ) {
+
+                const distance =
+                    Math.abs(
+                        obstacle.y -
+                        player.y
+                    );
+
+
+                if (
+                    distance <
+                    bestDistance
+                ) {
+
+                    bestDistance =
+                        distance;
+
+                    target =
+                        obstacle;
+
+                }
+
+            }
+
+        }
+    );
+
+
+    if (!target) {
+
+        gameMessage.textContent =
+            "Miss!";
+
+        return;
+
+    }
+
+
+    const perfect =
+        bestDistance < 55;
+
+
+    target.dead = true;
+
+    strikes--;
+
+
+    score +=
+        perfect
+            ? 70
+            : 40;
+
+
+    createExplosion(
+        target.x,
+        target.y,
+        currentLevel.theme
+    );
+
+
+    gameMessage.textContent =
+        perfect
+            ? "PERFECT HIT! +70"
+            : "DESTROYED! +40";
+
+
+    updateStrikeUI();
+
+}
+
+
+function updateStrikeUI() {
+
+    strikeDisplay.textContent =
+        `💥 ×${strikes}`;
+
+}
+
+
+/* ---------------------------------------------------------
+   GAME LOOP
+   --------------------------------------------------------- */
+
+function gameLoop(timestamp) {
+
+    if (!running)
+        return;
+
+
+    const delta =
+        Math.min(
+            0.035,
+            (timestamp - lastTime) / 1000
+        );
+
+
+    lastTime =
+        timestamp;
+
+
+    elapsed += delta;
+
+
+    score +=
+        delta *
+        10 *
+        multiplier;
+
+
+    multiplier =
+        Math.min(
+            5,
+            1 +
+            Math.floor(
+                elapsed / 10
+            )
+        );
+
+
+    speed =
+        Math.min(
+            currentLevel.maxSpeed,
+            currentLevel.startSpeed +
+            elapsed * 1.4
+        );
+
+
+    scoreElement.textContent =
+        Math.floor(score);
+
+
+    multiplierDisplay.textContent =
+        `×${multiplier}`;
+
+
+    spawnTimer += delta;
+
+
+    const spawnInterval =
+        Math.max(
+            0.42,
+            0.92 -
+            elapsed * 0.008
+        );
+
+
+    if (
+        spawnTimer >=
+        spawnInterval
+    ) {
+
+        spawnTimer = 0;
+
+        spawnObstacle();
+
+    }
+
+
+    updateObstacles(delta);
+
+    updateParticles(delta);
+
+    draw();
+
+
+    if (
+        score >=
+        currentLevel.target
+    ) {
+
+        completeLevel();
+
+        return;
+
+    }
+
+
+    requestAnimationFrame(
+        gameLoop
+    );
+
+}
+
+
+/* ---------------------------------------------------------
+   SPAWN OBSTACLE
+   --------------------------------------------------------- */
+
+function spawnObstacle() {
+
+    let type =
+        currentLevel.obstacle;
+
+
+    if (
+        level === 10
+    ) {
+
+        const types = [
+            "barrier",
+            "diamond",
+            "rock",
+            "coral",
+            "comet"
+        ];
+
+        type =
+            types[
+                Math.floor(
+                    Math.random() *
+                    types.length
+                )
+            ];
+
+    }
+
+
+    obstacles.push({
+
+        x:
+            28 +
+            Math.random() *
+            (WIDTH - 56),
+
+        y:
+            -35,
+
+        width:
+            30 +
+            Math.random() * 20,
+
+        height:
+            28 +
+            Math.random() * 22,
+
+        type,
+
+        dead: false
+
+    });
+
+}
+
+
+/* ---------------------------------------------------------
+   UPDATE OBSTACLES
+   --------------------------------------------------------- */
+
+function updateObstacles(delta) {
+
+    obstacles.forEach(
+        obstacle => {
+
+            obstacle.y +=
+                speed * delta;
+
+        }
+    );
+
+
+    obstacles =
+        obstacles.filter(
+            obstacle => {
+
+                if (
+                    obstacle.dead
+                ) {
+
+                    return false;
+
+                }
+
+
+                if (
+                    obstacle.y >
+                    HEIGHT + 60
+                ) {
+
+                    return false;
+
+                }
+
+
+                if (
+                    checkCollision(
+                        obstacle
+                    )
+                ) {
+
+                    endGame();
+
+                    return false;
+
+                }
+
+
+                return true;
+
+            }
+        );
+
+}
+
+
+/* ---------------------------------------------------------
+   COLLISION
+   --------------------------------------------------------- */
+
+function checkCollision(
+    obstacle
+) {
+
+    const px =
+        player.x;
+
+    const py =
+        player.y;
+
+
+    const halfPlayer =
+        player.width / 2;
+
+
+    return (
+
+        obstacle.x -
+            obstacle.width / 2
+            <
+            px + halfPlayer
+
+        &&
+
+        obstacle.x +
+            obstacle.width / 2
+            >
+            px - halfPlayer
+
+        &&
+
+        obstacle.y +
+            obstacle.height / 2
+            >
+            py - player.height / 2
+
+        &&
+
+        obstacle.y -
+            obstacle.height / 2
+            <
+            py + player.height / 2
+
+    );
+
+}
+
+
+/* ---------------------------------------------------------
+   GAME OVER
+   --------------------------------------------------------- */
+
+function endGame() {
+
+    if (!running)
+        return;
+
+
+    running = false;
+
+    gameOver = true;
+
+
+    if (
+        score >
+        bestScore
+    ) {
+
+        bestScore =
+            Math.floor(score);
+
+        localStorage.setItem(
+            `1M_best_${level}`,
+            bestScore
+        );
+
+        bestElement.textContent =
+            bestScore;
+
+    }
+
+
+    gameOverlay.style.display =
+        "flex";
+
+
+    overlayLabel.textContent =
+        "RUN OVER";
+
+
+    overlayTitle.innerHTML =
+        "ONE MORE";
+
+
+    overlayText.innerHTML =
+        `SCORE ${Math.floor(score)}<br>` +
+        `TARGET ${currentLevel.target}`;
+
+
+    startButton.style.display =
+        "none";
+
+    nextButton.style.display =
+        "none";
+
+    retryButton.style.display =
+        "inline-block";
+
+
+    gameMessage.textContent =
+        "So close. One more run.";
+
+
+    draw();
+
+}
+
+
+/* ---------------------------------------------------------
+   LEVEL COMPLETE
+   --------------------------------------------------------- */
+
+function completeLevel() {
+
+    if (!running)
+        return;
+
+
+    running = false;
+
+    completed = true;
+
+
+    if (
+        score >
+        bestScore
+    ) {
+
+        bestScore =
+            Math.floor(score);
+
+        localStorage.setItem(
+            `1M_best_${level}`,
+            bestScore
+        );
+
+        bestElement.textContent =
+            bestScore;
+
+    }
+
+
+    if (
+        level <
+        10
+    ) {
+
+        unlockedLevel =
+            Math.max(
+                unlockedLevel,
+                level + 1
+            );
+
+        localStorage.setItem(
+            "1M_unlocked_level",
+            unlockedLevel
+        );
+
+    }
+
+
+    gameOverlay.style.display =
+        "flex";
+
+
+    overlayLabel.textContent =
+        "LEVEL COMPLETE";
+
+
+    if (level < 10) {
+
+        overlayTitle.innerHTML =
+            `LEVEL ${level}<span>✓</span>`;
+
+
+        overlayText.innerHTML =
+            `TARGET ${currentLevel.target}<br>` +
+            `LEVEL ${level + 1} UNLOCKED`;
+
+        nextButton.style.display =
+            "block";
+
+        nextButton.textContent =
+            `▶ LEVEL ${level + 1}`;
+
+    } else {
+
+        overlayTitle.innerHTML =
+            `1M<span>!</span>`;
+
+
+        overlayText.innerHTML =
+            "YOU BEAT ALL 10 LEVELS";
+
+
+        nextButton.style.display =
+            "block";
+
+        nextButton.textContent =
+            "▶ PLAY AGAIN";
+
+    }
+
+
+    startButton.style.display =
+        "none";
+
+    retryButton.style.display =
+        "none";
+
+
+    gameMessage.textContent =
+        "New level unlocked!";
+
+    draw();
+
+}
+
+
+/* ---------------------------------------------------------
+   PARTICLES
+   --------------------------------------------------------- */
+
+function createExplosion(
+    x,
+    y,
+    themeName
+) {
+
+    const theme =
+        THEMES[themeName];
+
+
+    for (
+        let i = 0;
+        i < 14;
+        i++
+    ) {
+
+        particles.push({
+
+            x,
+            y,
+
+            vx:
+                (Math.random() - .5)
+                * 180,
+
+            vy:
+                (Math.random() - .5)
+                * 180,
+
+            life: .55,
+
+            size:
+                2 +
+                Math.random() * 4,
+
+            color:
+                theme.accent
+
+        });
+
+    }
+
+}
+
+
+function updateParticles(
+    delta
+) {
+
+    particles.forEach(
+        particle => {
+
+            particle.x +=
+                particle.vx *
+                delta;
+
+            particle.y +=
+                particle.vy *
+                delta;
+
+            particle.life -=
+                delta;
+
+        }
+    );
+
+
+    particles =
+        particles.filter(
+            particle =>
+                particle.life > 0
+        );
+
+}
+
+
+/* ---------------------------------------------------------
+   DRAW
+   --------------------------------------------------------- */
+
+function draw() {
+
+    const theme =
+        THEMES[currentLevel.theme];
+
+
+    ctx.clearRect(
+        0,
+        0,
+        WIDTH,
+        HEIGHT
+    );
+
+
+    /* BACKGROUND */
+
+    ctx.fillStyle =
+        theme.background;
+
+    ctx.fillRect(
+        0,
+        0,
+        WIDTH,
+        HEIGHT
+    );
+
+
+    drawWorld(
+        theme
+    );
+
+
+    obstacles.forEach(
+        drawObstacle
+    );
+
+
+    drawPlayer(
+        theme
+    );
+
+
+    particles.forEach(
+        drawParticle
+    );
+
+}
+
+
+/* ---------------------------------------------------------
+   WORLD
+   --------------------------------------------------------- */
+
+function drawWorld(
+    theme
+) {
+
+    /* ROAD */
+
+    ctx.fillStyle =
+        theme.road;
+
+    ctx.fillRect(
+        35,
+        0,
+        WIDTH - 70,
+        HEIGHT
+    );
+
+
+    /* GRID */
+
+    ctx.strokeStyle =
+        theme.grid;
+
+    ctx.lineWidth = 1;
+
+
+    const offset =
+        (elapsed * speed) % 40;
+
+
+    for (
+        let y = -40 + offset;
+        y < HEIGHT;
+        y += 40
+    ) {
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            35,
+            y
+        );
+
+        ctx.lineTo(
+            WIDTH - 35,
+            y
+        );
+
+        ctx.stroke();
+
+    }
+
+
+    /* SIDE LINES */
+
+    ctx.strokeStyle =
+        theme.accent;
+
+    ctx.globalAlpha =
+        .16;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        35,
+        0
+    );
+
+    ctx.lineTo(
+        35,
+        HEIGHT
+    );
+
+    ctx.moveTo(
+        WIDTH - 35,
+        0
+    );
+
+    ctx.lineTo(
+        WIDTH - 35,
+        HEIGHT
+    );
+
+    ctx.stroke();
+
+    ctx.globalAlpha = 1;
+
+
+    /* SPECIAL WORLD DETAILS */
+
+    if (
+        level === 4
+    ) {
+
+        drawOceanDetails();
+
+    }
+
+
+    if (
+        level === 5
+    ) {
+
+        drawDesertDetails();
+
+    }
+
+
+    if (
+        level === 6
+    ) {
+
+        drawForestDetails();
+
+    }
+
+
+    if (
+        level === 7
+    ) {
+
+        drawSpaceDetails();
+
+    }
+
+
+    if (
+        level === 8
+    ) {
+
+        drawIceDetails();
+
+    }
+
+
+    if (
+        level === 9
+    ) {
+
+        drawFruitDetails();
+
+    }
+
+}
+
+
+/* ---------------------------------------------------------
+   WORLD DETAILS
+   --------------------------------------------------------- */
+
+function drawOceanDetails() {
+
+    ctx.globalAlpha = .18;
+
+    ctx.strokeStyle =
+        "#38d9ff";
+
+    for (
+        let i = 0;
+        i < 5;
+        i++
+    ) {
+
+        const y =
+            90 +
+            i * 85;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            65,
+            y,
+            20,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.stroke();
+
+    }
+
+    ctx.globalAlpha = 1;
+
+}
+
+
+function drawDesertDetails() {
+
+    ctx.globalAlpha = .20;
+
+    ctx.fillStyle =
+        "#ffbd55";
+
+    for (
+        let i = 0;
+        i < 5;
+        i++
+    ) {
+
+        ctx.beginPath();
+
+        ctx.arc(
+            55,
+            80 + i * 90,
+            18,
+            0,
+            Math.PI
+        );
+
+        ctx.fill();
+
+    }
+
+    ctx.globalAlpha = 1;
+
+}
+
+
+function drawForestDetails() {
+
+    ctx.globalAlpha = .18;
+
+    ctx.fillStyle =
+        "#6aff8a";
+
+    for (
+        let i = 0;
+        i < 4;
+        i++
+    ) {
+
+        const y =
+            70 +
+            i * 110;
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            58,
+            y + 25
+        );
+
+        ctx.lineTo(
+            75,
+            y - 10
+        );
+
+        ctx.lineTo(
+            92,
+            y + 25
+        );
+
+        ctx.closePath();
+
+        ctx.fill();
+
+    }
+
+    ctx.globalAlpha = 1;
+
+}
+
+
+function drawSpaceDetails() {
+
+    ctx.fillStyle =
+        "rgba(255,255,255,.5)";
+
+    for (
+        let i = 0;
+        i < 25;
+        i++
+    ) {
+
+        const x =
+            (i * 73) % WIDTH;
+
+        const y =
+            (i * 137) % HEIGHT;
+
+        ctx.fillRect(
+            x,
+            y,
+            1.5,
+            1.5
+        );
+
+    }
+
+}
+
+
+function drawIceDetails() {
+
+    ctx.globalAlpha = .20;
+
+    ctx.fillStyle =
+        "#8ee9ff";
+
+    for (
+        let i = 0;
+        i < 4;
+        i++
+    ) {
+
+        const y =
+            80 +
+            i * 100;
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            WIDTH - 88,
+            y + 30
+        );
+
+        ctx.lineTo(
+            WIDTH - 70,
+            y - 5
+        );
+
+        ctx.lineTo(
+            WIDTH - 50,
+            y + 30
+        );
+
+        ctx.closePath();
+
+        ctx.fill();
+
+    }
+
+    ctx.globalAlpha = 1;
+
+}
+
+
+function drawFruitDetails() {
+
+    ctx.globalAlpha = .16;
+
+    ctx.fillStyle =
+        "#ffcb55";
+
+    for (
+        let i = 0;
+        i < 4;
+        i++
+    ) {
+
+        ctx.beginPath();
+
+        ctx.arc(
+            60,
+            70 + i * 100,
+            13,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+    }
+
+    ctx.globalAlpha = 1;
+
+}
+
+
+/* ---------------------------------------------------------
+   DRAW OBSTACLE
+   --------------------------------------------------------- */
+
+function drawObstacle(
+    obstacle
+) {
+
+    if (obstacle.dead)
+        return;
+
+
+    const theme =
+        THEMES[currentLevel.theme];
+
+
+    ctx.save();
+
+    ctx.translate(
+        obstacle.x,
+        obstacle.y
+    );
+
+
+    ctx.fillStyle =
+        theme.obstacle;
+
+    ctx.strokeStyle =
+        "rgba(255,255,255,.22)";
+
+    ctx.lineWidth = 2;
+
+
+    switch (
+        obstacle.type
+    ) {
+
+        case "diamond":
+
+            ctx.rotate(
+                Math.PI / 4
+            );
+
+            ctx.fillRect(
+                -17,
+                -17,
+                34,
+                34
+            );
+
+            break;
+
+
+        case "rock":
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                -22,
+                15
+            );
+
+            ctx.lineTo(
+                -17,
+                -14
+            );
+
+            ctx.lineTo(
+                3,
+                -22
+            );
+
+            ctx.lineTo(
+                22,
+                -4
+            );
+
+            ctx.lineTo(
+                18,
+                17
+            );
+
+            ctx.closePath();
+
+            ctx.fill();
+
+            break;
+
+
+        case "coral":
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                -20,
+                18
+            );
+
+            ctx.lineTo(
+                -14,
+                -12
+            );
+
+            ctx.lineTo(
+                -5,
+                2
+            );
+
+            ctx.lineTo(
+                2,
+                -22
+            );
+
+            ctx.lineTo(
+                9,
+                1
+            );
+
+            ctx.lineTo(
+                20,
+                -13
+            );
+
+            ctx.lineTo(
+                19,
+                20
+            );
+
+            ctx.closePath();
+
+            ctx.fill();
+
+            break;
+
+
+        case "sand":
+
+            ctx.beginPath();
+
+            ctx.arc(
+                0,
+                10,
+                24,
+                Math.PI,
+                0
+            );
+
+            ctx.fill();
+
+            break;
+
+
+        case "tree":
+
+            ctx.fillRect(
+                -6,
+                0,
+                12,
+                25
+            );
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                -25,
+                8
+            );
+
+            ctx.lineTo(
+                0,
+                -28
+            );
+
+            ctx.lineTo(
+                25,
+                8
+            );
+
+            ctx.closePath();
+
+            ctx.fill();
+
+            break;
+
+
+        case "comet":
+
+            ctx.beginPath();
+
+            ctx.arc(
+                8,
+                0,
+                17,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fill();
+
+            ctx.globalAlpha = .3;
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                -5,
+                -7
+            );
+
+            ctx.lineTo(
+                -34,
+                -18
+            );
+
+            ctx.lineTo(
+                -12,
+                0
+            );
+
+            ctx.closePath();
+
+            ctx.fill();
+
+            ctx.globalAlpha = 1;
+
+            break;
+
+
+        case "iceberg":
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                -24,
+                20
+            );
+
+            ctx.lineTo(
+                -12,
+                -18
+            );
+
+            ctx.lineTo(
+                2,
+                -30
+            );
+
+            ctx.lineTo(
+                20,
+                10
+            );
+
+            ctx.lineTo(
+                17,
+                20
+            );
+
+            ctx.closePath();
+
+            ctx.fill();
+
+            break;
+
+
+        case "fruit":
+
+            ctx.beginPath();
+
+            ctx.arc(
+                0,
+                2,
+                19,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fill();
+
+            ctx.stroke();
+
+            ctx.strokeStyle =
+                "#65ff77";
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                3,
+                -17
+            );
+
+            ctx.lineTo(
+                12,
+                -27
+            );
+
+            ctx.stroke();
+
+            break;
+
+
+        default:
+
+            ctx.fillRect(
+                -22,
+                -18,
+                44,
+                36
+            );
+
+            ctx.strokeRect(
+                -22,
+                -18,
+                44,
+                36
+            );
+
+    }
+
+
+    ctx.restore();
+
+}
+
+
+/* ---------------------------------------------------------
+   DRAW PLAYER
+   --------------------------------------------------------- */
+
+function drawPlayer(
+    theme
+) {
+
+    ctx.save();
+
+    ctx.translate(
+        player.x,
+        player.y
+    );
+
+
+    if (
+        level === 3
+    ) {
+
+        drawAnimal();
+
+    } else {
+
+        ctx.fillStyle =
+            theme.player;
+
+        ctx.shadowColor =
+            theme.accent;
+
+        ctx.shadowBlur =
+            18;
+
+        ctx.beginPath();
+
+        ctx.roundRect(
+            -15,
+            -15,
+            30,
+            30,
+            9
+        );
+
+        ctx.fill();
+
+        ctx.shadowBlur = 0;
+
+
+        ctx.fillStyle =
+            "#071018";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            -6,
+            -3,
+            2.5,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.arc(
+            6,
+            -3,
+            2.5,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+    }
+
+
+    ctx.restore();
+
+}
+
+
+/* ---------------------------------------------------------
+   ANIMAL DRAWING
+   --------------------------------------------------------- */
+
+function drawAnimal() {
+
+    ctx.textAlign =
+        "center";
+
+    ctx.textBaseline =
+        "middle";
+
+    ctx.font =
+        "30px Arial";
+
+    ctx.fillText(
+        animalEmoji(
+            selectedAnimal
+        ),
+        0,
+        1
+    );
+
+}
+
+
+function animalEmoji(
+    animal
+) {
+
+    if (
+        animal === "FOX"
+    )
+        return "🦊";
+
+
+    if (
+        animal === "CAT"
+    )
+        return "🐱";
+
+
+    if (
+        animal === "PANDA"
+    )
+        return "🐼";
+
+
+    return "🐰";
+
+}
+
+
+/* ---------------------------------------------------------
+   PARTICLE DRAW
+   --------------------------------------------------------- */
+
+function drawParticle(
+    particle
+) {
+
+    ctx.save();
+
+    ctx.globalAlpha =
+        Math.max(
+            0,
+            particle.life
+        );
+
+    ctx.fillStyle =
+        particle.color;
+
+    ctx.fillRect(
+        particle.x,
+        particle.y,
+        particle.size,
+        particle.size
+    );
+
+    ctx.restore();
+
+}
+
+
+/* ---------------------------------------------------------
+   SAVE BEST
+   --------------------------------------------------------- */
+
+window.addEventListener(
+    "beforeunload",
+    () => {
+
+        if (
+            score >
+            bestScore
+        ) {
+
+            localStorage.setItem(
+                `1M_best_${level}`,
+                Math.floor(score)
+            );
+
+        }
+
     }
 );
 
 
 /* ---------------------------------------------------------
-   INITIALIZE
+   INITIAL DRAW
    --------------------------------------------------------- */
-
-window.addEventListener(
-    "resize",
-    resizeCanvas
-);
-
-
-resizeCanvas();
-
-setupLevelUI();
-
-bestScoreEl.textContent =
-    bestScore;
-
-updateHUD();
-
-updateStrikeUI();
 
 draw();
