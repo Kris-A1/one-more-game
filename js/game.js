@@ -1,442 +1,365 @@
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
+// ============================================================
+// 1M GAME
+// LEVEL 1 = NEON RUN
+// LEVEL 2 = NEON RUSH
+// LEVEL 3 = ANIMAL RUN
+// ============================================================
 
-const scoreEl = document.getElementById("score");
-const bestScoreEl = document.getElementById("bestScore");
-const overlay = document.getElementById("gameOverlay");
-const overlayTitle = document.getElementById("overlayTitle");
-const overlayText = document.getElementById("overlayText");
-const startButton = document.getElementById("startButton");
-const levelSubtitle = document.getElementById("levelSubtitle");
-const gameMessage = document.getElementById("gameMessage");
 
-const leftButton = document.getElementById("leftButton");
-const rightButton = document.getElementById("rightButton");
-const controls = document.querySelector(".controls");
+// ------------------------------------------------------------
+// ELEMENTS
+// ------------------------------------------------------------
 
+const canvas =
+    document.getElementById("gameCanvas");
 
-// --------------------------------------------------
-// LEVEL
-// --------------------------------------------------
+const ctx =
+    canvas.getContext("2d");
 
-const params = new URLSearchParams(window.location.search);
 
-const level = Math.min(
-    3,
-    Math.max(
-        1,
-        Number(params.get("level")) || 1
-    )
-);
+const scoreEl =
+    document.getElementById("score");
 
+const bestScoreEl =
+    document.getElementById("bestScore");
 
-// --------------------------------------------------
-// LEVEL SETTINGS
-// --------------------------------------------------
+const overlay =
+    document.getElementById("gameOverlay");
 
-const LEVELS = {
+const overlayTitle =
+    document.getElementById("overlayTitle");
 
-    1: {
-        name: "NEON RUN",
+const overlayText =
+    document.getElementById("overlayText");
 
-        background: "#07111f",
-        background2: "#10243d",
+const startButton =
+    document.getElementById("startButton");
 
-        playerColor: "#31e6d1",
-        obstacleColor: "#ff4fa3",
+const levelSubtitle =
+    document.getElementById("levelSubtitle");
 
-        startSpeed: 175,
-        maxSpeed: 195,
-
-        spawnStart: 1.00,
-        spawnMin: 0.42,
-        spawnRandom: 0.38,
-
-        sameLaneChance: 0.30,
-
-        attacks: false
-    },
-
-    2: {
-        name: "NEON RUSH",
-
-        background: "#12051d",
-        background2: "#350a31",
-
-        playerColor: "#49a7ff",
-        obstacleColor: "#ff304f",
-
-        startSpeed: 205,
-        maxSpeed: 235,
-
-        spawnStart: 0.82,
-        spawnMin: 0.30,
-        spawnRandom: 0.28,
-
-        sameLaneChance: 0.47,
-
-        attacks: true
-    },
-
-    3: {
-        name: "ANIMAL RUN",
-
-        background: "#102719",
-        background2: "#1d4528",
-
-        playerColor: "#ffd84a",
-        obstacleColor: "#a56b38",
-
-        startSpeed: 220,
-        maxSpeed: 250,
-
-        spawnStart: 0.72,
-        spawnMin: 0.27,
-        spawnRandom: 0.25,
-
-        sameLaneChance: 0.52,
-
-        attacks: true
-    }
-
-};
-
-const settings = LEVELS[level];
-
-
-// --------------------------------------------------
-// GAME VARIABLES
-// --------------------------------------------------
-
-let gameRunning = false;
-
-let playerLane = 1;
-let targetLane = 1;
-
-let score = 0;
-let bestScore = 0;
-
-let elapsed = 0;
-let multiplier = 1;
-
-let obstacles = [];
-let particles = [];
-
-let spawnTimer = 0;
-
-let lastTime = 0;
-
-let strikes = 3;
-
-let attackCooldown = 0;
-
-let selectedAnimal = "BUNNY";
-
-
-// --------------------------------------------------
-// PLAYER
-// --------------------------------------------------
-
-const player = {
-
-    x: 180,
-    y: 405,
-
-    width: 30,
-    height: 30,
-
-    laneWidth: 90,
-
-    moveSpeed: 10
-
-};
-
-
-// --------------------------------------------------
-// LANES
-// --------------------------------------------------
-
-function laneX(lane) {
-
-    return 90 + lane * 90;
-
-}
-
-
-// --------------------------------------------------
-// BEST SCORE
-// --------------------------------------------------
-
-const bestKey = `1M_best_level_${level}`;
-
-bestScore =
-    Number(
-        localStorage.getItem(bestKey)
-    ) || 0;
-
-bestScoreEl.textContent = bestScore;
-
-
-// --------------------------------------------------
-// HEADER
-// --------------------------------------------------
-
-levelSubtitle.textContent =
-    `LEVEL ${level} · ${settings.name}`;
-
-
-// --------------------------------------------------
-// MULTIPLIER UI
-// --------------------------------------------------
+const gameMessage =
+    document.getElementById("gameMessage");
 
 const multiplierDisplay =
     document.getElementById("multiplierDisplay");
 
+const strikeDisplay =
+    document.getElementById("strikeDisplay");
 
-// --------------------------------------------------
-// STRIKE UI
-// --------------------------------------------------
+const animalChooser =
+    document.getElementById("animalChooser");
 
-let strikeDisplay = null;
+const attackButton =
+    document.getElementById("attackButton");
 
-if (settings.attacks) {
+const leftButton =
+    document.getElementById("leftButton");
 
-    strikeDisplay =
-        document.createElement("div");
+const rightButton =
+    document.getElementById("rightButton");
 
-    strikeDisplay.id =
-        "strikeDisplay";
 
-    strikeDisplay.textContent =
-        "STRIKES ×3";
+// ------------------------------------------------------------
+// LEVEL
+// ------------------------------------------------------------
 
-    strikeDisplay.style.position =
-        "absolute";
+const params =
+    new URLSearchParams(
+        window.location.search
+    );
 
-    strikeDisplay.style.left =
-        "50%";
+const level =
+    Math.min(
+        3,
+        Math.max(
+            1,
+            Number(
+                params.get("level")
+            ) || 1
+        )
+    );
 
-    strikeDisplay.style.top =
-        "105px";
 
-    strikeDisplay.style.transform =
-        "translateX(-50%)";
+// ------------------------------------------------------------
+// LEVEL SETTINGS
+// ------------------------------------------------------------
 
-    strikeDisplay.style.fontSize =
-        "12px";
+const LEVELS = {
 
-    strikeDisplay.style.fontWeight =
-        "800";
+    1: {
 
-    strikeDisplay.style.letterSpacing =
-        "2px";
+        name: "NEON RUN",
 
-    strikeDisplay.style.color =
-        "#ffffff";
+        backgroundTop: "#07111f",
 
-    strikeDisplay.style.zIndex =
-        "20";
+        backgroundBottom: "#10243d",
 
-    strikeDisplay.style.textShadow =
-        "0 0 10px rgba(255,255,255,.7)";
+        playerColor: "#31e6d1",
 
-    document.querySelector(".game-container")
-        .appendChild(strikeDisplay);
+        obstacleColor: "#ff4fa3",
+
+        startSpeed: 175,
+
+        maxSpeed: 195,
+
+        spawnDelay: 0.95,
+
+        spawnMinimum: 0.40,
+
+        sameLaneChance: 0.30,
+
+        attacks: false
+
+    },
+
+
+    2: {
+
+        name: "NEON RUSH",
+
+        backgroundTop: "#12051d",
+
+        backgroundBottom: "#3b092f",
+
+        playerColor: "#4ba7ff",
+
+        obstacleColor: "#ff304f",
+
+        startSpeed: 205,
+
+        maxSpeed: 240,
+
+        spawnDelay: 0.78,
+
+        spawnMinimum: 0.29,
+
+        sameLaneChance: 0.48,
+
+        attacks: true
+
+    },
+
+
+    3: {
+
+        name: "ANIMAL RUN",
+
+        backgroundTop: "#0d2517",
+
+        backgroundBottom: "#2c5a32",
+
+        playerColor: "#ffd84a",
+
+        obstacleColor: "#9a6538",
+
+        startSpeed: 220,
+
+        maxSpeed: 255,
+
+        spawnDelay: 0.70,
+
+        spawnMinimum: 0.27,
+
+        sameLaneChance: 0.53,
+
+        attacks: true
+
+    }
+
+};
+
+
+const settings =
+    LEVELS[level];
+
+
+// ------------------------------------------------------------
+// GAME STATE
+// ------------------------------------------------------------
+
+let gameRunning =
+    false;
+
+let score =
+    0;
+
+let bestScore =
+    Number(
+        localStorage.getItem(
+            `1M_best_level_${level}`
+        )
+    ) || 0;
+
+let elapsed =
+    0;
+
+let multiplier =
+    1;
+
+let strikes =
+    3;
+
+let spawnTimer =
+    0;
+
+let attackCooldown =
+    0;
+
+let lastTime =
+    0;
+
+let selectedAnimal =
+    "BUNNY";
+
+let playerLane =
+    1;
+
+let targetLane =
+    1;
+
+let obstacles =
+    [];
+
+let particles =
+    [];
+
+
+// ------------------------------------------------------------
+// PLAYER
+// ------------------------------------------------------------
+
+const player = {
+
+    x: 180,
+
+    y: 410,
+
+    width: 30,
+
+    height: 30
+
+};
+
+
+// ------------------------------------------------------------
+// INITIAL UI
+// ------------------------------------------------------------
+
+levelSubtitle.textContent =
+    `LEVEL ${level} · ${settings.name}`;
+
+bestScoreEl.textContent =
+    bestScore;
+
+
+// ------------------------------------------------------------
+// LEVEL 1 UI
+// ------------------------------------------------------------
+
+if (level === 1) {
+
+    animalChooser.style.display =
+        "none";
+
+    strikeDisplay.style.display =
+        "none";
+
+    attackButton.style.display =
+        "none";
+
+    overlayText.innerHTML =
+        "Dodge. Survive.<br>Beat your best.";
+
+    startButton.textContent =
+        "▶ START RUN";
+
 }
 
 
-// --------------------------------------------------
-// ATTACK BUTTON
-// --------------------------------------------------
+// ------------------------------------------------------------
+// LEVEL 2 UI
+// ------------------------------------------------------------
 
-let attackButton = null;
+if (level === 2) {
 
-if (settings.attacks) {
+    animalChooser.style.display =
+        "none";
 
-    attackButton =
-        document.createElement("button");
+    strikeDisplay.style.display =
+        "block";
 
-    attackButton.id =
-        "attackButton";
+    attackButton.style.display =
+        "flex";
 
-    attackButton.textContent =
-        "💥";
+    overlayText.innerHTML =
+        "Dodge. Destroy.<br>You have 3 strikes.";
 
-    attackButton.setAttribute(
-        "aria-label",
-        "Attack"
-    );
+    startButton.textContent =
+        "▶ START RUSH";
 
-    attackButton.style.width =
-        "72px";
-
-    attackButton.style.height =
-        "58px";
-
-    attackButton.style.border =
-        "2px solid rgba(255,255,255,.35)";
-
-    attackButton.style.borderRadius =
-        "18px";
-
-    attackButton.style.background =
-        "rgba(255,50,80,.18)";
-
-    attackButton.style.color =
-        "#ffffff";
-
-    attackButton.style.fontSize =
-        "27px";
-
-    attackButton.style.fontWeight =
-        "900";
-
-    attackButton.style.touchAction =
-        "manipulation";
-
-    attackButton.style.cursor =
-        "pointer";
-
-    attackButton.style.boxShadow =
-        "0 0 20px rgba(255,40,80,.25)";
-
-    controls.appendChild(
-        attackButton
-    );
-
-    attackButton.addEventListener(
-        "pointerdown",
-        function(event) {
-
-            event.preventDefault();
-
-            attack();
-
-        }
-    );
 }
 
 
-// --------------------------------------------------
-// ANIMAL SELECTOR
-// --------------------------------------------------
+// ------------------------------------------------------------
+// LEVEL 3 UI
+// ------------------------------------------------------------
 
-let animalChooser = null;
-
-const animals = [
-    {
-        id: "BUNNY",
-        emoji: "🐰"
-    },
-    {
-        id: "FOX",
-        emoji: "🦊"
-    },
-    {
-        id: "CAT",
-        emoji: "🐱"
-    },
-    {
-        id: "PANDA",
-        emoji: "🐼"
-    }
-];
-
-
-function createAnimalChooser() {
-
-    if (level !== 3) {
-        return;
-    }
-
-    animalChooser =
-        document.createElement("div");
-
-    animalChooser.id =
-        "animalChooser";
+if (level === 3) {
 
     animalChooser.style.display =
         "flex";
 
-    animalChooser.style.justifyContent =
-        "center";
+    strikeDisplay.style.display =
+        "block";
 
-    animalChooser.style.flexWrap =
-        "wrap";
+    attackButton.style.display =
+        "flex";
 
-    animalChooser.style.gap =
-        "8px";
+    overlayText.innerHTML =
+        "Choose your animal.<br>Dodge. Destroy. Survive.";
 
-    animalChooser.style.margin =
-        "14px auto";
+    startButton.textContent =
+        "▶ START AS BUNNY";
 
-    animalChooser.style.maxWidth =
-        "300px";
+}
 
-    animals.forEach(function(animal) {
 
-        const button =
-            document.createElement("button");
+// ------------------------------------------------------------
+// ANIMAL BUTTONS
+// ------------------------------------------------------------
 
-        button.type =
-            "button";
+const animalButtons =
+    document.querySelectorAll(
+        ".animal-button"
+    );
 
-        button.dataset.animal =
-            animal.id;
 
-        button.innerHTML =
-            `${animal.emoji}<br><span>${animal.id}</span>`;
-
-        button.style.width =
-            "64px";
-
-        button.style.height =
-            "58px";
-
-        button.style.borderRadius =
-            "14px";
-
-        button.style.border =
-            "2px solid rgba(255,255,255,.2)";
-
-        button.style.background =
-            "rgba(255,255,255,.08)";
-
-        button.style.color =
-            "#ffffff";
-
-        button.style.fontSize =
-            "20px";
-
-        button.style.lineHeight =
-            "18px";
-
-        button.style.cursor =
-            "pointer";
-
-        button.style.touchAction =
-            "manipulation";
-
-        const label =
-            button.querySelector("span");
-
-        label.style.fontSize =
-            "8px";
-
-        label.style.fontWeight =
-            "800";
-
-        label.style.letterSpacing =
-            "1px";
+animalButtons.forEach(
+    function(button) {
 
         button.addEventListener(
             "click",
-            function() {
+            function(event) {
+
+                event.preventDefault();
 
                 selectedAnimal =
-                    animal.id;
+                    button.dataset.animal;
 
-                updateAnimalButtons();
+                animalButtons.forEach(
+                    function(other) {
+
+                        other.classList.remove(
+                            "selected"
+                        );
+
+                    }
+                );
+
+                button.classList.add(
+                    "selected"
+                );
 
                 startButton.textContent =
                     `▶ START AS ${selectedAnimal}`;
@@ -444,73 +367,13 @@ function createAnimalChooser() {
             }
         );
 
-        animalChooser.appendChild(
-            button
-        );
-
-    });
-
-    overlayText.insertAdjacentElement(
-        "afterend",
-        animalChooser
-    );
-
-    updateAnimalButtons();
-
-}
-
-
-function updateAnimalButtons() {
-
-    if (!animalChooser) {
-        return;
     }
-
-    const buttons =
-        animalChooser.querySelectorAll(
-            "button"
-        );
-
-    buttons.forEach(function(button) {
-
-        if (
-            button.dataset.animal ===
-            selectedAnimal
-        ) {
-
-            button.style.background =
-                "rgba(255,216,74,.25)";
-
-            button.style.border =
-                "2px solid #ffd84a";
-
-            button.style.transform =
-                "scale(1.05)";
-
-        } else {
-
-            button.style.background =
-                "rgba(255,255,255,.08)";
-
-            button.style.border =
-                "2px solid rgba(255,255,255,.2)";
-
-            button.style.transform =
-                "scale(1)";
-
-        }
-
-    });
-
-}
+);
 
 
-createAnimalChooser();
-
-
-// --------------------------------------------------
-// CANVAS HELPERS
-// --------------------------------------------------
+// ------------------------------------------------------------
+// CANVAS ROUNDED RECTANGLE
+// ------------------------------------------------------------
 
 function roundedRect(
     x,
@@ -587,31 +450,52 @@ function roundedRect(
 }
 
 
-// --------------------------------------------------
-// RESET
-// --------------------------------------------------
+// ------------------------------------------------------------
+// LANE POSITION
+// ------------------------------------------------------------
+
+function laneX(lane) {
+
+    return 90 + lane * 90;
+
+}
+
+
+// ------------------------------------------------------------
+// RESET GAME
+// ------------------------------------------------------------
 
 function resetGame() {
 
-    score = 0;
+    score =
+        0;
 
-    elapsed = 0;
+    elapsed =
+        0;
 
-    multiplier = 1;
+    multiplier =
+        1;
 
-    playerLane = 1;
+    strikes =
+        3;
 
-    targetLane = 1;
+    spawnTimer =
+        0;
 
-    obstacles = [];
+    attackCooldown =
+        0;
 
-    particles = [];
+    obstacles =
+        [];
 
-    spawnTimer = 0;
+    particles =
+        [];
 
-    strikes = 3;
+    playerLane =
+        1;
 
-    attackCooldown = 0;
+    targetLane =
+        1;
 
     player.x =
         laneX(1);
@@ -622,25 +506,49 @@ function resetGame() {
     multiplierDisplay.textContent =
         "×1";
 
-    if (strikeDisplay) {
+    updateStrikeDisplay();
 
-        strikeDisplay.textContent =
-            "STRIKES ×3";
+}
+
+
+// ------------------------------------------------------------
+// STRIKE DISPLAY
+// ------------------------------------------------------------
+
+function updateStrikeDisplay() {
+
+    if (level === 1) {
+        return;
+    }
+
+    strikeDisplay.textContent =
+        `STRIKES ×${strikes}`;
+
+    if (strikes === 0) {
+
+        strikeDisplay.style.opacity =
+            "0.45";
+
+    } else {
+
+        strikeDisplay.style.opacity =
+            "1";
 
     }
 
 }
 
 
-// --------------------------------------------------
-// START
-// --------------------------------------------------
+// ------------------------------------------------------------
+// START GAME
+// ------------------------------------------------------------
 
 function startGame() {
 
     resetGame();
 
-    gameRunning = true;
+    gameRunning =
+        true;
 
     overlay.style.display =
         "none";
@@ -658,13 +566,15 @@ function startGame() {
 }
 
 
-// --------------------------------------------------
+// ------------------------------------------------------------
 // GAME OVER
-// --------------------------------------------------
+// ------------------------------------------------------------
 
 function endGame() {
 
-    gameRunning = false;
+    gameRunning =
+        false;
+
 
     if (score > bestScore) {
 
@@ -672,7 +582,7 @@ function endGame() {
             score;
 
         localStorage.setItem(
-            bestKey,
+            `1M_best_level_${level}`,
             bestScore
         );
 
@@ -681,26 +591,42 @@ function endGame() {
 
     }
 
+
     overlay.style.display =
         "flex";
+
 
     overlayTitle.textContent =
         "RUN OVER";
 
+
     overlayText.innerHTML =
         `SCORE <strong>${score}</strong><br>BEST <strong>${bestScore}</strong>`;
+
+
+    if (level === 1) {
+
+        startButton.textContent =
+            "▶ TRY AGAIN";
+
+    }
+
+
+    if (level === 2) {
+
+        startButton.textContent =
+            "▶ TRY AGAIN";
+
+    }
+
 
     if (level === 3) {
 
         startButton.textContent =
             `▶ RUN AS ${selectedAnimal}`;
 
-    } else {
-
-        startButton.textContent =
-            "▶ TRY AGAIN";
-
     }
+
 
     gameMessage.textContent =
         "ONE MORE RUN?";
@@ -708,9 +634,9 @@ function endGame() {
 }
 
 
-// --------------------------------------------------
+// ------------------------------------------------------------
 // SCORE
-// --------------------------------------------------
+// ------------------------------------------------------------
 
 function addScore(amount) {
 
@@ -725,26 +651,28 @@ function addScore(amount) {
 }
 
 
-// --------------------------------------------------
-// OBSTACLES
-// --------------------------------------------------
+// ------------------------------------------------------------
+// SPAWN OBSTACLE
+// ------------------------------------------------------------
 
 function spawnObstacle() {
 
     let lane;
 
+
     if (
         obstacles.length > 0 &&
-        Math.random() < settings.sameLaneChance
+        Math.random() <
+        settings.sameLaneChance
     ) {
 
-        const last =
+        const previous =
             obstacles[
                 obstacles.length - 1
             ];
 
         lane =
-            last.lane;
+            previous.lane;
 
     } else {
 
@@ -755,82 +683,78 @@ function spawnObstacle() {
 
     }
 
+
     obstacles.push({
 
         lane: lane,
 
         x: laneX(lane),
 
-        y: -55,
+        y: -60,
 
         width: 54,
 
-        height: 32,
+        height: 34,
 
         rotation:
             Math.random() *
-            Math.PI,
-
-        speed:
-            settings.startSpeed +
-            Math.random() * 20
+            Math.PI
 
     });
 
 }
 
 
-// --------------------------------------------------
-// OBSTACLE DRAWING
-// --------------------------------------------------
+// ------------------------------------------------------------
+// DRAW OBSTACLE
+// ------------------------------------------------------------
 
 function drawObstacle(obstacle) {
-
-    const x =
-        obstacle.x;
-
-    const y =
-        obstacle.y;
 
     ctx.save();
 
     ctx.translate(
-        x,
-        y
+        obstacle.x,
+        obstacle.y
     );
+
+
+    // LEVEL 1
+    // Pink neon blocks
 
     if (level === 1) {
 
-        // NEON RUN
-        // Pink energy bars
-
         ctx.shadowBlur =
-            18;
+            20;
 
         ctx.shadowColor =
-            settings.obstacleColor;
+            "#ff4fa3";
 
         ctx.fillStyle =
-            settings.obstacleColor;
+            "#ff4fa3";
 
         roundedRect(
             -27,
-            -16,
+            -17,
             54,
-            32,
+            34,
             9
         );
 
         ctx.fill();
 
+
+        ctx.shadowBlur =
+            0;
+
         ctx.fillStyle =
-            "rgba(255,255,255,.35)";
+            "rgba(255,255,255,.45)";
 
         roundedRect(
-            -19,
-            -5,
-            38,
-            4,
+            -18,
+            -4,
+            36,
+            5,
             2
         );
 
@@ -838,17 +762,18 @@ function drawObstacle(obstacle) {
 
     }
 
-    else if (level === 2) {
 
-        // NEON RUSH
-        // Warning diamonds
+    // LEVEL 2
+    // Red warning diamonds
+
+    if (level === 2) {
 
         ctx.rotate(
             obstacle.rotation
         );
 
         ctx.shadowBlur =
-            22;
+            24;
 
         ctx.shadowColor =
             "#ff304f";
@@ -860,21 +785,21 @@ function drawObstacle(obstacle) {
 
         ctx.moveTo(
             0,
-            -24
+            -27
         );
 
         ctx.lineTo(
-            30,
+            32,
             0
         );
 
         ctx.lineTo(
             0,
-            24
+            27
         );
 
         ctx.lineTo(
-            -30,
+            -32,
             0
         );
 
@@ -882,8 +807,12 @@ function drawObstacle(obstacle) {
 
         ctx.fill();
 
+
+        ctx.shadowBlur =
+            0;
+
         ctx.fillStyle =
-            "#ffb0bb";
+            "#ffb7c0";
 
         ctx.beginPath();
 
@@ -899,59 +828,64 @@ function drawObstacle(obstacle) {
 
     }
 
-    else {
 
-        // ANIMAL RUN
-        // Forest rocks
+    // LEVEL 3
+    // Forest rocks
+
+    if (level === 3) {
 
         ctx.shadowBlur =
             10;
 
         ctx.shadowColor =
-            "rgba(0,0,0,.5)";
+            "rgba(0,0,0,.6)";
 
         ctx.fillStyle =
-            "#8b5a32";
+            "#87562f";
 
         ctx.beginPath();
 
         ctx.moveTo(
-            -27,
+            -28,
             12
         );
 
         ctx.quadraticCurveTo(
-            -25,
-            -15,
-            -8,
+            -27,
+            -12,
+            -10,
             -20
         );
 
         ctx.quadraticCurveTo(
             10,
-            -30,
+            -29,
             27,
-            -4
+            -5
         );
 
         ctx.quadraticCurveTo(
-            32,
+            31,
             18,
-            10,
-            20
+            9,
+            21
         );
 
         ctx.lineTo(
-            -15,
-            21
+            -17,
+            20
         );
 
         ctx.closePath();
 
         ctx.fill();
 
+
+        ctx.shadowBlur =
+            0;
+
         ctx.fillStyle =
-            "#c78a4a";
+            "#c38a50";
 
         ctx.beginPath();
 
@@ -967,29 +901,25 @@ function drawObstacle(obstacle) {
 
     }
 
+
     ctx.restore();
 
 }
 
 
-// --------------------------------------------------
-// PLAYER DRAWING
-// --------------------------------------------------
+// ------------------------------------------------------------
+// DRAW PLAYER
+// ------------------------------------------------------------
 
 function drawPlayer() {
-
-    const x =
-        player.x;
-
-    const y =
-        player.y;
 
     ctx.save();
 
     ctx.translate(
-        x,
-        y
+        player.x,
+        player.y
     );
+
 
     if (level === 3) {
 
@@ -1016,6 +946,10 @@ function drawPlayer() {
 
         ctx.fill();
 
+
+        ctx.shadowBlur =
+            0;
+
         ctx.fillStyle =
             "#ffffff";
 
@@ -1031,14 +965,15 @@ function drawPlayer() {
 
     }
 
+
     ctx.restore();
 
 }
 
 
-// --------------------------------------------------
-// ANIMAL DRAWING
-// --------------------------------------------------
+// ------------------------------------------------------------
+// DRAW ANIMAL
+// ------------------------------------------------------------
 
 function drawAnimal() {
 
@@ -1048,41 +983,43 @@ function drawAnimal() {
     ctx.shadowColor =
         "#ffd84a";
 
+
+    // BUNNY
+
     if (selectedAnimal === "BUNNY") {
 
         ctx.fillStyle =
-            "#f2f2f2";
+            "#f0f0f0";
 
-        // ears
 
         roundedRect(
             -12,
-            -30,
+            -31,
             8,
-            20,
+            22,
             4
         );
 
         ctx.fill();
+
 
         roundedRect(
             4,
-            -30,
+            -31,
             8,
-            20,
+            22,
             4
         );
 
         ctx.fill();
 
-        // body
 
         ctx.beginPath();
 
         ctx.arc(
             0,
             3,
-            17,
+            18,
             0,
             Math.PI * 2
         );
@@ -1091,7 +1028,10 @@ function drawAnimal() {
 
     }
 
-    else if (selectedAnimal === "FOX") {
+
+    // FOX
+
+    if (selectedAnimal === "FOX") {
 
         ctx.fillStyle =
             "#e87922";
@@ -1099,38 +1039,38 @@ function drawAnimal() {
         ctx.beginPath();
 
         ctx.moveTo(
-            -19,
-            -10
+            -20,
+            -9
         );
 
         ctx.lineTo(
-            -10,
-            -25
+            -12,
+            -27
         );
 
         ctx.lineTo(
             0,
-            -17
+            -18
         );
 
         ctx.lineTo(
-            10,
-            -25
+            12,
+            -27
         );
 
         ctx.lineTo(
-            19,
-            -10
+            20,
+            -9
         );
 
         ctx.lineTo(
             16,
-            14
+            15
         );
 
         ctx.lineTo(
             -16,
-            14
+            15
         );
 
         ctx.closePath();
@@ -1139,21 +1079,24 @@ function drawAnimal() {
 
     }
 
-    else if (selectedAnimal === "CAT") {
+
+    // CAT
+
+    if (selectedAnimal === "CAT") {
 
         ctx.fillStyle =
-            "#b9b9c5";
+            "#b9bac5";
 
         ctx.beginPath();
 
         ctx.moveTo(
-            -19,
+            -20,
             -8
         );
 
         ctx.lineTo(
             -16,
-            -24
+            -25
         );
 
         ctx.lineTo(
@@ -1168,21 +1111,21 @@ function drawAnimal() {
 
         ctx.lineTo(
             16,
-            -24
+            -25
         );
 
         ctx.lineTo(
-            19,
+            20,
             -8
         );
 
         ctx.lineTo(
-            15,
+            16,
             15
         );
 
         ctx.lineTo(
-            -15,
+            -16,
             15
         );
 
@@ -1192,10 +1135,13 @@ function drawAnimal() {
 
     }
 
-    else {
+
+    // PANDA
+
+    if (selectedAnimal === "PANDA") {
 
         ctx.fillStyle =
-            "#f2f2f2";
+            "#f1f1f1";
 
         ctx.beginPath();
 
@@ -1209,27 +1155,30 @@ function drawAnimal() {
 
         ctx.fill();
 
+
         ctx.fillStyle =
             "#151515";
+
 
         ctx.beginPath();
 
         ctx.arc(
             -12,
-            -8,
-            6,
+            -9,
+            7,
             0,
             Math.PI * 2
         );
 
         ctx.fill();
 
+
         ctx.beginPath();
 
         ctx.arc(
             12,
-            -8,
-            6,
+            -9,
+            7,
             0,
             Math.PI * 2
         );
@@ -1238,10 +1187,15 @@ function drawAnimal() {
 
     }
 
-    // eyes
+
+    // EYES
+
+    ctx.shadowBlur =
+        0;
 
     ctx.fillStyle =
         "#111";
+
 
     ctx.beginPath();
 
@@ -1254,6 +1208,7 @@ function drawAnimal() {
     );
 
     ctx.fill();
+
 
     ctx.beginPath();
 
@@ -1270,9 +1225,9 @@ function drawAnimal() {
 }
 
 
-// --------------------------------------------------
+// ------------------------------------------------------------
 // BACKGROUND
-// --------------------------------------------------
+// ------------------------------------------------------------
 
 function drawBackground() {
 
@@ -1284,15 +1239,18 @@ function drawBackground() {
             canvas.height
         );
 
+
     gradient.addColorStop(
         0,
-        settings.background
+        settings.backgroundTop
     );
+
 
     gradient.addColorStop(
         1,
-        settings.background2
+        settings.backgroundBottom
     );
+
 
     ctx.fillStyle =
         gradient;
@@ -1305,7 +1263,7 @@ function drawBackground() {
     );
 
 
-    // road
+    // Road
 
     ctx.fillStyle =
         "rgba(255,255,255,.035)";
@@ -1318,7 +1276,7 @@ function drawBackground() {
     );
 
 
-    // lane lines
+    // Lane lines
 
     ctx.strokeStyle =
         "rgba(255,255,255,.09)";
@@ -1329,6 +1287,7 @@ function drawBackground() {
     ctx.setLineDash(
         [8, 15]
     );
+
 
     for (
         let i = 1;
@@ -1355,32 +1314,41 @@ function drawBackground() {
 
     }
 
+
     ctx.setLineDash([]);
 
 
-    // Level 2 speed streaks
+    // LEVEL 2 SPEED STREAKS
 
     if (level === 2) {
 
         ctx.strokeStyle =
-            "rgba(255,80,100,.25)";
+            "rgba(255,70,100,.30)";
 
         ctx.lineWidth =
             2;
 
+
         for (
             let i = 0;
-            i < 12;
+            i < 14;
             i++
         ) {
 
             const x =
-                (i * 37 + elapsed * 80) %
+                (
+                    i * 47 +
+                    elapsed * 100
+                ) %
                 canvas.width;
 
             const y =
-                (i * 83 + elapsed * 170) %
+                (
+                    i * 79 +
+                    elapsed * 180
+                ) %
                 canvas.height;
+
 
             ctx.beginPath();
 
@@ -1401,31 +1369,31 @@ function drawBackground() {
     }
 
 
-    // Level 3 trees
+    // LEVEL 3 TREES
 
     if (level === 3) {
 
         drawTree(
             18,
-            105,
+            100,
             0.8
         );
 
         drawTree(
-            340,
-            160,
-            0.65
+            342,
+            145,
+            0.7
         );
 
         drawTree(
-            20,
+            18,
             300,
             0.55
         );
 
         drawTree(
             342,
-            340,
+            350,
             0.8
         );
 
@@ -1434,9 +1402,9 @@ function drawBackground() {
 }
 
 
-// --------------------------------------------------
-// TREE
-// --------------------------------------------------
+// ------------------------------------------------------------
+// DRAW TREE
+// ------------------------------------------------------------
 
 function drawTree(
     x,
@@ -1456,24 +1424,26 @@ function drawTree(
         scale
     );
 
+
     ctx.fillStyle =
         "#5b3823";
 
     ctx.fillRect(
         -6,
-        15,
         12,
-        35
+        12,
+        38
     );
 
+
     ctx.fillStyle =
-        "#2e7138";
+        "#286b35";
 
     ctx.beginPath();
 
     ctx.arc(
         0,
-        5,
+        3,
         25,
         0,
         Math.PI * 2
@@ -1481,50 +1451,53 @@ function drawTree(
 
     ctx.fill();
 
+
     ctx.fillStyle =
-        "#3f8c45";
+        "#3d8a45";
 
     ctx.beginPath();
 
     ctx.arc(
         -14,
-        -3,
+        -4,
         17,
         0,
         Math.PI * 2
     );
 
     ctx.fill();
+
 
     ctx.beginPath();
 
     ctx.arc(
         14,
-        -3,
+        -4,
         17,
         0,
         Math.PI * 2
     );
 
     ctx.fill();
+
 
     ctx.restore();
 
 }
 
 
-// --------------------------------------------------
+// ------------------------------------------------------------
 // PARTICLES
-// --------------------------------------------------
+// ------------------------------------------------------------
 
-function createHitParticles(
+function createParticles(
     x,
     y
 ) {
 
     for (
         let i = 0;
-        i < 14;
+        i < 16;
         i++
     ) {
 
@@ -1536,17 +1509,18 @@ function createHitParticles(
 
             vx:
                 (Math.random() - 0.5) *
-                220,
+                240,
 
             vy:
                 (Math.random() - 0.5) *
-                220,
+                240,
 
-            life: 0.5,
+            life:
+                0.55,
 
             size:
                 3 +
-                Math.random() * 5
+                Math.random() * 4
 
         });
 
@@ -1563,22 +1537,29 @@ function updateParticles(dt) {
         i--
     ) {
 
-        const p =
+        const particle =
             particles[i];
 
-        p.x +=
-            p.vx * dt;
 
-        p.y +=
-            p.vy * dt;
+        particle.x +=
+            particle.vx * dt;
 
-        p.life -=
-            dt;
 
-        p.vy +=
+        particle.y +=
+            particle.vy * dt;
+
+
+        particle.vy +=
             350 * dt;
 
-        if (p.life <= 0) {
+
+        particle.life -=
+            dt;
+
+
+        if (
+            particle.life <= 0
+        ) {
 
             particles.splice(
                 i,
@@ -1595,23 +1576,24 @@ function updateParticles(dt) {
 function drawParticles() {
 
     particles.forEach(
-        function(p) {
+        function(particle) {
 
             ctx.globalAlpha =
                 Math.max(
                     0,
-                    p.life * 2
+                    particle.life * 2
                 );
 
             ctx.fillStyle =
                 "#ffffff";
 
+
             ctx.beginPath();
 
             ctx.arc(
-                p.x,
-                p.y,
-                p.size,
+                particle.x,
+                particle.y,
+                particle.size,
                 0,
                 Math.PI * 2
             );
@@ -1621,15 +1603,16 @@ function drawParticles() {
         }
     );
 
+
     ctx.globalAlpha =
         1;
 
 }
 
 
-// --------------------------------------------------
+// ------------------------------------------------------------
 // ATTACK
-// --------------------------------------------------
+// ------------------------------------------------------------
 
 function attack() {
 
@@ -1637,9 +1620,11 @@ function attack() {
         return;
     }
 
+
     if (!settings.attacks) {
         return;
     }
+
 
     if (strikes <= 0) {
 
@@ -1650,23 +1635,22 @@ function attack() {
 
     }
 
+
     if (attackCooldown > 0) {
         return;
     }
+
 
     attackCooldown =
         0.25;
 
 
-    // Find nearest obstacle
-    // in the player's lane.
+    let targetIndex =
+        -1;
 
-    let target = null;
-
-    let targetIndex = -1;
-
-    let closestDistance =
+    let closest =
         Infinity;
+
 
     for (
         let i = 0;
@@ -1677,29 +1661,31 @@ function attack() {
         const obstacle =
             obstacles[i];
 
+
         if (
             obstacle.lane !==
             playerLane
         ) {
+
             continue;
+
         }
+
 
         const distance =
             player.y -
             obstacle.y;
 
+
         if (
-            obstacle.y > 250 &&
-            obstacle.y < 410 &&
+            obstacle.y > 245 &&
+            obstacle.y < 405 &&
             distance >= 0 &&
-            distance < closestDistance
+            distance < closest
         ) {
 
-            closestDistance =
+            closest =
                 distance;
-
-            target =
-                obstacle;
 
             targetIndex =
                 i;
@@ -1709,10 +1695,11 @@ function attack() {
     }
 
 
-    // No target:
-    // do NOT waste a strike.
+    // No target = no strike lost
 
-    if (!target) {
+    if (
+        targetIndex === -1
+    ) {
 
         gameMessage.textContent =
             "NO TARGET";
@@ -1722,26 +1709,29 @@ function attack() {
     }
 
 
-    // Remove obstacle.
+    const target =
+        obstacles[targetIndex];
+
 
     obstacles.splice(
         targetIndex,
         1
     );
 
+
     strikes--;
 
-    createHitParticles(
+
+    createParticles(
         target.x,
         target.y
     );
 
 
-    // Perfect hit
-
     const perfect =
         target.y > 335 &&
         target.y < 395;
+
 
     if (perfect) {
 
@@ -1760,21 +1750,16 @@ function attack() {
     }
 
 
-    if (strikeDisplay) {
-
-        strikeDisplay.textContent =
-            `STRIKES ×${strikes}`;
-
-    }
+    updateStrikeDisplay();
 
 }
 
 
-// --------------------------------------------------
+// ------------------------------------------------------------
 // COLLISION
-// --------------------------------------------------
+// ------------------------------------------------------------
 
-function checkCollision(
+function collision(
     obstacle
 ) {
 
@@ -1794,6 +1779,7 @@ function checkCollision(
         player.y +
         player.height / 2;
 
+
     const obstacleLeft =
         obstacle.x -
         obstacle.width / 2;
@@ -1810,29 +1796,36 @@ function checkCollision(
         obstacle.y +
         obstacle.height / 2;
 
+
     return (
+
         playerLeft <
-            obstacleRight &&
+        obstacleRight &&
+
         playerRight >
-            obstacleLeft &&
+        obstacleLeft &&
+
         playerTop <
-            obstacleBottom &&
+        obstacleBottom &&
+
         playerBottom >
-            obstacleTop
+        obstacleTop
+
     );
 
 }
 
 
-// --------------------------------------------------
-// MOVE PLAYER
-// --------------------------------------------------
+// ------------------------------------------------------------
+// MOVE LEFT
+// ------------------------------------------------------------
 
 function moveLeft() {
 
     if (!gameRunning) {
         return;
     }
+
 
     targetLane =
         Math.max(
@@ -1843,11 +1836,16 @@ function moveLeft() {
 }
 
 
+// ------------------------------------------------------------
+// MOVE RIGHT
+// ------------------------------------------------------------
+
 function moveRight() {
 
     if (!gameRunning) {
         return;
     }
+
 
     targetLane =
         Math.min(
@@ -1858,9 +1856,9 @@ function moveRight() {
 }
 
 
-// --------------------------------------------------
-// CONTROLS
-// --------------------------------------------------
+// ------------------------------------------------------------
+// BUTTON CONTROLS
+// ------------------------------------------------------------
 
 leftButton.addEventListener(
     "pointerdown",
@@ -1886,6 +1884,22 @@ rightButton.addEventListener(
 );
 
 
+attackButton.addEventListener(
+    "pointerdown",
+    function(event) {
+
+        event.preventDefault();
+
+        attack();
+
+    }
+);
+
+
+// ------------------------------------------------------------
+// KEYBOARD CONTROLS
+// ------------------------------------------------------------
+
 document.addEventListener(
     "keydown",
     function(event) {
@@ -1899,6 +1913,7 @@ document.addEventListener(
 
         }
 
+
         if (
             event.key ===
             "ArrowRight"
@@ -1907,6 +1922,7 @@ document.addEventListener(
             moveRight();
 
         }
+
 
         if (
             event.code ===
@@ -1925,11 +1941,13 @@ document.addEventListener(
 );
 
 
-// --------------------------------------------------
+// ------------------------------------------------------------
 // TOUCH SWIPE
-// --------------------------------------------------
+// ------------------------------------------------------------
 
-let touchStartX = 0;
+let touchStartX =
+    0;
+
 
 canvas.addEventListener(
     "touchstart",
@@ -1938,8 +1956,11 @@ canvas.addEventListener(
         if (
             event.touches.length !== 1
         ) {
+
             return;
+
         }
+
 
         touchStartX =
             event.touches[0].clientX;
@@ -1959,22 +1980,30 @@ canvas.addEventListener(
             !gameRunning ||
             event.changedTouches.length !== 1
         ) {
+
             return;
+
         }
 
-        const endX =
+
+        const touchEndX =
             event.changedTouches[0].clientX;
 
+
         const distance =
-            endX -
+            touchEndX -
             touchStartX;
+
 
         if (
             Math.abs(distance) <
             30
         ) {
+
             return;
+
         }
+
 
         if (distance < 0) {
 
@@ -1993,24 +2022,29 @@ canvas.addEventListener(
 );
 
 
-// --------------------------------------------------
+// ------------------------------------------------------------
 // START BUTTON
-// --------------------------------------------------
+// ------------------------------------------------------------
 
 startButton.addEventListener(
     "click",
-    startGame
+    function() {
+
+        startGame();
+
+    }
 );
 
 
-// --------------------------------------------------
+// ------------------------------------------------------------
 // UPDATE
-// --------------------------------------------------
+// ------------------------------------------------------------
 
 function update(dt) {
 
     elapsed +=
         dt;
+
 
     attackCooldown =
         Math.max(
@@ -2019,7 +2053,7 @@ function update(dt) {
         );
 
 
-    // Multiplier
+    // Multiplier every 10 seconds
 
     multiplier =
         Math.min(
@@ -2030,14 +2064,16 @@ function update(dt) {
             )
         );
 
+
     multiplierDisplay.textContent =
         `×${multiplier}`;
 
 
-    // Player movement
+    // Smooth player movement
 
     const targetX =
         laneX(targetLane);
+
 
     player.x +=
         (
@@ -2046,17 +2082,17 @@ function update(dt) {
         ) *
         Math.min(
             1,
-            player.moveSpeed * dt
+            12 * dt
         );
 
 
-    // Speed increases
+    // Increasing speed
 
-    const currentSpeed =
+    const speed =
         Math.min(
             settings.maxSpeed,
             settings.startSpeed +
-            elapsed * 1.5
+            elapsed * 1.6
         );
 
 
@@ -2065,21 +2101,25 @@ function update(dt) {
     spawnTimer -=
         dt;
 
-    if (spawnTimer <= 0) {
+
+    if (
+        spawnTimer <= 0
+    ) {
 
         spawnObstacle();
 
-        const spawnDelay =
+
+        const nextSpawn =
             Math.max(
-                settings.spawnMin,
-                settings.spawnStart -
+                settings.spawnMinimum,
+                settings.spawnDelay -
                 elapsed * 0.004
-            ) +
-            Math.random() *
-            settings.spawnRandom;
+            );
+
 
         spawnTimer =
-            spawnDelay;
+            nextSpawn +
+            Math.random() * 0.22;
 
     }
 
@@ -2095,19 +2135,13 @@ function update(dt) {
         const obstacle =
             obstacles[i];
 
+
         obstacle.y +=
-            (
-                currentSpeed +
-                obstacle.speed -
-                settings.startSpeed
-            ) *
-            dt;
+            speed * dt;
 
 
         if (
-            checkCollision(
-                obstacle
-            )
+            collision(obstacle)
         ) {
 
             endGame();
@@ -2127,6 +2161,7 @@ function update(dt) {
                 1
             );
 
+
             addScore(10);
 
         }
@@ -2139,17 +2174,25 @@ function update(dt) {
 }
 
 
-// --------------------------------------------------
+// ------------------------------------------------------------
 // DRAW
-// --------------------------------------------------
+// ------------------------------------------------------------
 
 function draw() {
 
     drawBackground();
 
+
     obstacles.forEach(
-        drawObstacle
+        function(obstacle) {
+
+            drawObstacle(
+                obstacle
+            );
+
+        }
     );
+
 
     drawParticles();
 
@@ -2158,15 +2201,16 @@ function draw() {
 }
 
 
-// --------------------------------------------------
+// ------------------------------------------------------------
 // GAME LOOP
-// --------------------------------------------------
+// ------------------------------------------------------------
 
 function gameLoop(timestamp) {
 
     if (!gameRunning) {
         return;
     }
+
 
     const dt =
         Math.min(
@@ -2177,12 +2221,15 @@ function gameLoop(timestamp) {
             ) / 1000
         );
 
+
     lastTime =
         timestamp;
+
 
     update(dt);
 
     draw();
+
 
     if (gameRunning) {
 
@@ -2195,49 +2242,10 @@ function gameLoop(timestamp) {
 }
 
 
-// --------------------------------------------------
-// INITIAL SCREEN
-// --------------------------------------------------
-
-overlay.style.display =
-    "flex";
-
-overlayTitle.textContent =
-    "1M.";
-
-if (level === 1) {
-
-    overlayText.innerHTML =
-        "Dodge. Survive.<br>Beat your best.";
-
-    startButton.textContent =
-        "▶ START RUN";
-
-}
-
-if (level === 2) {
-
-    overlayText.innerHTML =
-        "Dodge. Destroy.<br>You have 3 strikes.";
-
-    startButton.textContent =
-        "▶ START RUSH";
-
-}
-
-if (level === 3) {
-
-    overlayText.innerHTML =
-        "Choose your animal.<br>Dodge. Destroy. Survive.";
-
-    startButton.textContent =
-        `▶ START AS ${selectedAnimal}`;
-
-}
-
-
-// --------------------------------------------------
+// ------------------------------------------------------------
 // INITIAL DRAW
-// --------------------------------------------------
+// ------------------------------------------------------------
+
+updateStrikeDisplay();
 
 draw();
