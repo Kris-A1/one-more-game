@@ -17,24 +17,63 @@ const messageElement = document.getElementById("gameMessage");
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
 
-let gameState = "ready";
 
-/*
- * LEVEL SYSTEM
- *
- * Normal URL:
- * https://kris-a1.github.io/one-more-game/
- *
- * Level 2:
- * https://kris-a1.github.io/one-more-game/?level=2
- */
+// --------------------------------------------------
+// LEVEL
+// --------------------------------------------------
 
 const urlParams = new URLSearchParams(window.location.search);
 
-let currentLevel =
+const level =
     urlParams.get("level") === "2"
         ? 2
         : 1;
+
+
+// --------------------------------------------------
+// LEVEL SETTINGS
+// --------------------------------------------------
+
+const levelSettings = {
+
+    1: {
+        speed: 175,
+        maxSpeedIncrease: 190,
+        obstacleColor: "#ff637d",
+        obstacleHighlight: "#ffb1bd",
+        playerColor: "#72f5d0",
+        playerFeet: "#d8fff4",
+        edgeColor: "#72f5d0",
+        backgroundTop: "#0c1528",
+        backgroundBottom: "#111e30",
+        laneColor: "#243249",
+        roadColor: "#233149"
+    },
+
+    2: {
+        speed: 195,
+        maxSpeedIncrease: 215,
+        obstacleColor: "#ff4d4d",
+        obstacleHighlight: "#ffd0d0",
+        playerColor: "#4da6ff",
+        playerFeet: "#d7ebff",
+        edgeColor: "#4da6ff",
+        backgroundTop: "#160b18",
+        backgroundBottom: "#21102a",
+        laneColor: "#42233f",
+        roadColor: "#3a2038"
+    }
+};
+
+const settings =
+    levelSettings[level];
+
+
+// --------------------------------------------------
+// GAME STATE
+// --------------------------------------------------
+
+let gameState = "ready";
 
 let playerLane = 1;
 
@@ -44,12 +83,14 @@ let score = 0;
 
 let bestScore =
     Number(
-        localStorage.getItem("oneMoreBest") || 0
+        localStorage.getItem(
+            `oneMoreBestLevel${level}`
+        ) || 0
     );
 
 let elapsed = 0;
 
-let speed = 175;
+let speed = settings.speed;
 
 let spawnTimer = 0;
 
@@ -59,7 +100,24 @@ let flash = 0;
 
 let streak = 0;
 
-bestElement.textContent = bestScore;
+bestElement.textContent =
+    bestScore;
+
+
+// --------------------------------------------------
+// LEVEL LABEL
+// --------------------------------------------------
+
+if (level === 2) {
+
+    messageElement.textContent =
+        "LEVEL 2 · GET READY…";
+
+} else {
+
+    messageElement.textContent =
+        "Stay sharp…";
+}
 
 
 // --------------------------------------------------
@@ -74,27 +132,14 @@ const player = {
 
 
 // --------------------------------------------------
-// LEVEL SETTINGS
+// LANES
 // --------------------------------------------------
 
-function getLevelSettings() {
-
-    if (currentLevel === 2) {
-
-        return {
-            speed: 195,
-            minimumSpawnTime: 0.32,
-            maximumSpawnReduction: 0.45
-        };
-
-    }
-
-    return {
-        speed: 175,
-        minimumSpawnTime: 0.38,
-        maximumSpawnReduction: 0.38
-    };
-}
+const lanePositions = [
+    96,
+    180,
+    264
+];
 
 
 // --------------------------------------------------
@@ -113,36 +158,27 @@ function startGame() {
 
     elapsed = 0;
 
-    const settings =
-        getLevelSettings();
-
     speed = settings.speed;
 
-    spawnTimer =
-        currentLevel === 2
-            ? 0.45
-            : 0.5;
+    spawnTimer = 0.5;
 
     streak = 0;
 
     flash = 0;
 
-    scoreElement.textContent = "0";
+    scoreElement.textContent =
+        "0";
 
-    multiplierElement.textContent = "×1";
+    multiplierElement.textContent =
+        "×1";
 
-    if (currentLevel === 2) {
+    messageElement.textContent =
+        level === 2
+            ? "LEVEL 2 · STAY SHARP"
+            : "Stay sharp…";
 
-        messageElement.textContent =
-            "LEVEL 2 — Stay sharp…";
-
-    } else {
-
-        messageElement.textContent =
-            "Stay sharp…";
-    }
-
-    overlay.style.display = "none";
+    overlay.style.display =
+        "none";
 }
 
 
@@ -157,15 +193,13 @@ function gameOver() {
     const finalScore =
         Math.floor(score);
 
-    const isNewBest =
-        finalScore > bestScore;
+    if (finalScore > bestScore) {
 
-    if (isNewBest) {
-
-        bestScore = finalScore;
+        bestScore =
+            finalScore;
 
         localStorage.setItem(
-            "oneMoreBest",
+            `oneMoreBestLevel${level}`,
             bestScore
         );
 
@@ -177,22 +211,11 @@ function gameOver() {
         "RUN<br>OVER<span>.</span>";
 
     overlayText.innerHTML =
-        `LEVEL ${currentLevel}<br>
-         SCORE:
-         <strong
-            style="color:#72f5d0;font-size:24px"
-         >
-            ${finalScore}
-         </strong>
-         <br>
-         BEST:
-         <strong>${bestScore}</strong>
-         <br><br>
-         ${
-             isNewBest
-                 ? "NEW PERSONAL BEST!"
-                 : "YOU WERE GETTING CLOSER…"
-         }`;
+        `SCORE: <strong style="color:${settings.playerColor};font-size:24px">${finalScore}</strong><br>
+         BEST: <strong>${bestScore}</strong><br><br>
+         ${finalScore >= bestScore
+            ? "NEW PERSONAL BEST!"
+            : "YOU WERE GETTING CLOSER…"}`;
 
     startButton.textContent =
         "↻ TRY AGAIN";
@@ -201,7 +224,9 @@ function gameOver() {
         "flex";
 
     messageElement.textContent =
-        "Every run makes you sharper.";
+        level === 2
+            ? "Level 2 is waiting for you."
+            : "Every run makes you sharper.";
 }
 
 
@@ -220,7 +245,10 @@ function movePlayer(direction) {
     playerLane =
         Math.max(
             0,
-            Math.min(2, playerLane)
+            Math.min(
+                2,
+                playerLane
+            )
         );
 }
 
@@ -321,7 +349,9 @@ canvas.addEventListener(
         const difference =
             touchEndX - touchStartX;
 
-        if (Math.abs(difference) > 20) {
+        if (
+            Math.abs(difference) > 20
+        ) {
 
             movePlayer(
                 difference > 0
@@ -348,15 +378,18 @@ function createObstacle() {
         );
 
     /*
-     * Occasionally make the next obstacle
-     * appear in the same lane.
-     *
-     * This creates more interesting patterns.
+     * Level 2 has more repeated-lane
+     * patterns.
      */
+
+    const sameLaneChance =
+        level === 2
+            ? 0.45
+            : 0.30;
 
     if (
         obstacles.length > 0 &&
-        Math.random() < 0.30
+        Math.random() < sameLaneChance
     ) {
 
         lane =
@@ -385,27 +418,21 @@ function update(deltaTime) {
 
     elapsed += deltaTime;
 
-    const settings =
-        getLevelSettings();
-
 
     /*
-     * Difficulty gradually increases.
+     * Difficulty increases over time.
      */
 
     speed =
         settings.speed +
         Math.min(
             elapsed * 5,
-            currentLevel === 2
-                ? 210
-                : 190
+            settings.maxSpeedIncrease
         );
 
 
     /*
-     * Score multiplier increases
-     * every 10 seconds.
+     * Score multiplier.
      */
 
     const multiplier =
@@ -436,18 +463,29 @@ function update(deltaTime) {
 
         createObstacle();
 
-        const baseSpawnTime =
-            currentLevel === 2
+        const baseSpawn =
+            level === 2
                 ? 0.82
                 : 1.0;
 
+        const minimumSpawn =
+            level === 2
+                ? 0.32
+                : 0.38;
+
+        const randomSpawn =
+            level === 2
+                ? 0.30
+                : 0.38;
+
         spawnTimer =
             Math.max(
-                settings.minimumSpawnTime,
-                baseSpawnTime -
-                    elapsed * 0.008
+                minimumSpawn,
+                baseSpawn -
+                elapsed * 0.008
             ) +
-            Math.random() * 0.38;
+            Math.random() *
+            randomSpawn;
     }
 
 
@@ -470,7 +508,8 @@ function update(deltaTime) {
             obstacle.y > player.y
         ) {
 
-            obstacle.checked = true;
+            obstacle.checked =
+                true;
 
             if (
                 obstacle.lane !== playerLane
@@ -548,12 +587,12 @@ function drawBackground() {
 
     gradient.addColorStop(
         0,
-        "#0c1528"
+        settings.backgroundTop
     );
 
     gradient.addColorStop(
         1,
-        "#111e30"
+        settings.backgroundBottom
     );
 
     ctx.fillStyle =
@@ -572,20 +611,30 @@ function drawBackground() {
      */
 
     ctx.strokeStyle =
-        "#243249";
+        settings.laneColor;
 
     ctx.lineWidth = 1;
 
-    for (let i = 0; i < 4; i++) {
+    for (
+        let i = 0;
+        i < 4;
+        i++
+    ) {
 
         const x =
             54 + i * 84;
 
         ctx.beginPath();
 
-        ctx.moveTo(x, 0);
+        ctx.moveTo(
+            x,
+            0
+        );
 
-        ctx.lineTo(x, HEIGHT);
+        ctx.lineTo(
+            x,
+            HEIGHT
+        );
 
         ctx.stroke();
     }
@@ -599,7 +648,7 @@ function drawBackground() {
         (elapsed * speed) % 42;
 
     ctx.strokeStyle =
-        "#233149";
+        settings.roadColor;
 
     for (
         let y = -42 + offset;
@@ -609,9 +658,15 @@ function drawBackground() {
 
         ctx.beginPath();
 
-        ctx.moveTo(18, y);
+        ctx.moveTo(
+            18,
+            y
+        );
 
-        ctx.lineTo(342, y);
+        ctx.lineTo(
+            342,
+            y
+        );
 
         ctx.stroke();
     }
@@ -622,11 +677,10 @@ function drawBackground() {
      */
 
     ctx.fillStyle =
-        currentLevel === 2
-            ? "#3b82f6"
-            : "#72f5d0";
+        settings.edgeColor;
 
-    ctx.globalAlpha = 0.7;
+    ctx.globalAlpha =
+        0.7;
 
     ctx.fillRect(
         12,
@@ -642,7 +696,8 @@ function drawBackground() {
         HEIGHT
     );
 
-    ctx.globalAlpha = 1;
+    ctx.globalAlpha =
+        1;
 }
 
 
@@ -652,17 +707,9 @@ function drawBackground() {
 
 function drawObstacles() {
 
-    const obstacleColor =
-        currentLevel === 2
-            ? "#3b82f6"
-            : "#ff637d";
-
-    const obstacleHighlight =
-        currentLevel === 2
-            ? "#93c5fd"
-            : "#ffb1bd";
-
-    for (const obstacle of obstacles) {
+    for (
+        const obstacle of obstacles
+    ) {
 
         const x =
             lanePositions[
@@ -673,7 +720,7 @@ function drawObstacles() {
             obstacle.y;
 
         ctx.shadowColor =
-            obstacleColor;
+            settings.obstacleColor;
 
         ctx.shadowBlur = 12;
 
@@ -683,7 +730,7 @@ function drawObstacles() {
             60,
             20,
             5,
-            obstacleColor
+            settings.obstacleColor
         );
 
         ctx.shadowBlur = 0;
@@ -694,7 +741,7 @@ function drawObstacles() {
             50,
             3,
             2,
-            obstacleHighlight
+            settings.obstacleHighlight
         );
     }
 }
@@ -712,17 +759,6 @@ function drawPlayer() {
     const y =
         player.y;
 
-    const playerColor =
-        currentLevel === 2
-            ? "#ff3b3b"
-            : "#72f5d0";
-
-    const footColor =
-        currentLevel === 2
-            ? "#ffb3b3"
-            : "#d8fff4";
-
-
     ctx.save();
 
 
@@ -730,7 +766,9 @@ function drawPlayer() {
      * Tiny movement animation.
      */
 
-    if (gameState === "running") {
+    if (
+        gameState === "running"
+    ) {
 
         ctx.rotate(
             Math.sin(
@@ -750,7 +788,7 @@ function drawPlayer() {
      */
 
     ctx.shadowColor =
-        playerColor;
+        settings.playerColor;
 
     ctx.shadowBlur = 20;
 
@@ -765,9 +803,8 @@ function drawPlayer() {
         26,
         29,
         8,
-        playerColor
+        settings.playerColor
     );
-
 
     ctx.shadowBlur = 0;
 
@@ -805,7 +842,7 @@ function drawPlayer() {
         6,
         7,
         2,
-        footColor
+        settings.playerFeet
     );
 
     drawRoundedRect(
@@ -814,7 +851,7 @@ function drawPlayer() {
         6,
         7,
         2,
-        footColor
+        settings.playerFeet
     );
 
     ctx.restore();
@@ -871,12 +908,7 @@ function draw() {
     if (flash > 0) {
 
         ctx.fillStyle =
-            `rgba(
-                255,
-                85,
-                120,
-                ${flash * 0.25}
-            )`;
+            `rgba(255,85,120,${flash * 0.25})`;
 
         ctx.fillRect(
             0,
@@ -918,17 +950,6 @@ function gameLoop(timestamp) {
 // --------------------------------------------------
 // INITIALIZE
 // --------------------------------------------------
-
-if (currentLevel === 2) {
-
-    messageElement.textContent =
-        "LEVEL 2 — Red vs Blue";
-
-} else {
-
-    messageElement.textContent =
-        "Stay sharp…";
-}
 
 draw();
 
