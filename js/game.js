@@ -19,12 +19,33 @@ const HEIGHT = canvas.height;
 
 let gameState = "ready";
 
+/*
+ * LEVEL SYSTEM
+ *
+ * Normal URL:
+ * https://kris-a1.github.io/one-more-game/
+ *
+ * Level 2:
+ * https://kris-a1.github.io/one-more-game/?level=2
+ */
+
+const urlParams = new URLSearchParams(window.location.search);
+
+let currentLevel =
+    urlParams.get("level") === "2"
+        ? 2
+        : 1;
+
 let playerLane = 1;
 
 let obstacles = [];
 
 let score = 0;
-let bestScore = Number(localStorage.getItem("oneMoreBest") || 0);
+
+let bestScore =
+    Number(
+        localStorage.getItem("oneMoreBest") || 0
+    );
 
 let elapsed = 0;
 
@@ -53,14 +74,27 @@ const player = {
 
 
 // --------------------------------------------------
-// LANES
+// LEVEL SETTINGS
 // --------------------------------------------------
 
-const lanePositions = [
-    96,
-    180,
-    264
-];
+function getLevelSettings() {
+
+    if (currentLevel === 2) {
+
+        return {
+            speed: 195,
+            minimumSpawnTime: 0.32,
+            maximumSpawnReduction: 0.45
+        };
+
+    }
+
+    return {
+        speed: 175,
+        minimumSpawnTime: 0.38,
+        maximumSpawnReduction: 0.38
+    };
+}
 
 
 // --------------------------------------------------
@@ -79,9 +113,15 @@ function startGame() {
 
     elapsed = 0;
 
-    speed = 175;
+    const settings =
+        getLevelSettings();
 
-    spawnTimer = 0.5;
+    speed = settings.speed;
+
+    spawnTimer =
+        currentLevel === 2
+            ? 0.45
+            : 0.5;
 
     streak = 0;
 
@@ -91,7 +131,16 @@ function startGame() {
 
     multiplierElement.textContent = "×1";
 
-    messageElement.textContent = "Stay sharp…";
+    if (currentLevel === 2) {
+
+        messageElement.textContent =
+            "LEVEL 2 — Stay sharp…";
+
+    } else {
+
+        messageElement.textContent =
+            "Stay sharp…";
+    }
 
     overlay.style.display = "none";
 }
@@ -105,9 +154,13 @@ function gameOver() {
 
     gameState = "gameover";
 
-    const finalScore = Math.floor(score);
+    const finalScore =
+        Math.floor(score);
 
-    if (finalScore > bestScore) {
+    const isNewBest =
+        finalScore > bestScore;
+
+    if (isNewBest) {
 
         bestScore = finalScore;
 
@@ -116,22 +169,36 @@ function gameOver() {
             bestScore
         );
 
-        bestElement.textContent = bestScore;
+        bestElement.textContent =
+            bestScore;
     }
 
     overlayTitle.innerHTML =
         "RUN<br>OVER<span>.</span>";
 
     overlayText.innerHTML =
-        `SCORE: <strong style="color:#72f5d0;font-size:24px">${finalScore}</strong><br>
-         BEST: <strong>${bestScore}</strong><br><br>
-         ${finalScore >= bestScore
-            ? "NEW PERSONAL BEST!"
-            : "YOU WERE GETTING CLOSER…"}`;
+        `LEVEL ${currentLevel}<br>
+         SCORE:
+         <strong
+            style="color:#72f5d0;font-size:24px"
+         >
+            ${finalScore}
+         </strong>
+         <br>
+         BEST:
+         <strong>${bestScore}</strong>
+         <br><br>
+         ${
+             isNewBest
+                 ? "NEW PERSONAL BEST!"
+                 : "YOU WERE GETTING CLOSER…"
+         }`;
 
-    startButton.textContent = "↻ TRY AGAIN";
+    startButton.textContent =
+        "↻ TRY AGAIN";
 
-    overlay.style.display = "flex";
+    overlay.style.display =
+        "flex";
 
     messageElement.textContent =
         "Every run makes you sharper.";
@@ -150,10 +217,11 @@ function movePlayer(direction) {
 
     playerLane += direction;
 
-    playerLane = Math.max(
-        0,
-        Math.min(2, playerLane)
-    );
+    playerLane =
+        Math.max(
+            0,
+            Math.min(2, playerLane)
+        );
 }
 
 
@@ -208,8 +276,10 @@ window.addEventListener(
         }
 
         if (
-            (event.key === " " ||
-             event.key === "Enter") &&
+            (
+                event.key === " " ||
+                event.key === "Enter"
+            ) &&
             gameState !== "running"
         ) {
 
@@ -254,7 +324,9 @@ canvas.addEventListener(
         if (Math.abs(difference) > 20) {
 
             movePlayer(
-                difference > 0 ? 1 : -1
+                difference > 0
+                    ? 1
+                    : -1
             );
         }
 
@@ -271,11 +343,14 @@ canvas.addEventListener(
 function createObstacle() {
 
     let lane =
-        Math.floor(Math.random() * 3);
+        Math.floor(
+            Math.random() * 3
+        );
 
     /*
      * Occasionally make the next obstacle
      * appear in the same lane.
+     *
      * This creates more interesting patterns.
      */
 
@@ -285,7 +360,9 @@ function createObstacle() {
     ) {
 
         lane =
-            obstacles[obstacles.length - 1].lane;
+            obstacles[
+                obstacles.length - 1
+            ].lane;
     }
 
     obstacles.push({
@@ -308,15 +385,21 @@ function update(deltaTime) {
 
     elapsed += deltaTime;
 
+    const settings =
+        getLevelSettings();
+
+
     /*
      * Difficulty gradually increases.
      */
 
     speed =
-        175 +
+        settings.speed +
         Math.min(
             elapsed * 5,
-            190
+            currentLevel === 2
+                ? 210
+                : 190
         );
 
 
@@ -326,7 +409,10 @@ function update(deltaTime) {
      */
 
     const multiplier =
-        1 + Math.floor(elapsed / 10);
+        1 +
+        Math.floor(
+            elapsed / 10
+        );
 
     score +=
         deltaTime *
@@ -350,10 +436,16 @@ function update(deltaTime) {
 
         createObstacle();
 
+        const baseSpawnTime =
+            currentLevel === 2
+                ? 0.82
+                : 1.0;
+
         spawnTimer =
             Math.max(
-                0.38,
-                1.0 - elapsed * 0.008
+                settings.minimumSpawnTime,
+                baseSpawnTime -
+                    elapsed * 0.008
             ) +
             Math.random() * 0.38;
     }
@@ -407,8 +499,10 @@ function update(deltaTime) {
 
         if (
             obstacle.lane === playerLane &&
-            obstacle.y + 20 > player.y - 17 &&
-            obstacle.y < player.y + 20
+            obstacle.y + 20 >
+                player.y - 17 &&
+            obstacle.y <
+                player.y + 20
         ) {
 
             gameOver();
@@ -425,7 +519,8 @@ function update(deltaTime) {
     obstacles =
         obstacles.filter(
             obstacle =>
-                obstacle.y < HEIGHT + 30
+                obstacle.y <
+                HEIGHT + 30
         );
 
 
@@ -461,7 +556,8 @@ function drawBackground() {
         "#111e30"
     );
 
-    ctx.fillStyle = gradient;
+    ctx.fillStyle =
+        gradient;
 
     ctx.fillRect(
         0,
@@ -526,7 +622,9 @@ function drawBackground() {
      */
 
     ctx.fillStyle =
-        "#72f5d0";
+        currentLevel === 2
+            ? "#3b82f6"
+            : "#72f5d0";
 
     ctx.globalAlpha = 0.7;
 
@@ -554,16 +652,28 @@ function drawBackground() {
 
 function drawObstacles() {
 
+    const obstacleColor =
+        currentLevel === 2
+            ? "#3b82f6"
+            : "#ff637d";
+
+    const obstacleHighlight =
+        currentLevel === 2
+            ? "#93c5fd"
+            : "#ffb1bd";
+
     for (const obstacle of obstacles) {
 
         const x =
-            lanePositions[obstacle.lane] - 30;
+            lanePositions[
+                obstacle.lane
+            ] - 30;
 
         const y =
             obstacle.y;
 
         ctx.shadowColor =
-            "#ff637d";
+            obstacleColor;
 
         ctx.shadowBlur = 12;
 
@@ -573,7 +683,7 @@ function drawObstacles() {
             60,
             20,
             5,
-            "#ff637d"
+            obstacleColor
         );
 
         ctx.shadowBlur = 0;
@@ -584,7 +694,7 @@ function drawObstacles() {
             50,
             3,
             2,
-            "#ffb1bd"
+            obstacleHighlight
         );
     }
 }
@@ -602,8 +712,19 @@ function drawPlayer() {
     const y =
         player.y;
 
+    const playerColor =
+        currentLevel === 2
+            ? "#ff3b3b"
+            : "#72f5d0";
+
+    const footColor =
+        currentLevel === 2
+            ? "#ffb3b3"
+            : "#d8fff4";
+
 
     ctx.save();
+
 
     /*
      * Tiny movement animation.
@@ -612,11 +733,16 @@ function drawPlayer() {
     if (gameState === "running") {
 
         ctx.rotate(
-            Math.sin(elapsed * 12) * 0.06
+            Math.sin(
+                elapsed * 12
+            ) * 0.06
         );
     }
 
-    ctx.translate(x, y);
+    ctx.translate(
+        x,
+        y
+    );
 
 
     /*
@@ -624,7 +750,7 @@ function drawPlayer() {
      */
 
     ctx.shadowColor =
-        "#72f5d0";
+        playerColor;
 
     ctx.shadowBlur = 20;
 
@@ -639,7 +765,7 @@ function drawPlayer() {
         26,
         29,
         8,
-        "#72f5d0"
+        playerColor
     );
 
 
@@ -679,7 +805,7 @@ function drawPlayer() {
         6,
         7,
         2,
-        "#d8fff4"
+        footColor
     );
 
     drawRoundedRect(
@@ -688,7 +814,7 @@ function drawPlayer() {
         6,
         7,
         2,
-        "#d8fff4"
+        footColor
     );
 
     ctx.restore();
@@ -708,7 +834,8 @@ function drawRoundedRect(
     color
 ) {
 
-    ctx.fillStyle = color;
+    ctx.fillStyle =
+        color;
 
     ctx.beginPath();
 
@@ -744,7 +871,12 @@ function draw() {
     if (flash > 0) {
 
         ctx.fillStyle =
-            `rgba(255,85,120,${flash * 0.25})`;
+            `rgba(
+                255,
+                85,
+                120,
+                ${flash * 0.25}
+            )`;
 
         ctx.fillRect(
             0,
@@ -770,13 +902,16 @@ function gameLoop(timestamp) {
             )
             : 0;
 
-    lastTime = timestamp;
+    lastTime =
+        timestamp;
 
     update(deltaTime);
 
     draw();
 
-    requestAnimationFrame(gameLoop);
+    requestAnimationFrame(
+        gameLoop
+    );
 }
 
 
@@ -784,6 +919,19 @@ function gameLoop(timestamp) {
 // INITIALIZE
 // --------------------------------------------------
 
+if (currentLevel === 2) {
+
+    messageElement.textContent =
+        "LEVEL 2 — Red vs Blue";
+
+} else {
+
+    messageElement.textContent =
+        "Stay sharp…";
+}
+
 draw();
 
-requestAnimationFrame(gameLoop);
+requestAnimationFrame(
+    gameLoop
+);
