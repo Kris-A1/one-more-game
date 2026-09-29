@@ -1,836 +1,505 @@
-/* =========================================================
-   1M — COMPLETE GAME STYLE
-   Clean mobile game UI
-   ========================================================= */
-
-
-/* ---------------------------------------------------------
-   RESET
-   --------------------------------------------------------- */
-
 * {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html,
 body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    min-height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+  background: #050711;
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
 }
 
 body {
-    background:
-        radial-gradient(
-            circle at 50% 10%,
-            #18234a 0%,
-            #080b18 42%,
-            #03040a 100%
-        );
-
-    color: white;
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
-    overflow-x: hidden;
+  display: flex;
+  justify-content: center;
 }
 
-
-/* ---------------------------------------------------------
-   MAIN GAME SHELL
-   --------------------------------------------------------- */
+button {
+  font: inherit;
+}
 
 .game-shell {
-    width: 100%;
-    max-width: 520px;
-
-    min-height: 100vh;
-
-    margin: 0 auto;
-    padding: 18px 14px 22px;
-
-    display: flex;
-    flex-direction: column;
+  width: min(100%, 520px);
+  padding: 14px 14px 20px;
 }
 
 
-/* ---------------------------------------------------------
-   HEADER
-   --------------------------------------------------------- */
+/* =========================
+   TOP BAR
+========================= */
 
-.game-header {
-    width: 100%;
+.topbar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
 
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.logo {
+  font-size: 34px;
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -2px;
+}
 
-    margin-bottom: 12px;
+.level-name {
+  margin-top: 5px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  opacity: 0.55;
+}
+
+.best-box {
+  text-align: right;
+}
+
+.best-box span {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 2px;
+  opacity: 0.5;
+}
+
+.best-box strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 21px;
+  font-weight: 900;
 }
 
 
-.game-name {
-    font-size: 28px;
-    font-weight: 950;
-    letter-spacing: -1px;
-}
-
-
-.game-name span {
-    color: #55e8ff;
-}
-
-
-.game-subtitle {
-    margin-top: 3px;
-
-    font-size: 9px;
-    font-weight: 900;
-    letter-spacing: 2px;
-
-    color: rgba(255,255,255,0.55);
-}
-
-
-.best-score {
-    min-width: 62px;
-
-    text-align: right;
-
-    font-size: 8px;
-    font-weight: 900;
-    letter-spacing: 1.5px;
-
-    color: rgba(255,255,255,0.5);
-}
-
-
-.best-score strong {
-    display: block;
-
-    margin-top: 2px;
-
-    font-size: 18px;
-    letter-spacing: 0;
-
-    color: white;
-}
-
-
-/* ---------------------------------------------------------
+/* =========================
    GAME AREA
-   --------------------------------------------------------- */
+========================= */
 
-.game-container {
-    position: relative;
+.game-area {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 9 / 14;
+  min-height: 420px;
+  max-height: 690px;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #080c1b;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.025);
+}
 
-    width: 100%;
-
-    max-width: 440px;
-
-    margin: 0 auto;
-
-    aspect-ratio: 360 / 490;
-
-    overflow: hidden;
-
-    border-radius: 24px;
-
-    background: #080b18;
-
-    border: 1px solid rgba(255,255,255,0.10);
-
-    box-shadow:
-        0 20px 60px rgba(0,0,0,0.45),
-        inset 0 0 30px rgba(255,255,255,0.025);
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 
-#gameCanvas {
-    display: block;
+/* =========================
+   HUD
+========================= */
 
-    width: 100%;
-    height: 100%;
-
-    touch-action: none;
+.hud {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
 }
 
-
-/* ---------------------------------------------------------
-   SCORE
-   --------------------------------------------------------- */
-
-.score-display {
-    position: absolute;
-
-    top: 18px;
-    left: 20px;
-
-    z-index: 5;
-
-    pointer-events: none;
+.score-box,
+.multiplier-box,
+.strike-display {
+  min-width: 78px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(5, 7, 17, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
 }
 
-
-.score-display small {
-    display: block;
-
-    font-size: 8px;
-    font-weight: 900;
-    letter-spacing: 2px;
-
-    color: rgba(255,255,255,0.55);
+.hud span {
+  display: block;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 1.7px;
+  opacity: 0.48;
 }
 
-
-.score-display strong {
-    display: block;
-
-    margin-top: 1px;
-
-    font-size: 28px;
-    line-height: 1;
-
-    font-weight: 950;
+.hud strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 17px;
+  font-weight: 900;
 }
 
-
-/* ---------------------------------------------------------
-   MULTIPLIER
-   --------------------------------------------------------- */
-
-.multiplier-display {
-    position: absolute;
-
-    top: 18px;
-    right: 20px;
-
-    z-index: 5;
-
-    padding: 7px 10px;
-
-    border-radius: 10px;
-
-    background: rgba(255,255,255,0.08);
-
-    border: 1px solid rgba(255,255,255,0.12);
-
-    font-size: 12px;
-    font-weight: 950;
+.multiplier-box {
+  text-align: right;
 }
-
-
-/* ---------------------------------------------------------
-   STRIKE DISPLAY
-   --------------------------------------------------------- */
 
 .strike-display {
-    position: absolute;
+  text-align: center;
+}
 
-    top: 58px;
-    right: 20px;
-
-    z-index: 5;
-
-    padding: 6px 9px;
-
-    border-radius: 9px;
-
-    background: rgba(255,60,105,0.16);
-
-    border: 1px solid rgba(255,90,130,0.40);
-
-    color: #fff;
-
-    font-size: 9px;
-    font-weight: 950;
-    letter-spacing: 1px;
+.strike-display strong {
+  color: #ff5b72;
 }
 
 
-/* ---------------------------------------------------------
+/* =========================
    OVERLAY
-   --------------------------------------------------------- */
+========================= */
 
-.game-overlay {
-    position: absolute;
-
-    inset: 0;
-
-    z-index: 10;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    padding: 28px 20px;
-
-    text-align: center;
-
-    background:
-        radial-gradient(
-            circle at 50% 35%,
-            rgba(30,45,95,0.55),
-            rgba(3,5,12,0.92) 72%
-        );
-
-    backdrop-filter: blur(3px);
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 26px;
+  text-align: center;
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(12, 19, 48, 0.55),
+      rgba(3, 5, 12, 0.88)
+    );
+  z-index: 10;
 }
-
 
 .overlay-label {
-    margin-bottom: 8px;
+  margin-bottom: 8px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  opacity: 0.55;
+}
 
-    font-size: 9px;
-    font-weight: 900;
-    letter-spacing: 3px;
+.overlay h1 {
+  margin: 0;
+  font-size: clamp(38px, 10vw, 58px);
+  line-height: 0.95;
+  font-weight: 1000;
+  letter-spacing: -2px;
+}
 
-    color: #55e8ff;
+.overlay p {
+  margin: 15px 0 22px;
+  font-size: 14px;
+  line-height: 1.5;
+  opacity: 0.65;
 }
 
 
-.game-overlay h1 {
-    margin: 0;
-
-    font-size: 58px;
-    line-height: 0.95;
-
-    font-weight: 950;
-    letter-spacing: -3px;
-}
-
-
-.game-overlay h1 span {
-    color: #55e8ff;
-}
-
-
-.game-overlay p {
-    margin: 13px 0 0;
-
-    font-size: 12px;
-    line-height: 1.6;
-
-    color: rgba(255,255,255,0.62);
-}
-
-
-/* ---------------------------------------------------------
+/* =========================
    ANIMAL SELECTOR
-   --------------------------------------------------------- */
+========================= */
 
 .animal-chooser {
-    width: 100%;
-    max-width: 350px;
-
-    margin: 22px auto 15px;
+  width: 100%;
+  max-width: 390px;
+  margin: 0 auto 18px;
 }
 
-
-.animal-title {
-    margin-bottom: 11px;
-
-    font-size: 10px;
-    font-weight: 950;
-    letter-spacing: 2.5px;
-
-    color: rgba(255,255,255,0.65);
+.chooser-title {
+  margin-bottom: 10px;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  opacity: 0.5;
 }
-
-
-/* FOUR CHARACTER CARDS */
 
 .animal-grid {
-    width: 100%;
-
-    display: grid;
-
-    grid-template-columns: repeat(4, 1fr);
-
-    gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
 }
 
-
-.animal-button {
-    position: relative;
-
-    min-width: 0;
-    height: 100px;
-
-    padding: 10px 4px;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    gap: 8px;
-
-    border-radius: 18px;
-
-    border: 2px solid rgba(255,255,255,0.10);
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(255,255,255,0.10),
-            rgba(255,255,255,0.035)
-        );
-
-    color: white;
-
-    cursor: pointer;
-
-    font-family: inherit;
-
-    transition:
-        transform 0.15s ease,
-        border-color 0.15s ease,
-        background 0.15s ease,
-        box-shadow 0.15s ease;
+.animal-card {
+  position: relative;
+  min-width: 0;
+  min-height: 88px;
+  padding: 10px 5px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.045);
+  color: #ffffff;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease;
 }
 
-
-.animal-button:hover {
-    transform: translateY(-3px);
-
-    border-color: rgba(255,255,255,0.25);
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(255,255,255,0.15),
-            rgba(255,255,255,0.05)
-        );
+.animal-card:active {
+  transform: scale(0.95);
 }
 
-
-.animal-button:active {
-    transform: scale(0.95);
+.animal-card.selected {
+  border-color: #4df5ff;
+  background: rgba(77, 245, 255, 0.11);
+  box-shadow:
+    0 0 0 1px rgba(77, 245, 255, 0.2),
+    0 0 24px rgba(77, 245, 255, 0.12);
 }
 
-
-/* SELECTED CHARACTER */
-
-.animal-button.selected {
-    transform: translateY(-4px);
-
-    border-color: #55e8ff;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(85,232,255,0.20),
-            rgba(85,232,255,0.06)
-        );
-
-    box-shadow:
-        0 0 0 2px rgba(85,232,255,0.08),
-        0 0 28px rgba(85,232,255,0.22);
+.animal-icon {
+  display: block;
+  font-size: 34px;
+  line-height: 1;
 }
-
-
-.animal-button.selected::after {
-    content: "✓";
-
-    position: absolute;
-
-    top: 6px;
-    right: 7px;
-
-    width: 17px;
-    height: 17px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 50%;
-
-    background: #55e8ff;
-
-    color: #061018;
-
-    font-size: 10px;
-    font-weight: 950;
-}
-
-
-.animal-emoji {
-    display: block;
-
-    font-size: 42px;
-
-    line-height: 1;
-}
-
 
 .animal-name {
-    font-size: 8px;
-    font-weight: 950;
-    letter-spacing: 1px;
+  display: block;
+  margin-top: 7px;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  opacity: 0.7;
+}
 
-    color: rgba(255,255,255,0.72);
+.animal-check {
+  position: absolute;
+  top: 6px;
+  right: 7px;
+  display: none;
+  font-size: 11px;
+  font-weight: 900;
+  color: #4df5ff;
+}
+
+.animal-card.selected .animal-check {
+  display: block;
 }
 
 
-.animal-button.selected .animal-name {
-    color: white;
-}
-
-
-/* ---------------------------------------------------------
+/* =========================
    START BUTTON
-   --------------------------------------------------------- */
+========================= */
 
 .start-button {
-    width: 100%;
-    max-width: 320px;
-
-    min-height: 60px;
-
-    margin-top: 2px;
-
-    padding: 0 18px;
-
-    border: 0;
-    border-radius: 18px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #ffffff,
-            #d9efff
-        );
-
-    color: #08111c;
-
-    font-family: inherit;
-
-    font-size: 14px;
-    font-weight: 950;
-    letter-spacing: 0.7px;
-
-    cursor: pointer;
-
-    box-shadow:
-        0 10px 30px rgba(0,0,0,0.30),
-        0 0 20px rgba(85,232,255,0.08);
-
-    transition:
-        transform 0.12s ease,
-        box-shadow 0.12s ease;
+  width: min(100%, 280px);
+  min-height: 60px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 18px;
+  background: #ffffff;
+  color: #070912;
+  font-size: 15px;
+  font-weight: 1000;
+  letter-spacing: 1px;
+  cursor: pointer;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.3);
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease;
 }
-
-
-.start-button:hover {
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 14px 35px rgba(0,0,0,0.35),
-        0 0 25px rgba(85,232,255,0.15);
-}
-
 
 .start-button:active {
-    transform: scale(0.97);
+  transform: scale(0.96);
+}
+
+.start-button:hover {
+  opacity: 0.92;
 }
 
 
-/* ---------------------------------------------------------
+/* =========================
    INSTRUCTIONS
-   --------------------------------------------------------- */
+========================= */
 
 .instructions {
-    margin-top: 11px;
+  margin-top: 15px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  opacity: 0.42;
+}
 
-    font-size: 8px;
-    font-weight: 900;
-    letter-spacing: 1.8px;
+.instructions span {
+  display: inline-block;
+  margin-right: 4px;
+}
 
-    color: rgba(255,255,255,0.35);
+.instructions #attackInstruction {
+  margin-left: 12px;
 }
 
 
-/* ---------------------------------------------------------
-   BOTTOM CONTROL BAR
-   IMPORTANT: ALWAYS ONE ROW
-   --------------------------------------------------------- */
+/* =========================
+   BOTTOM CONTROLS
+========================= */
 
 .controls {
-    width: 100%;
-
-    display: grid !important;
-
-    grid-template-columns:
-        minmax(0, 1fr)
-        110px
-        minmax(0, 1fr);
-
-    align-items: center;
-
-    gap: 10px;
-
-    margin: 14px auto 0;
-
-    padding: 0;
-
-    max-width: 440px;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 112px minmax(0, 1fr) !important;
+  gap: 10px;
+  width: 100%;
+  margin-top: 12px;
 }
-
-
-/* ALL THREE CONTROL BUTTONS */
 
 .control-button {
-    width: 100% !important;
-
-    height: 64px !important;
-
-    margin: 0 !important;
-
-    padding: 0 !important;
-
-    border-radius: 18px;
-
-    font-family: inherit;
-
-    cursor: pointer;
-
-    touch-action: manipulation;
-
-    user-select: none;
-    -webkit-user-select: none;
-
-    transition:
-        transform 0.08s ease,
-        background 0.12s ease,
-        border-color 0.12s ease;
+  width: 100% !important;
+  min-width: 0;
+  height: 64px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  transition:
+    transform 0.1s ease,
+    background 0.1s ease;
 }
-
 
 .control-button:active {
-    transform: scale(0.94);
+  transform: scale(0.94);
 }
-
-
-/* LEFT + RIGHT */
 
 .move-button {
-    display: flex !important;
-
-    align-items: center;
-    justify-content: center;
-
-    background:
-        rgba(255,255,255,0.065);
-
-    border: 2px solid rgba(255,255,255,0.12);
-
-    color: white;
-
-    font-size: 34px;
-    font-weight: 950;
+  background: #11182b;
+  font-size: 30px;
+  font-weight: 400;
 }
-
-
-.move-button:hover {
-    background:
-        rgba(255,255,255,0.11);
-
-    border-color:
-        rgba(255,255,255,0.22);
-}
-
-
-/* CENTRAL STRIKE */
 
 .attack-button {
-    display: flex !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  background: #2a1220;
+  border-color: rgba(255, 91, 114, 0.3);
+}
 
-    flex-direction: column;
+.attack-icon {
+  font-size: 22px;
+  line-height: 1;
+}
 
-    align-items: center;
-    justify-content: center;
+.attack-label {
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 1.2px;
+}
 
-    gap: 2px;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(255,65,105,0.28),
-            rgba(155,25,65,0.22)
-        );
-
-    border: 2px solid rgba(255,90,125,0.65);
-
-    color: white;
-
-    box-shadow:
-        0 0 20px rgba(255,60,110,0.08);
+.attack-button > span:last-child {
+  font-size: 9px;
+  font-weight: 900;
+  opacity: 0.65;
 }
 
 
-.attack-button span {
-    font-size: 25px;
-
-    line-height: 1;
-}
-
-
-.attack-button small {
-    font-size: 8px;
-    font-weight: 950;
-    letter-spacing: 0.8px;
-
-    color: rgba(255,255,255,0.82);
-}
-
-
-.attack-button:hover {
-    background:
-        linear-gradient(
-            145deg,
-            rgba(255,65,105,0.38),
-            rgba(155,25,65,0.30)
-        );
-}
-
-
-/* ---------------------------------------------------------
+/* =========================
    GAME MESSAGE
-   --------------------------------------------------------- */
+========================= */
 
 .game-message {
-    width: 100%;
-
-    margin-top: 9px;
-
-    text-align: center;
-
-    font-size: 9px;
-    font-weight: 800;
-
-    color: rgba(255,255,255,0.35);
+  min-height: 18px;
+  margin-top: 8px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 800;
+  opacity: 0.65;
 }
 
 
-/* ---------------------------------------------------------
-   LEVEL 1
-   --------------------------------------------------------- */
+/* =========================
+   UTILITY
+========================= */
 
-.game-container.level-1 {
-    background: #07111f;
+.hidden {
+  display: none !important;
 }
 
 
-/* ---------------------------------------------------------
-   LEVEL 2
-   --------------------------------------------------------- */
-
-.game-container.level-2 {
-    background: #12091e;
-}
-
-
-/* ---------------------------------------------------------
-   LEVEL 3
-   --------------------------------------------------------- */
-
-.game-container.level-3 {
-    background: #0b1710;
-}
-
-
-/* ---------------------------------------------------------
+/* =========================
    SMALL PHONES
-   --------------------------------------------------------- */
+========================= */
 
-@media (max-width: 380px) {
+@media (max-width: 360px) {
 
-    .game-shell {
-        padding-left: 10px;
-        padding-right: 10px;
-    }
+  .game-shell {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
 
+  .game-area {
+    border-radius: 20px;
+  }
 
-    .controls {
-        grid-template-columns:
-            minmax(0, 1fr)
-            96px
-            minmax(0, 1fr);
+  .controls {
+    grid-template-columns: minmax(0, 1fr) 96px minmax(0, 1fr) !important;
+    gap: 7px;
+  }
 
-        gap: 7px;
-    }
+  .control-button {
+    height: 58px;
+  }
 
+  .animal-grid {
+    gap: 6px;
+  }
 
-    .control-button {
-        height: 60px !important;
-    }
+  .animal-card {
+    min-height: 80px;
+  }
 
-
-    .animal-grid {
-        gap: 6px;
-    }
-
-
-    .animal-button {
-        height: 88px;
-        border-radius: 15px;
-    }
-
-
-    .animal-emoji {
-        font-size: 35px;
-    }
-
-
-    .animal-name {
-        font-size: 7px;
-    }
-
-
-    .game-overlay {
-        padding-left: 13px;
-        padding-right: 13px;
-    }
+  .animal-icon {
+    font-size: 29px;
+  }
 
 }
 
 
-/* ---------------------------------------------------------
-   VERY SMALL PHONES
-   --------------------------------------------------------- */
+/* =========================
+   LANDSCAPE / SHORT SCREENS
+========================= */
 
-@media (max-width: 340px) {
+@media (max-height: 650px) {
 
-    .animal-grid {
-        grid-template-columns: repeat(2, 1fr);
+  .game-area {
+    min-height: 390px;
+  }
 
-        gap: 8px;
-    }
+  .overlay {
+    padding-top: 18px;
+    padding-bottom: 18px;
+  }
 
+  .overlay p {
+    margin-top: 9px;
+    margin-bottom: 12px;
+  }
 
-    .animal-button {
-        height: 82px;
-    }
+  .animal-chooser {
+    margin-bottom: 12px;
+  }
 
+  .animal-card {
+    min-height: 72px;
+  }
 
-    .animal-emoji {
-        font-size: 32px;
-    }
+  .animal-icon {
+    font-size: 27px;
+  }
 
-
-    .controls {
-        grid-template-columns:
-            minmax(0, 1fr)
-            88px
-            minmax(0, 1fr);
-    }
+  .start-button {
+    min-height: 52px;
+  }
 
 }
