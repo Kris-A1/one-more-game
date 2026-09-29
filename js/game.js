@@ -1,90 +1,115 @@
+/* =========================================================
+   1M — COMPLETE GAME
+   MASTER VISUAL STYLE
+   Levels 1–10
+   ========================================================= */
+
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 const scoreElement = document.getElementById("score");
 const bestScoreElement = document.getElementById("bestScore");
-const multiplierElement = document.getElementById("multiplier");
 
-const strikesElement = document.getElementById("strikes");
-const attackCountElement = document.getElementById("attackCount");
-
-const levelName = document.getElementById("levelName");
-
-const overlay = document.getElementById("overlay");
-const overlayLabel = document.getElementById("overlayLabel");
-const overlayTitle = document.getElementById("overlayTitle");
-const overlayText = document.getElementById("overlayText");
-
-const animalChooser = document.getElementById("animalChooser");
-const chooserTitle = document.getElementById("chooserTitle");
-const characterGrid = document.getElementById("characterGrid");
-
-const startButton = document.getElementById("startButton");
-
-const leftButton = document.getElementById("leftButton");
-const rightButton = document.getElementById("rightButton");
-const attackButton = document.getElementById("attackButton");
-
-const attackInstruction =
-  document.getElementById("attackInstruction");
+const multiplierElement =
+  document.getElementById("multiplierDisplay");
 
 const strikeDisplay =
   document.getElementById("strikeDisplay");
+
+const overlay =
+  document.getElementById("gameOverlay");
+
+const overlayLabel =
+  document.querySelector(".overlay-label");
+
+const overlayTitle =
+  document.getElementById("overlayTitle");
+
+const overlayText =
+  document.getElementById("overlayText");
+
+const startButton =
+  document.getElementById("startButton");
+
+const leftButton =
+  document.getElementById("leftButton");
+
+const rightButton =
+  document.getElementById("rightButton");
+
+const attackButton =
+  document.getElementById("attackButton");
+
+const animalChooser =
+  document.getElementById("animalChooser");
+
+const animalCards =
+  document.querySelectorAll(".animal-button");
+
+const levelSubtitle =
+  document.getElementById("levelSubtitle");
 
 const gameMessage =
   document.getElementById("gameMessage");
 
 
 /* =========================================================
-   LEVELS
-========================================================= */
+   LEVEL SETUP
+   ========================================================= */
+
+const params =
+  new URLSearchParams(window.location.search);
+
+let level =
+  Number(params.get("level")) || 1;
+
+if (level < 1 || level > 10) {
+  level = 1;
+}
+
 
 const LEVELS = {
 
   1: {
     name: "NEON RUN",
+    label: "LEVEL 1",
     world: "neon",
-    character: "runner",
-    characterName: "RUNNER",
-    description:
-      "Dodge everything.<br>How long can you survive?",
+    background: "#080d22",
+    playerColor: "#42f5ff",
+    obstacleColor: "#ff3b81",
+    speed: 175,
+    maxSpeed: 245,
     attack: false,
     strikes: 0,
-    baseSpeed: 175,
-    maxSpeed: 245,
-    obstacle: "neon-block",
-    background: "#070b20"
+    character: "RUNNER"
   },
 
   2: {
     name: "NEON RUSH",
-    world: "neon-rush",
-    character: "runner",
-    characterName: "RUNNER",
-    description:
-      "Dodge or destroy obstacles.<br>You have 3 strikes.",
+    label: "LEVEL 2",
+    world: "neon",
+    background: "#12081e",
+    playerColor: "#64a8ff",
+    obstacleColor: "#ff4d65",
+    speed: 205,
+    maxSpeed: 275,
     attack: true,
     strikes: 3,
-    baseSpeed: 205,
-    maxSpeed: 275,
-    obstacle: "diamond",
-    background: "#0b0820"
+    character: "RUNNER"
   },
 
   3: {
     name: "ANIMAL RUN",
+    label: "LEVEL 3",
     world: "animal",
-    character: "animals",
-    characterName: "ANIMAL",
-    description:
-      "Choose your runner.<br>Dodge or destroy obstacles.",
+    background: "#0a1912",
+    playerColor: "#ffe66b",
+    obstacleColor: "#b77b46",
+    speed: 220,
+    maxSpeed: 295,
     attack: true,
     strikes: 3,
-    baseSpeed: 220,
-    maxSpeed: 295,
-    obstacle: "rock",
-    background: "#061914",
-
+    character: "ANIMAL",
     characters: [
       ["BUNNY", "🐰"],
       ["FOX", "🦊"],
@@ -95,18 +120,16 @@ const LEVELS = {
 
   4: {
     name: "ANIMAL RUSH",
-    world: "animal-rush",
-    character: "animals",
-    characterName: "ANIMAL",
-    description:
-      "Faster. Harder.<br>Can you survive the rush?",
+    label: "LEVEL 4",
+    world: "animal",
+    background: "#07150e",
+    playerColor: "#ffe66b",
+    obstacleColor: "#d88b48",
+    speed: 250,
+    maxSpeed: 330,
     attack: true,
     strikes: 3,
-    baseSpeed: 250,
-    maxSpeed: 330,
-    obstacle: "rock-fast",
-    background: "#07170f",
-
+    character: "ANIMAL",
     characters: [
       ["BUNNY", "🐰"],
       ["FOX", "🦊"],
@@ -117,18 +140,16 @@ const LEVELS = {
 
   5: {
     name: "FRUIT RUN",
+    label: "LEVEL 5",
     world: "fruit",
-    character: "fruit",
-    characterName: "FRUIT",
-    description:
-      "Pick your fruit.<br>Then survive the rush.",
+    background: "#24130d",
+    playerColor: "#ff6f61",
+    obstacleColor: "#ffb347",
+    speed: 260,
+    maxSpeed: 340,
     attack: true,
     strikes: 3,
-    baseSpeed: 260,
-    maxSpeed: 340,
-    obstacle: "fruit-hazard",
-    background: "#180d19",
-
+    character: "FRUIT",
     characters: [
       ["WATERMELON", "🍉"],
       ["PINEAPPLE", "🍍"],
@@ -139,107 +160,89 @@ const LEVELS = {
 
   6: {
     name: "OCEAN",
+    label: "LEVEL 6",
     world: "ocean",
-    character: "fish",
-    characterName: "FISH",
-    description:
-      "Dive through the neon deep.<br>Watch the coral.",
+    background: "#061a2b",
+    playerColor: "#43e8ff",
+    obstacleColor: "#ff6b9d",
+    speed: 270,
+    maxSpeed: 350,
     attack: true,
     strikes: 5,
-    baseSpeed: 270,
-    maxSpeed: 350,
-    obstacle: "coral",
-    background: "#04172b"
+    character: "FISH"
   },
 
   7: {
     name: "DESERT",
+    label: "LEVEL 7",
     world: "desert",
-    character: "sun",
-    characterName: "SUN",
-    description:
-      "Cross the neon desert.<br>Don't get buried.",
+    background: "#29180b",
+    playerColor: "#ffd95a",
+    obstacleColor: "#d88b4b",
+    speed: 280,
+    maxSpeed: 360,
     attack: true,
     strikes: 5,
-    baseSpeed: 280,
-    maxSpeed: 360,
-    obstacle: "sand",
-    background: "#1b100b"
+    character: "SUN"
   },
 
   8: {
     name: "FOREST",
+    label: "LEVEL 8",
     world: "forest",
-    character: "plant",
-    characterName: "PLANT",
-    description:
-      "The forest is alive.<br>Keep moving.",
+    background: "#07170d",
+    playerColor: "#72ef6a",
+    obstacleColor: "#795438",
+    speed: 290,
+    maxSpeed: 370,
     attack: true,
     strikes: 5,
-    baseSpeed: 290,
-    maxSpeed: 370,
-    obstacle: "tree",
-    background: "#04170f"
+    character: "PLANT"
   },
 
   9: {
     name: "SPACE",
+    label: "LEVEL 9",
     world: "space",
-    character: "robot",
-    characterName: "ROBOT",
-    description:
-      "No gravity. No mercy.<br>Avoid the comets.",
+    background: "#050511",
+    playerColor: "#a8b8ff",
+    obstacleColor: "#ff6b5e",
+    speed: 300,
+    maxSpeed: 385,
     attack: true,
     strikes: 5,
-    baseSpeed: 300,
-    maxSpeed: 385,
-    obstacle: "comet",
-    background: "#050512"
+    character: "ROBOT"
   },
 
   10: {
     name: "ANTARCTICA",
+    label: "LEVEL 10",
     world: "ice",
-    character: "icecube",
-    characterName: "ICE CUBE",
-    description:
-      "Frozen ground.<br>One mistake is enough.",
+    background: "#081923",
+    playerColor: "#dff9ff",
+    obstacleColor: "#79d7ff",
+    speed: 310,
+    maxSpeed: 395,
     attack: true,
     strikes: 5,
-    baseSpeed: 310,
-    maxSpeed: 395,
-    obstacle: "iceberg",
-    background: "#061622"
+    character: "ICE CUBE"
   }
 
 };
 
-
-/* =========================================================
-   CURRENT LEVEL
-========================================================= */
-
-const params =
-  new URLSearchParams(window.location.search);
-
-let level =
-  Number(params.get("level")) || 1;
-
-if (!LEVELS[level]) {
-  level = 1;
-}
 
 const settings = LEVELS[level];
 
 
 /* =========================================================
    STATE
-========================================================= */
+   ========================================================= */
 
 let canvasWidth = 360;
-let canvasHeight = 560;
+let canvasHeight = 490;
 
 let running = false;
+let gameOver = false;
 
 let score = 0;
 
@@ -258,7 +261,7 @@ let strikes =
 let selectedCharacter =
   settings.characters
     ? settings.characters[0][0]
-    : settings.characterName;
+    : "BUNNY";
 
 let lane = 1;
 let targetLane = 1;
@@ -267,19 +270,18 @@ let obstacles = [];
 let particles = [];
 
 let spawnTimer = 0;
+let lastTime = 0;
 let elapsed = 0;
 
 let currentSpeed =
-  settings.baseSpeed;
-
-let lastTime = 0;
+  settings.speed;
 
 let animationId = null;
 
 
 /* =========================================================
    RESIZE
-========================================================= */
+   ========================================================= */
 
 function resizeCanvas() {
 
@@ -312,6 +314,8 @@ function resizeCanvas() {
     0,
     0
   );
+
+  draw();
 }
 
 window.addEventListener(
@@ -321,165 +325,284 @@ window.addEventListener(
 
 
 /* =========================================================
-   UI
-========================================================= */
+   LEVEL UI
+   ========================================================= */
 
-function setupUI() {
+function setupLevelUI() {
 
-  levelName.textContent =
-    settings.name;
-
-  overlayLabel.textContent =
-    `LEVEL ${level}`;
-
-  overlayTitle.textContent =
-    settings.name;
-
-  overlayText.innerHTML =
-    settings.description;
+  levelSubtitle.textContent =
+    `${settings.label} · ${settings.name}`;
 
   bestScoreElement.textContent =
     bestScore;
 
 
-  if (settings.attack) {
+  /*
+    Character selector.
+  */
 
-    strikeDisplay.classList.remove(
-      "hidden"
-    );
+  if (
+    settings.characters
+  ) {
 
-    attackButton.classList.remove(
-      "hidden"
-    );
+    animalChooser.style.display =
+      "block";
 
-    attackInstruction.classList.remove(
-      "hidden"
-    );
+    updateCharacterCards();
 
   } else {
 
-    strikeDisplay.classList.add(
-      "hidden"
-    );
-
-    attackButton.classList.add(
-      "hidden"
-    );
-
-    attackInstruction.classList.add(
-      "hidden"
-    );
+    animalChooser.style.display =
+      "none";
   }
 
 
-  if (settings.characters) {
+  /*
+    Strike UI.
+  */
 
-    animalChooser.classList.remove(
-      "hidden"
-    );
+  if (settings.attack) {
 
-    characterGrid.innerHTML = "";
+    strikeDisplay.style.display =
+      "block";
 
-    settings.characters.forEach(
-      character => {
+    attackButton.style.display =
+      "flex";
 
-        const button =
-          document.createElement("button");
+  } else {
 
-        button.type = "button";
+    strikeDisplay.style.display =
+      "none";
 
-        button.className =
-          "character-card";
+    attackButton.style.display =
+      "none";
+  }
 
-        if (
-          character[0] ===
-          selectedCharacter
-        ) {
 
-          button.classList.add(
-            "selected"
-          );
-        }
+  /*
+    Overlay.
+  */
 
-        button.dataset.character =
-          character[0];
+  overlayLabel.textContent =
+    settings.label;
 
-        button.innerHTML = `
-          <span class="character-icon">
-            ${character[1]}
-          </span>
+  overlayTitle.textContent =
+    settings.name;
 
-          <span class="character-name">
-            ${character[0]}
-          </span>
 
-          <span class="character-check">
-            ✓
-          </span>
-        `;
+  if (level === 1) {
 
-        button.addEventListener(
-          "click",
-          () => {
+    overlayText.innerHTML =
+      "Dodge everything.<br>How long can you survive?";
 
-            if (running) {
-              return;
-            }
+    startButton.textContent =
+      "▶ START RUN";
 
-            selectedCharacter =
-              character[0];
+  }
 
-            document
-              .querySelectorAll(
-                ".character-card"
-              )
-              .forEach(card => {
 
-                card.classList.remove(
-                  "selected"
-                );
+  if (level === 2) {
 
-              });
+    overlayText.innerHTML =
+      "Dodge or destroy obstacles.<br>You have 3 strikes.";
 
-            button.classList.add(
-              "selected"
-            );
+    startButton.textContent =
+      "▶ START RUN";
 
-            startButton.textContent =
-              `▶ START AS ${selectedCharacter}`;
+  }
 
-            draw();
 
-          }
-        );
+  if (level === 3) {
 
-        characterGrid.appendChild(
-          button
-        );
-
-      }
-    );
+    overlayText.innerHTML =
+      "Choose your runner.<br>Dodge or destroy obstacles.";
 
     startButton.textContent =
       `▶ START AS ${selectedCharacter}`;
 
-  } else {
+  }
 
-    animalChooser.classList.add(
-      "hidden"
-    );
+
+  if (level === 4) {
+
+    overlayText.innerHTML =
+      "Faster. Harder.<br>Can you survive the rush?";
 
     startButton.textContent =
-      "▶ START";
+      `▶ START AS ${selectedCharacter}`;
+
   }
+
+
+  if (level === 5) {
+
+    overlayText.innerHTML =
+      "Pick your fruit.<br>Then survive the rush.";
+
+    startButton.textContent =
+      `▶ START AS ${selectedCharacter}`;
+
+  }
+
+
+  if (level === 6) {
+
+    overlayText.innerHTML =
+      "Dive through the ocean.<br>Watch the coral.";
+
+    startButton.textContent =
+      "▶ START RUN";
+
+  }
+
+
+  if (level === 7) {
+
+    overlayText.innerHTML =
+      "Cross the desert.<br>Don't get buried.";
+
+    startButton.textContent =
+      "▶ START RUN";
+
+  }
+
+
+  if (level === 8) {
+
+    overlayText.innerHTML =
+      "The forest is alive.<br>Keep moving.";
+
+    startButton.textContent =
+      "▶ START RUN";
+
+  }
+
+
+  if (level === 9) {
+
+    overlayText.innerHTML =
+      "No gravity. No mercy.<br>Avoid the comets.";
+
+    startButton.textContent =
+      "▶ START RUN";
+
+  }
+
+
+  if (level === 10) {
+
+    overlayText.innerHTML =
+      "Frozen ground.<br>One mistake is enough.";
+
+    startButton.textContent =
+      "▶ START RUN";
+
+  }
+
 
   updateStrikeUI();
 }
 
 
 /* =========================================================
-   STRIKES
-========================================================= */
+   CHARACTER CARDS
+   ========================================================= */
+
+function updateCharacterCards() {
+
+  if (!settings.characters) {
+    return;
+  }
+
+  animalCards.forEach(
+    (card, index) => {
+
+      const character =
+        settings.characters[index];
+
+      if (!character) {
+        card.style.display =
+          "none";
+        return;
+      }
+
+      card.style.display =
+        "flex";
+
+      const emoji =
+        card.querySelector(
+          ".animal-emoji"
+        );
+
+      const name =
+        card.querySelector(
+          ".animal-name"
+        );
+
+      if (emoji) {
+        emoji.textContent =
+          character[1];
+      }
+
+      if (name) {
+        name.textContent =
+          character[0];
+      }
+
+      card.dataset.animal =
+        character[0];
+
+      card.classList.toggle(
+        "selected",
+        character[0] ===
+        selectedCharacter
+      );
+    }
+  );
+}
+
+
+animalCards.forEach(
+  card => {
+
+    card.addEventListener(
+      "click",
+      () => {
+
+        if (
+          !settings.characters ||
+          running
+        ) {
+          return;
+        }
+
+        selectedCharacter =
+          card.dataset.animal;
+
+        animalCards.forEach(
+          other =>
+            other.classList.remove(
+              "selected"
+            )
+        );
+
+        card.classList.add(
+          "selected"
+        );
+
+        startButton.textContent =
+          `▶ START AS ${selectedCharacter}`;
+
+        draw();
+      }
+    );
+  }
+);
+
+
+/* =========================================================
+   STRIKE UI
+   ========================================================= */
 
 function updateStrikeUI() {
 
@@ -487,60 +610,59 @@ function updateStrikeUI() {
     return;
   }
 
-  strikesElement.textContent =
-    `×${strikes}`;
+  strikeDisplay.textContent =
+    `STRIKES ×${strikes}`;
 
-  attackCountElement.textContent =
-    `×${strikes}`;
+  attackButton.innerHTML =
+    `<span>💥</span><small>STRIKE ×${strikes}</small>`;
 
   attackButton.style.opacity =
-    strikes > 0 ? "1" : ".4";
+    strikes <= 0
+      ? "0.4"
+      : "1";
 }
 
 
 /* =========================================================
-   START
-========================================================= */
+   GAME START
+   ========================================================= */
 
 function startGame() {
 
   running = true;
+  gameOver = false;
 
   score = 0;
-
   multiplier = 1;
 
   strikes =
     settings.strikes;
 
   lane = 1;
-
   targetLane = 1;
 
   obstacles = [];
-
   particles = [];
 
-  spawnTimer = .25;
-
+  spawnTimer = 0.25;
   elapsed = 0;
 
   currentSpeed =
-    settings.baseSpeed;
+    settings.speed;
 
-  gameMessage.textContent = "";
+  gameMessage.textContent =
+    "";
 
-  overlay.style.display = "none";
+  overlay.style.display =
+    "none";
 
   updateHUD();
-
   updateStrikeUI();
 
   lastTime =
     performance.now();
 
   if (animationId) {
-
     cancelAnimationFrame(
       animationId
     );
@@ -554,8 +676,8 @@ function startGame() {
 
 
 /* =========================================================
-   LOOP
-========================================================= */
+   GAME LOOP
+   ========================================================= */
 
 function gameLoop(time) {
 
@@ -566,7 +688,7 @@ function gameLoop(time) {
   const delta =
     Math.min(
       (time - lastTime) / 1000,
-      .035
+      0.035
     );
 
   lastTime = time;
@@ -574,7 +696,6 @@ function gameLoop(time) {
   elapsed += delta;
 
   update(delta);
-
   draw();
 
   animationId =
@@ -586,9 +707,16 @@ function gameLoop(time) {
 
 /* =========================================================
    UPDATE
-========================================================= */
+   ========================================================= */
 
 function update(delta) {
+
+  /*
+    Difficulty curve.
+
+    Every level starts harder than
+    the previous level.
+  */
 
   const difficulty =
     Math.min(
@@ -597,13 +725,16 @@ function update(delta) {
     );
 
   currentSpeed =
-    settings.baseSpeed +
+    settings.speed +
     (
       settings.maxSpeed -
-      settings.baseSpeed
-    ) *
-    difficulty;
+      settings.speed
+    ) * difficulty;
 
+
+  /*
+    Multiplier every 10 seconds.
+  */
 
   multiplier =
     Math.min(
@@ -615,11 +746,19 @@ function update(delta) {
     );
 
 
+  /*
+    Score.
+  */
+
   score +=
     delta *
     10 *
     multiplier;
 
+
+  /*
+    Smooth movement.
+  */
 
   lane +=
     (
@@ -632,27 +771,38 @@ function update(delta) {
     );
 
 
+  /*
+    Spawn.
+  */
+
   spawnTimer -= delta;
 
   const spawnInterval =
     Math.max(
-      .39,
-      .86 -
-      elapsed * .004
+      0.39,
+      0.88 -
+      elapsed * 0.004
     );
 
-  if (spawnTimer <= 0) {
+  if (
+    spawnTimer <= 0
+  ) {
 
     spawnObstacle();
 
     spawnTimer =
       spawnInterval *
       (
-        .85 +
-        Math.random() * .25
+        0.82 +
+        Math.random() *
+        0.25
       );
   }
 
+
+  /*
+    Obstacles.
+  */
 
   for (
     let i = obstacles.length - 1;
@@ -667,29 +817,41 @@ function update(delta) {
       currentSpeed *
       delta;
 
+
+    /*
+      Passed player.
+    */
+
     if (
       obstacle.y >
-      canvasHeight + 100
+      canvasHeight + 80
     ) {
 
-      obstacles.splice(i, 1);
+      obstacles.splice(
+        i,
+        1
+      );
 
       score +=
-        10 * multiplier;
+        10 *
+        multiplier;
 
       continue;
     }
 
 
+    /*
+      Collision.
+    */
+
     if (
       obstacle.y >
         canvasHeight - 155 &&
       obstacle.y <
-        canvasHeight - 65 &&
+        canvasHeight - 70 &&
       Math.abs(
-        obstacle.lane -
-        lane
-      ) < .34
+        obstacle.lane - lane
+      ) < 0.34
     ) {
 
       endGame();
@@ -698,6 +860,10 @@ function update(delta) {
     }
   }
 
+
+  /*
+    Particles.
+  */
 
   for (
     let i = particles.length - 1;
@@ -717,7 +883,8 @@ function update(delta) {
       delta;
 
     particle.vy +=
-      300 * delta;
+      300 *
+      delta;
 
     particle.life -=
       delta;
@@ -733,33 +900,49 @@ function update(delta) {
     }
   }
 
+
   updateHUD();
 }
 
 
 /* =========================================================
-   OBSTACLES
-========================================================= */
+   OBSTACLE SPAWN
+   ========================================================= */
 
 function spawnObstacle() {
 
-  const firstLane =
+  const laneChoice =
     Math.floor(
       Math.random() * 3
     );
 
   obstacles.push({
-    lane: firstLane,
-    y: -55,
+
+    lane:
+      laneChoice,
+
+    y:
+      -55,
+
     size:
-      28 +
-      Math.random() * 10
+      30 +
+      Math.random() * 8
   });
 
 
+  /*
+    Two-obstacle patterns.
+  */
+
+  const secondChance =
+    level >= 4
+      ? 0.23
+      : 0.16;
+
   if (
     elapsed > 18 &&
-    Math.random() < .18
+    Math.random() <
+      secondChance
   ) {
 
     let secondLane =
@@ -768,7 +951,8 @@ function spawnObstacle() {
       );
 
     if (
-      secondLane === firstLane
+      secondLane ===
+      laneChoice
     ) {
 
       secondLane =
@@ -776,11 +960,16 @@ function spawnObstacle() {
     }
 
     obstacles.push({
-      lane: secondLane,
-      y: -145,
+
+      lane:
+        secondLane,
+
+      y:
+        -145,
+
       size:
-        26 +
-        Math.random() * 9
+        27 +
+        Math.random() * 7
     });
   }
 }
@@ -788,21 +977,22 @@ function spawnObstacle() {
 
 /* =========================================================
    ATTACK
-========================================================= */
+   ========================================================= */
 
 function attack() {
 
-  if (
-    !running ||
-    !settings.attack
-  ) {
+  if (!running) {
+    return;
+  }
+
+  if (!settings.attack) {
     return;
   }
 
   if (strikes <= 0) {
 
     gameMessage.textContent =
-      "NO STRIKES — DODGE!";
+      "NO STRIKES LEFT — DODGE!";
 
     return;
   }
@@ -810,7 +1000,8 @@ function attack() {
 
   let target = null;
   let targetIndex = -1;
-  let bestDistance = Infinity;
+  let bestDistance =
+    Infinity;
 
 
   for (
@@ -824,9 +1015,8 @@ function attack() {
 
     if (
       Math.abs(
-        obstacle.lane -
-        lane
-      ) < .38 &&
+        obstacle.lane - lane
+      ) < 0.38 &&
       obstacle.y >
         canvasHeight - 330 &&
       obstacle.y <
@@ -887,18 +1077,18 @@ function attack() {
 
   strikes--;
 
+
   score +=
-    (
-      perfect
-        ? 70
-        : 40
-    ) *
-    multiplier;
+    perfect
+      ? 70 * multiplier
+      : 40 * multiplier;
+
 
   gameMessage.textContent =
     perfect
       ? "PERFECT HIT!"
       : "NICE HIT!";
+
 
   updateStrikeUI();
 }
@@ -906,7 +1096,7 @@ function attack() {
 
 /* =========================================================
    MOVEMENT
-========================================================= */
+   ========================================================= */
 
 function moveLeft() {
 
@@ -938,11 +1128,12 @@ function moveRight() {
 
 /* =========================================================
    GAME OVER
-========================================================= */
+   ========================================================= */
 
 function endGame() {
 
   running = false;
+  gameOver = true;
 
   const finalScore =
     Math.floor(score);
@@ -980,18 +1171,20 @@ function endGame() {
   overlay.style.display =
     "flex";
 
-
   overlayLabel.textContent =
     "RUN OVER";
 
   overlayTitle.textContent =
-    finalScore.toString();
+    finalScore;
+
 
   overlayText.innerHTML =
     `BEST ${bestScore}<br><br>Ready for one more?`;
 
 
-  if (settings.characters) {
+  if (
+    settings.characters
+  ) {
 
     startButton.textContent =
       `▶ RUN AS ${selectedCharacter}`;
@@ -999,7 +1192,7 @@ function endGame() {
   } else {
 
     startButton.textContent =
-      "▶ ONE MORE";
+      "▶ TRY AGAIN";
   }
 
 
@@ -1010,7 +1203,7 @@ function endGame() {
 
 /* =========================================================
    HUD
-========================================================= */
+   ========================================================= */
 
 function updateHUD() {
 
@@ -1018,22 +1211,20 @@ function updateHUD() {
     Math.floor(score);
 
   multiplierElement.textContent =
-    `x${multiplier}`;
+    `×${multiplier}`;
+
 
   if (settings.attack) {
 
-    strikesElement.textContent =
-      `×${strikes}`;
-
-    attackCountElement.textContent =
-      `×${strikes}`;
+    strikeDisplay.textContent =
+      `STRIKES ×${strikes}`;
   }
 }
 
 
 /* =========================================================
-   MAIN DRAW
-========================================================= */
+   DRAW
+   ========================================================= */
 
 function draw() {
 
@@ -1043,6 +1234,7 @@ function draw() {
     canvasWidth,
     canvasHeight
   );
+
 
   ctx.fillStyle =
     settings.background;
@@ -1054,8 +1246,8 @@ function draw() {
     canvasHeight
   );
 
-  drawWorldBackground();
 
+  drawBackground();
   drawTrack();
 
   obstacles.forEach(
@@ -1072,93 +1264,96 @@ function draw() {
 
 /* =========================================================
    WORLD BACKGROUNDS
-   SAME 1M NEON ARCADE LANGUAGE
-========================================================= */
+   SAME CLEAN 1M STYLE
+   ========================================================= */
 
-function drawWorldBackground() {
+function drawBackground() {
 
   if (
-    settings.world === "neon" ||
-    settings.world === "neon-rush"
+    level === 1 ||
+    level === 2
   ) {
 
-    drawNeonCity();
+    drawNeonBackground();
+    return;
+  }
 
-  } else if (
-    settings.world === "animal" ||
-    settings.world === "animal-rush"
+
+  if (
+    level === 3 ||
+    level === 4
   ) {
 
-    drawAnimalWorld();
+    drawAnimalBackground();
+    return;
+  }
 
-  } else if (
-    settings.world === "fruit"
-  ) {
 
-    drawFruitWorld();
+  if (level === 5) {
 
-  } else if (
-    settings.world === "ocean"
-  ) {
+    drawFruitBackground();
+    return;
+  }
 
-    drawOceanWorld();
 
-  } else if (
-    settings.world === "desert"
-  ) {
+  if (level === 6) {
 
-    drawDesertWorld();
+    drawOceanBackground();
+    return;
+  }
 
-  } else if (
-    settings.world === "forest"
-  ) {
 
-    drawForestWorld();
+  if (level === 7) {
 
-  } else if (
-    settings.world === "space"
-  ) {
+    drawDesertBackground();
+    return;
+  }
 
-    drawSpaceWorld();
 
-  } else if (
-    settings.world === "ice"
-  ) {
+  if (level === 8) {
 
-    drawIceWorld();
+    drawForestBackground();
+    return;
+  }
+
+
+  if (level === 9) {
+
+    drawSpaceBackground();
+    return;
+  }
+
+
+  if (level === 10) {
+
+    drawIceBackground();
   }
 }
 
 
 /* =========================================================
-   NEON CITY
-========================================================= */
+   NEON
+   ========================================================= */
 
-function drawNeonCity() {
-
-  const rush =
-    settings.world === "neon-rush";
+function drawNeonBackground() {
 
   ctx.save();
-
-
-  /* glow at horizon */
 
   const glow =
     ctx.createRadialGradient(
       canvasWidth / 2,
-      canvasHeight * .45,
-      20,
+      canvasHeight * 0.35,
+      10,
       canvasWidth / 2,
-      canvasHeight * .45,
-      canvasWidth * .8
+      canvasHeight * 0.35,
+      canvasWidth * 0.75
     );
 
   glow.addColorStop(
     0,
-    rush
-      ? "rgba(90,80,255,.22)"
-      : "rgba(0,220,255,.18)"
+    level === 1
+      ? "rgba(70,180,255,0.15)"
+      : "rgba(210,70,255,0.14)"
   );
 
   glow.addColorStop(
@@ -1176,36 +1371,9 @@ function drawNeonCity() {
   );
 
 
-  /* moon */
+  ctx.globalAlpha =
+    0.22;
 
-  ctx.shadowBlur = 30;
-
-  ctx.shadowColor =
-    rush
-      ? "#8f6cff"
-      : "#45eaff";
-
-  ctx.fillStyle =
-    rush
-      ? "#9a7cff"
-      : "#64edff";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    canvasWidth * .78,
-    105,
-    34,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-
-  /* skyline */
-
-  ctx.shadowBlur = 0;
 
   for (
     let i = 0;
@@ -1214,247 +1382,47 @@ function drawNeonCity() {
   ) {
 
     const x =
-      i *
-      (canvasWidth / 14) -
-      10;
+      (i * 83) %
+      canvasWidth;
 
     const h =
-      80 +
-      ((i * 43) % 130);
+      45 +
+      (
+        (i * 31) %
+        130
+      );
 
     ctx.fillStyle =
-      i % 2
-        ? "#101a3c"
-        : "#15102f";
+      i % 2 === 0
+        ? "#132b4f"
+        : "#21133c";
 
     ctx.fillRect(
       x,
-      canvasHeight - 190 - h,
-      55,
+      canvasHeight -
+        150 -
+        h,
+      42,
       h
     );
-
-
-    /* windows */
-
-    ctx.fillStyle =
-      i % 2
-        ? "rgba(60,220,255,.45)"
-        : "rgba(255,70,170,.38)";
-
-    for (
-      let w = 0;
-      w < 3;
-      w++
-    ) {
-
-      for (
-        let r = 0;
-        r < 4;
-        r++
-      ) {
-
-        ctx.fillRect(
-          x + 10 + w * 14,
-          canvasHeight - 170 - h + r * 25,
-          5,
-          9
-        );
-      }
-    }
   }
 
-
-  /* neon horizon */
-
-  ctx.shadowBlur = 18;
-
-  ctx.shadowColor =
-    rush
-      ? "#8d5cff"
-      : "#19e9ff";
-
-  ctx.strokeStyle =
-    rush
-      ? "#8d5cff"
-      : "#19e9ff";
-
-  ctx.lineWidth = 3;
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    0,
-    canvasHeight - 188
-  );
-
-  ctx.lineTo(
-    canvasWidth,
-    canvasHeight - 188
-  );
-
-  ctx.stroke();
 
   ctx.restore();
 }
 
 
 /* =========================================================
-   ANIMAL WORLD
-========================================================= */
+   ANIMAL FOREST
+   ========================================================= */
 
-function drawAnimalWorld() {
-
-  ctx.save();
-
-  const horizon =
-    canvasHeight - 190;
-
-
-  const glow =
-    ctx.createLinearGradient(
-      0,
-      60,
-      0,
-      horizon
-    );
-
-  glow.addColorStop(
-    0,
-    "rgba(38,255,163,.04)"
-  );
-
-  glow.addColorStop(
-    1,
-    "rgba(24,160,90,.18)"
-  );
-
-  ctx.fillStyle = glow;
-
-  ctx.fillRect(
-    0,
-    0,
-    canvasWidth,
-    horizon
-  );
-
-
-  /* moon */
-
-  ctx.shadowBlur = 25;
-  ctx.shadowColor = "#73ffc4";
-
-  ctx.fillStyle = "#c0ffe0";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    canvasWidth * .78,
-    95,
-    29,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-
-  /* layered trees */
-
-  for (
-    let i = 0;
-    i < 12;
-    i++
-  ) {
-
-    const x =
-      (i * 83) %
-      (canvasWidth + 50) -
-      25;
-
-    const y =
-      80 +
-      ((i * 37) % 150);
-
-    const size =
-      35 +
-      ((i * 11) % 25);
-
-    ctx.shadowBlur = 12;
-    ctx.shadowColor =
-      "#1aff8a";
-
-    ctx.fillStyle =
-      i % 2
-        ? "#0d5a38"
-        : "#0a412b";
-
-    ctx.beginPath();
-
-    ctx.arc(
-      x,
-      y,
-      size,
-      0,
-      Math.PI * 2
-    );
-
-    ctx.fill();
-
-    ctx.fillStyle =
-      "#70452a";
-
-    ctx.fillRect(
-      x - 5,
-      y + size * .5,
-      10,
-      60
-    );
-  }
-
-  ctx.restore();
-}
-
-
-/* =========================================================
-   FRUIT WORLD
-========================================================= */
-
-function drawFruitWorld() {
+function drawAnimalBackground() {
 
   ctx.save();
 
-  const glow =
-    ctx.createRadialGradient(
-      canvasWidth / 2,
-      170,
-      20,
-      canvasWidth / 2,
-      170,
-      300
-    );
+  ctx.globalAlpha =
+    0.30;
 
-  glow.addColorStop(
-    0,
-    "rgba(255,75,150,.18)"
-  );
-
-  glow.addColorStop(
-    1,
-    "rgba(255,60,100,0)"
-  );
-
-  ctx.fillStyle = glow;
-
-  ctx.fillRect(
-    0,
-    0,
-    canvasWidth,
-    canvasHeight
-  );
-
-
-  /* floating fruit-like lights */
 
   for (
     let i = 0;
@@ -1463,28 +1431,106 @@ function drawFruitWorld() {
   ) {
 
     const x =
-      (i * 97) %
+      (i * 91) %
       canvasWidth;
 
     const y =
-      75 +
-      ((i * 51) % 175);
+      80 +
+      (
+        (i * 43) %
+        190
+      );
+
+    drawSmallTree(
+      x,
+      y
+    );
+  }
+
+
+  ctx.restore();
+}
+
+
+function drawSmallTree(
+  x,
+  y
+) {
+
+  ctx.fillStyle =
+    "#10291c";
+
+  ctx.fillRect(
+    x - 4,
+    y + 20,
+    8,
+    38
+  );
+
+
+  ctx.fillStyle =
+    "#173c26";
+
+  ctx.beginPath();
+
+  ctx.arc(
+    x,
+    y,
+    25,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+}
+
+
+/* =========================================================
+   FRUIT
+   ========================================================= */
+
+function drawFruitBackground() {
+
+  ctx.save();
+
+  ctx.globalAlpha =
+    0.13;
+
+
+  for (
+    let i = 0;
+    i < 18;
+    i++
+  ) {
+
+    const x =
+      (i * 61) %
+      canvasWidth;
+
+    const y =
+      45 +
+      (
+        (i * 77) %
+        230
+      );
 
     const r =
-      14 +
-      (i % 3) * 5;
+      10 +
+      (
+        i % 3
+      ) * 5;
 
-    ctx.shadowBlur = 18;
-
-    ctx.shadowColor =
-      i % 2
-        ? "#ff4f9a"
-        : "#ffd34e";
 
     ctx.fillStyle =
-      i % 2
-        ? "rgba(255,72,135,.42)"
-        : "rgba(255,203,65,.38)";
+      [
+        "#ff4d6d",
+        "#ffca3a",
+        "#8ac926",
+        "#ff924c"
+      ][
+        i % 4
+      ];
+
 
     ctx.beginPath();
 
@@ -1500,409 +1546,21 @@ function drawFruitWorld() {
   }
 
 
-  /* vines */
-
-  ctx.strokeStyle =
-    "rgba(80,255,150,.3)";
-
-  ctx.lineWidth = 4;
-
-  for (
-    let i = 0;
-    i < 5;
-    i++
-  ) {
-
-    const x =
-      i *
-      (canvasWidth / 4);
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-      x,
-      0
-    );
-
-    ctx.quadraticCurveTo(
-      x + 30,
-      90,
-      x - 10,
-      180
-    );
-
-    ctx.stroke();
-  }
-
   ctx.restore();
 }
 
 
 /* =========================================================
-   OCEAN WORLD
-========================================================= */
+   OCEAN
+   ========================================================= */
 
-function drawOceanWorld() {
-
-  ctx.save();
-
-
-  /* underwater glow */
-
-  const water =
-    ctx.createLinearGradient(
-      0,
-      0,
-      0,
-      canvasHeight
-    );
-
-  water.addColorStop(
-    0,
-    "rgba(25,225,255,.13)"
-  );
-
-  water.addColorStop(
-    .55,
-    "rgba(8,90,160,.09)"
-  );
-
-  water.addColorStop(
-    1,
-    "rgba(0,20,55,.35)"
-  );
-
-  ctx.fillStyle = water;
-
-  ctx.fillRect(
-    0,
-    0,
-    canvasWidth,
-    canvasHeight
-  );
-
-
-  /* light rays */
-
-  ctx.globalAlpha = .12;
-
-  ctx.fillStyle = "#52efff";
-
-  for (
-    let i = 0;
-    i < 5;
-    i++
-  ) {
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-      i * 100,
-      0
-    );
-
-    ctx.lineTo(
-      i * 100 + 55,
-      0
-    );
-
-    ctx.lineTo(
-      i * 100 + 120,
-      canvasHeight - 190
-    );
-
-    ctx.lineTo(
-      i * 100 + 70,
-      canvasHeight - 190
-    );
-
-    ctx.closePath();
-
-    ctx.fill();
-  }
-
-  ctx.globalAlpha = 1;
-
-
-  /* bubbles */
-
-  for (
-    let i = 0;
-    i < 16;
-    i++
-  ) {
-
-    const x =
-      (i * 67) %
-      canvasWidth;
-
-    const y =
-      45 +
-      ((i * 83) % 250);
-
-    ctx.strokeStyle =
-      "rgba(90,240,255,.42)";
-
-    ctx.lineWidth = 2;
-
-    ctx.beginPath();
-
-    ctx.arc(
-      x,
-      y,
-      4 + i % 5,
-      0,
-      Math.PI * 2
-    );
-
-    ctx.stroke();
-  }
-
-
-  /* distant coral */
-
-  ctx.strokeStyle =
-    "rgba(255,70,150,.28)";
-
-  ctx.lineWidth = 5;
-
-  for (
-    let i = 0;
-    i < 8;
-    i++
-  ) {
-
-    const x =
-      i *
-      (canvasWidth / 7);
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-      x,
-      canvasHeight - 190
-    );
-
-    ctx.lineTo(
-      x,
-      canvasHeight - 240
-    );
-
-    ctx.moveTo(
-      x,
-      canvasHeight - 220
-    );
-
-    ctx.lineTo(
-      x - 18,
-      canvasHeight - 250
-    );
-
-    ctx.moveTo(
-      x,
-      canvasHeight - 225
-    );
-
-    ctx.lineTo(
-      x + 18,
-      canvasHeight - 250
-    );
-
-    ctx.stroke();
-  }
-
-  ctx.restore();
-}
-
-
-/* =========================================================
-   DESERT WORLD
-========================================================= */
-
-function drawDesertWorld() {
+function drawOceanBackground() {
 
   ctx.save();
 
+  ctx.globalAlpha =
+    0.16;
 
-  const sky =
-    ctx.createLinearGradient(
-      0,
-      0,
-      0,
-      canvasHeight - 180
-    );
-
-  sky.addColorStop(
-    0,
-    "rgba(255,100,50,.08)"
-  );
-
-  sky.addColorStop(
-    1,
-    "rgba(255,190,60,.17)"
-  );
-
-  ctx.fillStyle = sky;
-
-  ctx.fillRect(
-    0,
-    0,
-    canvasWidth,
-    canvasHeight
-  );
-
-
-  /* giant sun */
-
-  ctx.shadowBlur = 35;
-
-  ctx.shadowColor =
-    "#ffb72e";
-
-  ctx.fillStyle =
-    "rgba(255,185,55,.8)";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    canvasWidth * .78,
-    115,
-    46,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-
-  /* dunes */
-
-  ctx.shadowBlur = 0;
-
-  ctx.fillStyle =
-    "rgba(218,125,55,.24)";
-
-  for (
-    let i = 0;
-    i < 5;
-    i++
-  ) {
-
-    ctx.beginPath();
-
-    ctx.arc(
-      i * 100 - 30,
-      canvasHeight - 170,
-      115,
-      Math.PI,
-      0
-    );
-
-    ctx.fill();
-  }
-
-
-  /* distant cactus */
-
-  for (
-    let i = 0;
-    i < 5;
-    i++
-  ) {
-
-    const x =
-      35 +
-      i * 82;
-
-    const y =
-      canvasHeight - 215;
-
-    ctx.strokeStyle =
-      "rgba(95,230,130,.45)";
-
-    ctx.lineWidth = 8;
-
-    ctx.lineCap = "round";
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-      x,
-      y + 40
-    );
-
-    ctx.lineTo(
-      x,
-      y - 25
-    );
-
-    ctx.moveTo(
-      x,
-      y
-    );
-
-    ctx.lineTo(
-      x - 15,
-      y - 12
-    );
-
-    ctx.moveTo(
-      x,
-      y + 8
-    );
-
-    ctx.lineTo(
-      x + 16,
-      y - 3
-    );
-
-    ctx.stroke();
-  }
-
-  ctx.restore();
-}
-
-
-/* =========================================================
-   FOREST WORLD
-========================================================= */
-
-function drawForestWorld() {
-
-  ctx.save();
-
-
-  const glow =
-    ctx.createRadialGradient(
-      canvasWidth / 2,
-      120,
-      10,
-      canvasWidth / 2,
-      120,
-      330
-    );
-
-  glow.addColorStop(
-    0,
-    "rgba(80,255,150,.14)"
-  );
-
-  glow.addColorStop(
-    1,
-    "rgba(0,0,0,0)"
-  );
-
-  ctx.fillStyle = glow;
-
-  ctx.fillRect(
-    0,
-    0,
-    canvasWidth,
-    canvasHeight
-  );
-
-
-  /* giant tree silhouettes */
 
   for (
     let i = 0;
@@ -1911,127 +1569,236 @@ function drawForestWorld() {
   ) {
 
     const x =
-      i * 55;
-
-    const top =
-      80 +
-      ((i * 29) % 100);
-
-    ctx.fillStyle =
-      "#082d20";
-
-    ctx.fillRect(
-      x,
-      top + 55,
-      16,
-      canvasHeight
-    );
-
-    ctx.beginPath();
-
-    ctx.arc(
-      x + 8,
-      top + 35,
-      45,
-      0,
-      Math.PI * 2
-    );
-
-    ctx.fill();
-  }
-
-
-  /* fireflies */
-
-  ctx.shadowBlur = 14;
-  ctx.shadowColor = "#6dff9e";
-  ctx.fillStyle = "#8affb2";
-
-  for (
-    let i = 0;
-    i < 20;
-    i++
-  ) {
-
-    const x =
-      (i * 71) %
+      (i * 73) %
       canvasWidth;
 
     const y =
-      70 +
-      ((i * 43) % 230);
+      60 +
+      (
+        (i * 83) %
+        250
+      );
+
+    ctx.strokeStyle =
+      "#45dff5";
+
+    ctx.lineWidth =
+      2;
 
     ctx.beginPath();
 
     ctx.arc(
       x,
       y,
-      2,
+      8 +
+      (i % 3) * 6,
       0,
       Math.PI * 2
     );
 
-    ctx.fill();
+    ctx.stroke();
   }
+
+
+  /*
+    Coral silhouettes.
+  */
+
+  ctx.globalAlpha =
+    0.18;
+
+  ctx.strokeStyle =
+    "#ff6394";
+
+  ctx.lineWidth =
+    5;
+
+  for (
+    let i = 0;
+    i < 5;
+    i++
+  ) {
+
+    const x =
+      25 +
+      i *
+      78;
+
+    const base =
+      canvasHeight -
+      150;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+      x,
+      base
+    );
+
+    ctx.lineTo(
+      x,
+      base - 30
+    );
+
+    ctx.lineTo(
+      x - 10,
+      base - 52
+    );
+
+    ctx.moveTo(
+      x,
+      base - 30
+    );
+
+    ctx.lineTo(
+      x + 13,
+      base - 48
+    );
+
+    ctx.stroke();
+  }
+
 
   ctx.restore();
 }
 
 
 /* =========================================================
-   SPACE WORLD
-========================================================= */
+   DESERT
+   ========================================================= */
 
-function drawSpaceWorld() {
+function drawDesertBackground() {
 
   ctx.save();
 
+  ctx.globalAlpha =
+    0.16;
 
-  /* nebula */
-
-  const nebula =
-    ctx.createRadialGradient(
-      canvasWidth * .45,
-      170,
-      20,
-      canvasWidth * .45,
-      170,
-      330
-    );
-
-  nebula.addColorStop(
-    0,
-    "rgba(112,76,255,.20)"
-  );
-
-  nebula.addColorStop(
-    .45,
-    "rgba(30,150,255,.08)"
-  );
-
-  nebula.addColorStop(
-    1,
-    "rgba(0,0,0,0)"
-  );
-
-  ctx.fillStyle = nebula;
-
-  ctx.fillRect(
-    0,
-    0,
-    canvasWidth,
-    canvasHeight
-  );
-
-
-  /* stars */
-
-  ctx.fillStyle =
-    "rgba(255,255,255,.85)";
 
   for (
     let i = 0;
-    i < 75;
+    i < 7;
+    i++
+  ) {
+
+    const x =
+      i * 70;
+
+    const y =
+      120 +
+      (
+        i % 3
+      ) * 35;
+
+    ctx.fillStyle =
+      "#d49a5a";
+
+    ctx.beginPath();
+
+    ctx.arc(
+      x,
+      y,
+      42,
+      Math.PI,
+      Math.PI * 2
+    );
+
+    ctx.fill();
+  }
+
+
+  ctx.restore();
+}
+
+
+/* =========================================================
+   FOREST
+   ========================================================= */
+
+function drawForestBackground() {
+
+  ctx.save();
+
+  ctx.globalAlpha =
+    0.22;
+
+
+  for (
+    let i = 0;
+    i < 11;
+    i++
+  ) {
+
+    const x =
+      (i * 81) %
+      canvasWidth;
+
+    const y =
+      70 +
+      (
+        (i * 49) %
+        200
+      );
+
+    drawDeepTree(
+      x,
+      y
+    );
+  }
+
+
+  ctx.restore();
+}
+
+
+function drawDeepTree(
+  x,
+  y
+) {
+
+  ctx.fillStyle =
+    "#173b25";
+
+  ctx.fillRect(
+    x - 5,
+    y + 18,
+    10,
+    50
+  );
+
+
+  ctx.fillStyle =
+    "#1d5331";
+
+  ctx.beginPath();
+
+  ctx.arc(
+    x,
+    y,
+    30,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+}
+
+
+/* =========================================================
+   SPACE
+   ========================================================= */
+
+function drawSpaceBackground() {
+
+  ctx.save();
+
+  ctx.globalAlpha =
+    0.7;
+
+
+  for (
+    let i = 0;
+    i < 55;
     i++
   ) {
 
@@ -2041,188 +1808,82 @@ function drawSpaceWorld() {
 
     const y =
       (i * 83) %
-      (canvasHeight - 180);
+      canvasHeight;
 
-    const size =
-      i % 7 === 0
-        ? 2
-        : 1;
+    const r =
+      i % 4 === 0
+        ? 1.5
+        : 0.7;
 
-    ctx.fillRect(
+
+    ctx.fillStyle =
+      "#ffffff";
+
+    ctx.beginPath();
+
+    ctx.arc(
       x,
       y,
-      size,
-      size
+      r,
+      0,
+      Math.PI * 2
     );
+
+    ctx.fill();
   }
 
-
-  /* distant planet */
-
-  ctx.shadowBlur = 25;
-
-  ctx.shadowColor =
-    "#7b63ff";
-
-  ctx.fillStyle =
-    "rgba(117,91,255,.7)";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    canvasWidth * .78,
-    125,
-    32,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
 
   ctx.restore();
 }
 
 
 /* =========================================================
-   ICE WORLD
-========================================================= */
+   ICE
+   ========================================================= */
 
-function drawIceWorld() {
+function drawIceBackground() {
 
   ctx.save();
 
-
-  const iceGlow =
-    ctx.createRadialGradient(
-      canvasWidth / 2,
-      130,
-      10,
-      canvasWidth / 2,
-      130,
-      340
-    );
-
-  iceGlow.addColorStop(
-    0,
-    "rgba(100,235,255,.20)"
-  );
-
-  iceGlow.addColorStop(
-    1,
-    "rgba(0,0,0,0)"
-  );
-
-  ctx.fillStyle = iceGlow;
-
-  ctx.fillRect(
-    0,
-    0,
-    canvasWidth,
-    canvasHeight
-  );
-
-
-  /* aurora */
-
-  ctx.globalAlpha = .28;
-
-  ctx.strokeStyle =
-    "#56f5ff";
-
-  ctx.lineWidth = 10;
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    0,
-    105
-  );
-
-  ctx.bezierCurveTo(
-    80,
-    40,
-    120,
-    180,
-    210,
-    90
-  );
-
-  ctx.bezierCurveTo(
-    275,
-    30,
-    320,
-    140,
-    canvasWidth,
-    70
-  );
-
-  ctx.stroke();
-
-
-  ctx.globalAlpha = .16;
-
-  ctx.strokeStyle =
-    "#9c7cff";
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    0,
-    135
-  );
-
-  ctx.bezierCurveTo(
-    90,
-    75,
-    145,
-    205,
-    240,
-    120
-  );
-
-  ctx.bezierCurveTo(
-    300,
-    70,
-    330,
-    150,
-    canvasWidth,
-    100
-  );
-
-  ctx.stroke();
-
-  ctx.globalAlpha = 1;
-
-
-  /* distant ice mountains */
+  ctx.globalAlpha =
+    0.15;
 
   ctx.fillStyle =
-    "rgba(100,200,230,.18)";
+    "#8cecff";
+
 
   for (
     let i = 0;
-    i < 6;
+    i < 8;
     i++
   ) {
 
     const x =
-      i * 75;
+      (i * 74) %
+      canvasWidth;
+
+    const y =
+      80 +
+      (
+        (i * 67) %
+        210
+      );
 
     ctx.beginPath();
 
     ctx.moveTo(
-      x - 60,
-      canvasHeight - 180
-    );
-
-    ctx.lineTo(
       x,
-      canvasHeight - 285
+      y - 35
     );
 
     ctx.lineTo(
-      x + 70,
-      canvasHeight - 180
+      x + 25,
+      y + 20
+    );
+
+    ctx.lineTo(
+      x - 20,
+      y + 20
     );
 
     ctx.closePath();
@@ -2230,13 +1891,14 @@ function drawIceWorld() {
     ctx.fill();
   }
 
+
   ctx.restore();
 }
 
 
 /* =========================================================
    TRACK
-========================================================= */
+   ========================================================= */
 
 function drawTrack() {
 
@@ -2244,26 +1906,8 @@ function drawTrack() {
     canvasHeight - 205;
 
 
-  const gradient =
-    ctx.createLinearGradient(
-      0,
-      trackTop,
-      0,
-      canvasHeight
-    );
-
-  gradient.addColorStop(
-    0,
-    "rgba(255,255,255,.045)"
-  );
-
-  gradient.addColorStop(
-    1,
-    "rgba(0,0,0,.25)"
-  );
-
   ctx.fillStyle =
-    gradient;
+    "rgba(255,255,255,0.025)";
 
   ctx.fillRect(
     0,
@@ -2276,9 +1920,11 @@ function drawTrack() {
   ctx.save();
 
   ctx.strokeStyle =
-    "rgba(255,255,255,.075)";
+    "rgba(255,255,255,0.055)";
 
-  ctx.lineWidth = 1;
+  ctx.lineWidth =
+    1;
+
 
   for (
     let i = 1;
@@ -2287,8 +1933,7 @@ function drawTrack() {
   ) {
 
     const x =
-      canvasWidth / 3 *
-      i;
+      canvasWidth / 3 * i;
 
     ctx.beginPath();
 
@@ -2306,44 +1951,13 @@ function drawTrack() {
   }
 
 
-  /* lane glow */
-
-  ctx.strokeStyle =
-    "rgba(80,220,255,.10)";
-
-  ctx.lineWidth = 2;
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    canvasWidth / 3,
-    trackTop
-  );
-
-  ctx.lineTo(
-    canvasWidth / 3,
-    canvasHeight
-  );
-
-  ctx.moveTo(
-    canvasWidth / 3 * 2,
-    trackTop
-  );
-
-  ctx.lineTo(
-    canvasWidth / 3 * 2,
-    canvasHeight
-  );
-
-  ctx.stroke();
-
   ctx.restore();
 }
 
 
 /* =========================================================
    PLAYER
-========================================================= */
+   ========================================================= */
 
 function drawPlayer() {
 
@@ -2355,8 +1969,8 @@ function drawPlayer() {
 
 
   if (
-    settings.character ===
-    "runner"
+    level === 1 ||
+    level === 2
   ) {
 
     drawRunner(
@@ -2369,11 +1983,11 @@ function drawPlayer() {
 
 
   if (
-    settings.character ===
-    "animals"
+    level === 3 ||
+    level === 4
   ) {
 
-    drawAnimalCharacter(
+    drawAnimal(
       x,
       y,
       selectedCharacter
@@ -2383,12 +1997,9 @@ function drawPlayer() {
   }
 
 
-  if (
-    settings.character ===
-    "fruit"
-  ) {
+  if (level === 5) {
 
-    drawFruitCharacter(
+    drawFruit(
       x,
       y,
       selectedCharacter
@@ -2398,17 +2009,64 @@ function drawPlayer() {
   }
 
 
-  drawSpecialCharacter(
-    x,
-    y,
-    settings.character
-  );
+  if (level === 6) {
+
+    drawFish(
+      x,
+      y
+    );
+
+    return;
+  }
+
+
+  if (level === 7) {
+
+    drawSun(
+      x,
+      y
+    );
+
+    return;
+  }
+
+
+  if (level === 8) {
+
+    drawPlant(
+      x,
+      y
+    );
+
+    return;
+  }
+
+
+  if (level === 9) {
+
+    drawRobot(
+      x,
+      y
+    );
+
+    return;
+  }
+
+
+  if (level === 10) {
+
+    drawIceCube(
+      x,
+      y
+    );
+  }
 }
 
 
 /* =========================================================
-   ORIGINAL RUNNER
-========================================================= */
+   RUNNER
+   ORIGINAL STYLE
+   ========================================================= */
 
 function drawRunner(
   x,
@@ -2422,84 +2080,41 @@ function drawRunner(
     y
   );
 
+  ctx.shadowBlur =
+    20;
 
-  const glow =
-    settings.world ===
-    "neon-rush"
-      ? "#6f8cff"
-      : "#35efff";
+  ctx.shadowColor =
+    settings.playerColor;
 
+  ctx.fillStyle =
+    settings.playerColor;
 
-  /* shadow */
-
-  ctx.globalAlpha = .3;
-
-  ctx.fillStyle = "#000";
-
-  ctx.beginPath();
-
-  ctx.ellipse(
-    0,
-    31,
-    25,
-    7,
-    0,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-  ctx.globalAlpha = 1;
-
-
-  /* body */
-
-  ctx.shadowBlur = 28;
-  ctx.shadowColor = glow;
-  ctx.fillStyle = glow;
 
   ctx.beginPath();
 
   ctx.roundRect(
-    -20,
-    -29,
-    40,
-    51,
-    14
+    -17,
+    -22,
+    34,
+    44,
+    11
   );
 
   ctx.fill();
 
 
-  /* face */
-
-  ctx.shadowBlur = 0;
-
-  ctx.fillStyle =
-    "#06111d";
-
-  ctx.beginPath();
-
-  ctx.roundRect(
-    -14,
-    -15,
-    28,
-    19,
-    8
-  );
-
-  ctx.fill();
+  ctx.shadowBlur =
+    0;
 
 
   ctx.fillStyle =
-    "#b9fbff";
+    "#07101b";
 
   ctx.beginPath();
 
   ctx.arc(
     -6,
-    -6,
+    -5,
     3,
     0,
     Math.PI * 2
@@ -2507,7 +2122,7 @@ function drawRunner(
 
   ctx.arc(
     6,
-    -6,
+    -5,
     3,
     0,
     Math.PI * 2
@@ -2516,586 +2131,273 @@ function drawRunner(
   ctx.fill();
 
 
-  /* legs */
-
   ctx.strokeStyle =
-    "#06111d";
+    "#07101b";
 
-  ctx.lineWidth = 5;
-
-  ctx.lineCap = "round";
+  ctx.lineWidth =
+    4;
 
   ctx.beginPath();
 
   ctx.moveTo(
-    -8,
+    -7,
     18
   );
 
   ctx.lineTo(
-    -14,
-    31
+    -12,
+    27
   );
 
   ctx.moveTo(
-    8,
+    7,
     18
   );
 
   ctx.lineTo(
-    14,
-    31
+    12,
+    27
   );
 
   ctx.stroke();
 
-
-  /* speed lines */
-
-  ctx.strokeStyle =
-    glow;
-
-  ctx.lineWidth = 2;
-
-  ctx.globalAlpha = .65;
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    -27,
-    -5
-  );
-
-  ctx.lineTo(
-    -39,
-    -5
-  );
-
-  ctx.moveTo(
-    27,
-    4
-  );
-
-  ctx.lineTo(
-    39,
-    4
-  );
-
-  ctx.stroke();
 
   ctx.restore();
 }
 
 
 /* =========================================================
-   ANIMAL CHARACTERS
-========================================================= */
+   ANIMALS
+   ORIGINAL STYLE
+   ========================================================= */
 
-function drawAnimalCharacter(
+function drawAnimal(
   x,
   y,
-  character
+  animal
 ) {
 
-  if (character === "BUNNY") {
-    drawBunny(x, y);
+  ctx.save();
+
+  ctx.translate(
+    x,
+    y
+  );
+
+  ctx.shadowBlur =
+    18;
+
+  ctx.shadowColor =
+    "#ffe66b";
+
+
+  /*
+    Bunny.
+  */
+
+  if (
+    animal === "BUNNY"
+  ) {
+
+    drawBunny();
   }
 
-  else if (character === "FOX") {
-    drawFox(x, y);
+
+  /*
+    Fox.
+  */
+
+  if (
+    animal === "FOX"
+  ) {
+
+    drawFox();
   }
 
-  else if (character === "CAT") {
-    drawCat(x, y);
+
+  /*
+    Cat.
+  */
+
+  if (
+    animal === "CAT"
+  ) {
+
+    drawCat();
   }
 
-  else if (character === "PANDA") {
-    drawPanda(x, y);
+
+  /*
+    Panda.
+  */
+
+  if (
+    animal === "PANDA"
+  ) {
+
+    drawPanda();
   }
 
-  else {
-    drawBunny(x, y);
-  }
+
+  ctx.restore();
 }
 
 
 /* =========================================================
    BUNNY
-========================================================= */
+   ========================================================= */
 
-function drawBunny(
-  x,
-  y
-) {
-
-  ctx.save();
-
-  ctx.translate(x, y);
-
-  ctx.shadowBlur = 25;
-  ctx.shadowColor = "#ff8fd8";
-
-  ctx.fillStyle = "#ffd6ef";
-
-  /* ears */
-
-  ctx.beginPath();
-
-  ctx.ellipse(
-    -12,
-    -37,
-    9,
-    24,
-    -.12,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.ellipse(
-    12,
-    -37,
-    9,
-    24,
-    .12,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-
-  ctx.fillStyle = "#ff86c9";
-
-  ctx.shadowBlur = 0;
-
-  ctx.beginPath();
-
-  ctx.ellipse(
-    -12,
-    -37,
-    4,
-    15,
-    -.12,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.ellipse(
-    12,
-    -37,
-    4,
-    15,
-    .12,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-
-  /* head */
-
-  ctx.shadowBlur = 25;
-  ctx.shadowColor = "#ff8fd8";
-
-  ctx.fillStyle = "#ffd6ef";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    0,
-    -5,
-    29,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-
-  /* cheeks */
-
-  ctx.shadowBlur = 0;
+function drawBunny() {
 
   ctx.fillStyle =
-    "rgba(255,115,180,.55)";
+    "#ffe66b";
 
-  ctx.beginPath();
 
-  ctx.arc(
-    -18,
-    3,
+  roundedRect(
+    ctx,
+    -15,
+    -45,
+    10,
+    28,
+    5
+  );
+
+  roundedRect(
+    ctx,
     5,
-    0,
-    Math.PI * 2
+    -45,
+    10,
+    28,
+    5
   );
 
-  ctx.arc(
-    18,
-    3,
-    5,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-
-  drawCuteFace(
-    0,
-    -3
-  );
 
   drawAnimalBody(
-    "#ffb9e1"
+    "#ffe66b"
   );
-
-  ctx.restore();
 }
 
 
 /* =========================================================
    FOX
-========================================================= */
+   ========================================================= */
 
-function drawFox(
-  x,
-  y
-) {
+function drawFox() {
 
-  ctx.save();
+  ctx.fillStyle =
+    "#ff9a4d";
 
-  ctx.translate(x, y);
 
-  ctx.shadowBlur = 25;
-  ctx.shadowColor = "#ff7b3d";
-
-  ctx.fillStyle = "#ff8245";
-
-  /* ears */
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    -25,
-    -22
-  );
-
-  ctx.lineTo(
+  triangle(
+    ctx,
     -20,
-    -48
-  );
-
-  ctx.lineTo(
-    -3,
-    -28
-  );
-
-  ctx.closePath();
-
-  ctx.moveTo(
-    25,
-    -22
-  );
-
-  ctx.lineTo(
-    20,
-    -48
-  );
-
-  ctx.lineTo(
+    -9,
+    -7,
+    -42,
     3,
-    -28
+    -9
   );
 
-  ctx.closePath();
-
-  ctx.fill();
-
-
-  /* head */
-
-  ctx.beginPath();
-
-  ctx.arc(
-    0,
+  triangle(
+    ctx,
+    20,
+    -9,
+    7,
+    -42,
     -3,
-    29,
-    0,
-    Math.PI * 2
+    -9
   );
-
-  ctx.fill();
-
-
-  /* muzzle */
-
-  ctx.shadowBlur = 0;
-
-  ctx.fillStyle =
-    "#fff1df";
-
-  ctx.beginPath();
-
-  ctx.ellipse(
-    0,
-    9,
-    17,
-    13,
-    0,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-
-  /* nose */
-
-  ctx.fillStyle =
-    "#281522";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    0,
-    5,
-    4,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
 
 
   drawAnimalBody(
-    "#ff6d3d"
+    "#ff9a4d"
   );
-
-  ctx.restore();
 }
 
 
 /* =========================================================
    CAT
-========================================================= */
+   ========================================================= */
 
-function drawCat(
-  x,
-  y
-) {
-
-  ctx.save();
-
-  ctx.translate(x, y);
-
-  ctx.shadowBlur = 25;
-  ctx.shadowColor = "#b38cff";
-
-  ctx.fillStyle = "#b88cff";
-
-  /* ears */
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    -25,
-    -22
-  );
-
-  ctx.lineTo(
-    -20,
-    -48
-  );
-
-  ctx.lineTo(
-    -5,
-    -27
-  );
-
-  ctx.closePath();
-
-  ctx.moveTo(
-    25,
-    -22
-  );
-
-  ctx.lineTo(
-    20,
-    -48
-  );
-
-  ctx.lineTo(
-    5,
-    -27
-  );
-
-  ctx.closePath();
-
-  ctx.fill();
-
-
-  /* head */
-
-  ctx.beginPath();
-
-  ctx.arc(
-    0,
-    -4,
-    29,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-
-  /* muzzle */
-
-  ctx.shadowBlur = 0;
+function drawCat() {
 
   ctx.fillStyle =
-    "#eee4ff";
+    "#9aa8b7";
 
-  ctx.beginPath();
 
-  ctx.arc(
+  triangle(
+    ctx,
+    -20,
     -9,
-    8,
-    9,
-    0,
-    Math.PI * 2
+    -7,
+    -39,
+    3,
+    -9
   );
 
-  ctx.arc(
-    9,
-    8,
-    9,
-    0,
-    Math.PI * 2
+  triangle(
+    ctx,
+    20,
+    -9,
+    7,
+    -39,
+    -3,
+    -9
   );
-
-  ctx.fill();
 
 
   drawAnimalBody(
-    "#9d72ee"
+    "#9aa8b7"
   );
-
-  ctx.restore();
 }
 
 
 /* =========================================================
    PANDA
-========================================================= */
+   ========================================================= */
 
-function drawPanda(
-  x,
-  y
-) {
-
-  ctx.save();
-
-  ctx.translate(x, y);
-
-  ctx.shadowBlur = 25;
-  ctx.shadowColor = "#72eaff";
-
-  ctx.fillStyle = "#f2fbff";
-
-
-  /* ears */
-
-  ctx.beginPath();
-
-  ctx.arc(
-    -19,
-    -29,
-    11,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.arc(
-    19,
-    -29,
-    11,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fillStyle =
-    "#20243a";
-
-  ctx.fill();
-
-
-  /* head */
-
-  ctx.fillStyle =
-    "#f2fbff";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    0,
-    -4,
-    29,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-
-  /* eye patches */
-
-  ctx.fillStyle =
-    "#25283b";
-
-  ctx.beginPath();
-
-  ctx.ellipse(
-    -10,
-    -7,
-    8,
-    12,
-    -.4,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.ellipse(
-    10,
-    -7,
-    8,
-    12,
-    .4,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
+function drawPanda() {
 
   drawAnimalBody(
-    "#dceeff"
+    "#f5f5f5"
   );
 
-  ctx.restore();
+
+  ctx.fillStyle =
+    "#20242b";
+
+  ctx.beginPath();
+
+  ctx.arc(
+    -15,
+    -17,
+    8,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.arc(
+    15,
+    -17,
+    8,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
 }
 
 
 /* =========================================================
    ANIMAL BODY
-========================================================= */
+   ========================================================= */
 
 function drawAnimalBody(
   color
 ) {
 
-  ctx.shadowBlur = 20;
+  ctx.shadowBlur =
+    18;
 
   ctx.shadowColor =
     color;
@@ -3105,87 +2407,84 @@ function drawAnimalBody(
 
   ctx.beginPath();
 
-  ctx.roundRect(
-    -23,
-    18,
-    46,
-    28,
-    13
+  ctx.arc(
+    0,
+    0,
+    22,
+    0,
+    Math.PI * 2
   );
 
   ctx.fill();
 
 
-  ctx.shadowBlur = 0;
+  ctx.shadowBlur =
+    0;
+
 
   ctx.fillStyle =
-    "#161827";
+    "#10131a";
 
   ctx.beginPath();
 
   ctx.arc(
+    -7,
+    -4,
+    3,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.arc(
+    7,
+    -4,
+    3,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+
+  ctx.beginPath();
+
+  ctx.arc(
+    0,
+    5,
+    3,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+
+  ctx.strokeStyle =
+    "#10131a";
+
+  ctx.lineWidth =
+    4;
+
+  ctx.beginPath();
+
+  ctx.moveTo(
     -9,
-    -5,
-    3,
-    0,
-    Math.PI * 2
+    18
   );
 
-  ctx.arc(
+  ctx.lineTo(
+    -14,
+    28
+  );
+
+  ctx.moveTo(
     9,
-    -5,
-    3,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-
-  ctx.strokeStyle =
-    "#161827";
-
-  ctx.lineWidth = 3;
-
-  ctx.lineCap = "round";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    0,
-    3,
-    7,
-    0,
-    Math.PI
-  );
-
-  ctx.stroke();
-
-
-  /* feet */
-
-  ctx.lineWidth = 5;
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    -12,
-    43
+    18
   );
 
   ctx.lineTo(
-    -16,
-    51
-  );
-
-  ctx.moveTo(
-    12,
-    43
-  );
-
-  ctx.lineTo(
-    16,
-    51
+    14,
+    28
   );
 
   ctx.stroke();
@@ -3193,132 +2492,79 @@ function drawAnimalBody(
 
 
 /* =========================================================
-   FACE
-========================================================= */
+   FRUITS
+   ========================================================= */
 
-function drawCuteFace(
-  x,
-  y
-) {
-
-  ctx.shadowBlur = 0;
-
-  ctx.fillStyle =
-    "#27152a";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    x - 9,
-    y,
-    3,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.arc(
-    x + 9,
-    y,
-    3,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-
-  ctx.strokeStyle =
-    "#27152a";
-
-  ctx.lineWidth = 3;
-
-  ctx.beginPath();
-
-  ctx.arc(
-    x,
-    y + 7,
-    7,
-    0,
-    Math.PI
-  );
-
-  ctx.stroke();
-}
-
-
-/* =========================================================
-   FRUIT CHARACTERS
-========================================================= */
-
-function drawFruitCharacter(
+function drawFruit(
   x,
   y,
-  character
+  fruit
 ) {
 
-  if (character === "WATERMELON") {
-    drawWatermelon(x, y);
+  ctx.save();
+
+  ctx.translate(
+    x,
+    y
+  );
+
+
+  if (
+    fruit === "WATERMELON"
+  ) {
+
+    drawWatermelon();
   }
 
-  else if (character === "PINEAPPLE") {
-    drawPineapple(x, y);
+
+  if (
+    fruit === "PINEAPPLE"
+  ) {
+
+    drawPineapple();
   }
 
-  else if (character === "STRAWBERRY") {
-    drawStrawberry(x, y);
+
+  if (
+    fruit === "STRAWBERRY"
+  ) {
+
+    drawStrawberry();
   }
 
-  else if (character === "PEACH") {
-    drawPeach(x, y);
+
+  if (
+    fruit === "PEACH"
+  ) {
+
+    drawPeach();
   }
 
-  else {
-    drawWatermelon(x, y);
-  }
+
+  ctx.restore();
 }
 
 
 /* =========================================================
    WATERMELON
-========================================================= */
+   ========================================================= */
 
-function drawWatermelon(
-  x,
-  y
-) {
+function drawWatermelon() {
 
-  ctx.save();
+  ctx.shadowBlur =
+    18;
 
-  ctx.translate(x, y);
-
-  ctx.shadowBlur = 25;
-  ctx.shadowColor = "#31ff91";
-
-  ctx.fillStyle = "#37e889";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    0,
-    0,
-    31,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-
-  ctx.shadowBlur = 0;
+  ctx.shadowColor =
+    "#55e878";
 
   ctx.fillStyle =
-    "#ff5d87";
+    "#58e878";
 
   ctx.beginPath();
 
   ctx.arc(
     0,
-    2,
+    0,
     24,
     0,
     Math.PI * 2
@@ -3328,295 +2574,184 @@ function drawWatermelon(
 
 
   ctx.fillStyle =
-    "#1d1825";
+    "#ff5d73";
 
-  [
-    [-9, -6],
-    [8, -10],
-    [-2, 10],
-    [12, 7]
-  ].forEach(
-    p => {
+  ctx.beginPath();
 
-      ctx.beginPath();
-
-      ctx.ellipse(
-        p[0],
-        p[1],
-        2,
-        4,
-        -.3,
-        0,
-        Math.PI * 2
-      );
-
-      ctx.fill();
-    }
+  ctx.arc(
+    0,
+    1,
+    17,
+    0,
+    Math.PI * 2
   );
+
+  ctx.fill();
 
 
   drawFruitFace();
-
-  ctx.restore();
 }
 
 
 /* =========================================================
    PINEAPPLE
-========================================================= */
+   ========================================================= */
 
-function drawPineapple(
-  x,
-  y
-) {
+function drawPineapple() {
 
-  ctx.save();
+  ctx.shadowBlur =
+    18;
 
-  ctx.translate(x, y);
-
-  ctx.shadowBlur = 25;
-  ctx.shadowColor = "#ffd84d";
-
-  /* leaves */
+  ctx.shadowColor =
+    "#ffd34d";
 
   ctx.fillStyle =
-    "#57e68a";
-
-  for (
-    let i = -2;
-    i <= 2;
-    i++
-  ) {
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-      i * 8,
-      -33,
-      7,
-      18,
-      i * .25,
-      0,
-      Math.PI * 2
-    );
-
-    ctx.fill();
-  }
-
-
-  ctx.fillStyle =
-    "#ffc83d";
+    "#ffd34d";
 
   ctx.beginPath();
 
   ctx.roundRect(
-    -25,
-    -18,
-    50,
-    58,
-    20
+    -19,
+    -21,
+    38,
+    43,
+    12
   );
 
   ctx.fill();
 
 
-  ctx.shadowBlur = 0;
+  ctx.fillStyle =
+    "#5be06d";
 
-  ctx.strokeStyle =
-    "#e79a2f";
+  triangle(
+    ctx,
+    -13,
+    -18,
+    -8,
+    -38,
+    -1,
+    -19
+  );
 
-  ctx.lineWidth = 2;
+  triangle(
+    ctx,
+    0,
+    -19,
+    7,
+    -40,
+    11,
+    -17
+  );
 
-  for (
-    let i = -18;
-    i <= 18;
-    i += 12
-  ) {
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-      i,
-      -10
-    );
-
-    ctx.lineTo(
-      i + 8,
-      2
-    );
-
-    ctx.stroke();
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-      i,
-      10
-    );
-
-    ctx.lineTo(
-      i + 8,
-      22
-    );
-
-    ctx.stroke();
-  }
 
   drawFruitFace();
-
-  ctx.restore();
 }
 
 
 /* =========================================================
    STRAWBERRY
-========================================================= */
+   ========================================================= */
 
-function drawStrawberry(
-  x,
-  y
-) {
+function drawStrawberry() {
 
-  ctx.save();
+  ctx.shadowBlur =
+    18;
 
-  ctx.translate(x, y);
-
-  ctx.shadowBlur = 25;
-  ctx.shadowColor = "#ff4779";
+  ctx.shadowColor =
+    "#ff5474";
 
   ctx.fillStyle =
-    "#ff4e78";
+    "#ff5474";
 
   ctx.beginPath();
 
   ctx.moveTo(
-    0,
-    34
+    -23,
+    -12
   );
 
-  ctx.bezierCurveTo(
-    -35,
-    10,
+  ctx.quadraticCurveTo(
+    0,
+    -28,
+    23,
+    -12
+  );
+
+  ctx.quadraticCurveTo(
+    19,
+    18,
+    0,
+    27
+  );
+
+  ctx.quadraticCurveTo(
+    -19,
+    18,
+    -23,
+    -12
+  );
+
+  ctx.fill();
+
+
+  ctx.fillStyle =
+    "#63e46e";
+
+  triangle(
+    ctx,
+    -12,
+    -12,
+    -5,
     -29,
-    -22,
     0,
-    -28
+    -15
   );
 
-  ctx.bezierCurveTo(
-    29,
-    -22,
-    35,
-    10,
+  triangle(
+    ctx,
     0,
-    34
+    -14,
+    7,
+    -31,
+    12,
+    -10
   );
 
-  ctx.closePath();
-
-  ctx.fill();
-
-
-  ctx.shadowBlur = 0;
-
-  ctx.fillStyle =
-    "#5cff9c";
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    -16,
-    -22
-  );
-
-  ctx.lineTo(
-    -4,
-    -39
-  );
-
-  ctx.lineTo(
-    0,
-    -25
-  );
-
-  ctx.lineTo(
-    9,
-    -39
-  );
-
-  ctx.lineTo(
-    16,
-    -22
-  );
-
-  ctx.closePath();
-
-  ctx.fill();
-
-
-  ctx.fillStyle =
-    "#ffe2a8";
-
-  for (
-    let i = -2;
-    i <= 2;
-    i++
-  ) {
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-      i * 8,
-      i % 2 ? 3 : 13,
-      2,
-      4,
-      -.3,
-      0,
-      Math.PI * 2
-    );
-
-    ctx.fill();
-  }
 
   drawFruitFace();
-
-  ctx.restore();
 }
 
 
 /* =========================================================
    PEACH
-========================================================= */
+   ========================================================= */
 
-function drawPeach(
-  x,
-  y
-) {
+function drawPeach() {
 
-  ctx.save();
+  ctx.shadowBlur =
+    18;
 
-  ctx.translate(x, y);
-
-  ctx.shadowBlur = 25;
-  ctx.shadowColor = "#ff9c6a";
+  ctx.shadowColor =
+    "#ff9c6b";
 
   ctx.fillStyle =
-    "#ff9f70";
+    "#ff9c6b";
 
   ctx.beginPath();
 
   ctx.arc(
-    -8,
-    0,
-    23,
+    -9,
+    1,
+    17,
     0,
     Math.PI * 2
   );
 
   ctx.arc(
-    8,
-    0,
-    23,
+    9,
+    1,
+    17,
     0,
     Math.PI * 2
   );
@@ -3624,68 +2759,44 @@ function drawPeach(
   ctx.fill();
 
 
-  ctx.shadowBlur = 0;
-
-  ctx.strokeStyle =
-    "#e66c64";
-
-  ctx.lineWidth = 3;
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    0,
-    -18
-  );
-
-  ctx.quadraticCurveTo(
-    -5,
-    0,
-    0,
-    26
-  );
-
-  ctx.stroke();
-
-
   ctx.fillStyle =
-    "#5de68a";
+    "#5fcf68";
 
   ctx.beginPath();
 
   ctx.ellipse(
-    10,
-    -25,
-    8,
-    4,
-    -.5,
+    5,
+    -22,
+    7,
+    3,
+    -0.5,
     0,
     Math.PI * 2
   );
 
   ctx.fill();
 
-  drawFruitFace();
 
-  ctx.restore();
+  drawFruitFace();
 }
 
 
 /* =========================================================
    FRUIT FACE
-========================================================= */
+   ========================================================= */
 
 function drawFruitFace() {
 
-  ctx.shadowBlur = 0;
+  ctx.shadowBlur =
+    0;
 
   ctx.fillStyle =
-    "#30182a";
+    "#17131a";
 
   ctx.beginPath();
 
   ctx.arc(
-    -8,
+    -7,
     -2,
     3,
     0,
@@ -3693,7 +2804,7 @@ function drawFruitFace() {
   );
 
   ctx.arc(
-    8,
+    7,
     -2,
     3,
     0,
@@ -3704,18 +2815,19 @@ function drawFruitFace() {
 
 
   ctx.strokeStyle =
-    "#30182a";
+    "#17131a";
 
-  ctx.lineWidth = 3;
+  ctx.lineWidth =
+    2;
 
   ctx.beginPath();
 
   ctx.arc(
     0,
-    7,
-    7,
-    0,
-    Math.PI
+    5,
+    6,
+    0.2,
+    Math.PI - 0.2
   );
 
   ctx.stroke();
@@ -3723,40 +2835,8 @@ function drawFruitFace() {
 
 
 /* =========================================================
-   SPECIAL CHARACTERS
-========================================================= */
-
-function drawSpecialCharacter(
-  x,
-  y,
-  type
-) {
-
-  if (type === "fish") {
-    drawFish(x, y);
-  }
-
-  else if (type === "sun") {
-    drawBigSun(x, y);
-  }
-
-  else if (type === "plant") {
-    drawBigPlant(x, y);
-  }
-
-  else if (type === "robot") {
-    drawBigRobot(x, y);
-  }
-
-  else if (type === "icecube") {
-    drawBigIceCube(x, y);
-  }
-}
-
-
-/* =========================================================
    FISH
-========================================================= */
+   ========================================================= */
 
 function drawFish(
   x,
@@ -3765,52 +2845,40 @@ function drawFish(
 
   ctx.save();
 
-  ctx.translate(x, y);
-
-  ctx.shadowBlur = 28;
-  ctx.shadowColor = "#36efff";
-
-
-  /* body */
-
-  ctx.fillStyle =
-    "#39dff4";
-
-  ctx.beginPath();
-
-  ctx.ellipse(
-    0,
-    0,
-    31,
-    22,
-    0,
-    0,
-    Math.PI * 2
+  ctx.translate(
+    x,
+    y
   );
 
-  ctx.fill();
+  ctx.shadowBlur =
+    20;
+
+  ctx.shadowColor =
+    "#43e8ff";
 
 
-  /* tail */
+  /*
+    Tail.
+  */
 
   ctx.fillStyle =
-    "#ff6da8";
+    "#ff709f";
 
   ctx.beginPath();
 
   ctx.moveTo(
-    -27,
+    18,
     0
   );
 
   ctx.lineTo(
-    -48,
-    -19
+    35,
+    -15
   );
 
   ctx.lineTo(
-    -48,
-    19
+    35,
+    15
   );
 
   ctx.closePath();
@@ -3818,20 +2886,20 @@ function drawFish(
   ctx.fill();
 
 
-  /* belly */
-
-  ctx.shadowBlur = 0;
+  /*
+    Body.
+  */
 
   ctx.fillStyle =
-    "#b9f9ff";
+    "#43e8ff";
 
   ctx.beginPath();
 
   ctx.ellipse(
-    8,
-    7,
-    16,
-    10,
+    -2,
+    0,
+    27,
+    19,
     0,
     0,
     Math.PI * 2
@@ -3840,26 +2908,53 @@ function drawFish(
   ctx.fill();
 
 
-  /* fin */
+  /*
+    Belly.
+  */
+
+  ctx.shadowBlur =
+    0;
 
   ctx.fillStyle =
-    "#ff77b5";
+    "#c9f9ff";
+
+  ctx.beginPath();
+
+  ctx.ellipse(
+    -7,
+    6,
+    14,
+    9,
+    0,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+
+  /*
+    Fin.
+  */
+
+  ctx.fillStyle =
+    "#ff709f";
 
   ctx.beginPath();
 
   ctx.moveTo(
-    0,
-    -16
+    -2,
+    -13
   );
 
   ctx.lineTo(
     8,
-    -34
+    -29
   );
 
   ctx.lineTo(
-    17,
-    -12
+    15,
+    -10
   );
 
   ctx.closePath();
@@ -3867,86 +2962,48 @@ function drawFish(
   ctx.fill();
 
 
-  /* eye */
+  /*
+    Eye.
+  */
 
   ctx.fillStyle =
-    "#071526";
+    "#10131a";
 
   ctx.beginPath();
 
   ctx.arc(
-    15,
-    -6,
-    5,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-
-  ctx.fillStyle =
-    "#fff";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    17,
-    -8,
-    2,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-
-  /* smile */
-
-  ctx.strokeStyle =
-    "#071526";
-
-  ctx.lineWidth = 3;
-
-  ctx.beginPath();
-
-  ctx.arc(
-    17,
-    1,
-    7,
-    0,
-    Math.PI
-  );
-
-  ctx.stroke();
-
-
-  /* bubbles */
-
-  ctx.strokeStyle =
-    "#63f5ff";
-
-  ctx.lineWidth = 2;
-
-  ctx.beginPath();
-
-  ctx.arc(
-    38,
-    -24,
+    -13,
+    -5,
     4,
     0,
     Math.PI * 2
   );
 
+  ctx.fill();
+
+
+  /*
+    Smile.
+  */
+
+  ctx.strokeStyle =
+    "#10131a";
+
+  ctx.lineWidth =
+    2;
+
+  ctx.beginPath();
+
   ctx.arc(
-    48,
-    -35,
+    -4,
     2,
-    0,
-    Math.PI * 2
+    8,
+    0.15,
+    1.1
   );
 
   ctx.stroke();
+
 
   ctx.restore();
 }
@@ -3954,48 +3011,54 @@ function drawFish(
 
 /* =========================================================
    SUN
-========================================================= */
+   ========================================================= */
 
-function drawBigSun(
+function drawSun(
   x,
   y
 ) {
 
   ctx.save();
 
-  ctx.translate(x, y);
+  ctx.translate(
+    x,
+    y
+  );
 
-  ctx.shadowBlur = 35;
-  ctx.shadowColor = "#ffd23f";
+  ctx.shadowBlur =
+    22;
+
+  ctx.shadowColor =
+    "#ffd95a";
 
   ctx.strokeStyle =
-    "#ffda55";
+    "#ffd95a";
 
-  ctx.lineWidth = 7;
+  ctx.lineWidth =
+    5;
 
-  ctx.lineCap = "round";
 
   for (
     let i = 0;
-    i < 10;
+    i < 8;
     i++
   ) {
 
     const angle =
       i *
       Math.PI /
-      5;
+      4;
 
     ctx.beginPath();
 
     ctx.moveTo(
-      Math.cos(angle) * 34,
-      Math.sin(angle) * 34
+      Math.cos(angle) * 25,
+      Math.sin(angle) * 25
     );
 
     ctx.lineTo(
-      Math.cos(angle) * 48,
-      Math.sin(angle) * 48
+      Math.cos(angle) * 34,
+      Math.sin(angle) * 34
     );
 
     ctx.stroke();
@@ -4003,14 +3066,14 @@ function drawBigSun(
 
 
   ctx.fillStyle =
-    "#ffc93f";
+    "#ffd95a";
 
   ctx.beginPath();
 
   ctx.arc(
     0,
     0,
-    31,
+    23,
     0,
     Math.PI * 2
   );
@@ -4018,11 +3081,51 @@ function drawBigSun(
   ctx.fill();
 
 
-  ctx.shadowBlur = 0;
+  ctx.shadowBlur =
+    0;
 
-  drawSimpleFace(
-    "#3b1d1d"
+  ctx.fillStyle =
+    "#3b2a0b";
+
+  ctx.beginPath();
+
+  ctx.arc(
+    -7,
+    -3,
+    3,
+    0,
+    Math.PI * 2
   );
+
+  ctx.arc(
+    7,
+    -3,
+    3,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+
+  ctx.strokeStyle =
+    "#3b2a0b";
+
+  ctx.lineWidth =
+    2;
+
+  ctx.beginPath();
+
+  ctx.arc(
+    0,
+    3,
+    7,
+    0.15,
+    Math.PI - 0.15
+  );
+
+  ctx.stroke();
+
 
   ctx.restore();
 }
@@ -4030,32 +3133,40 @@ function drawBigSun(
 
 /* =========================================================
    PLANT
-========================================================= */
+   ========================================================= */
 
-function drawBigPlant(
+function drawPlant(
   x,
   y
 ) {
 
   ctx.save();
 
-  ctx.translate(x, y);
+  ctx.translate(
+    x,
+    y
+  );
 
-  ctx.shadowBlur = 25;
-  ctx.shadowColor = "#47ff8b";
+  ctx.shadowBlur =
+    20;
+
+  ctx.shadowColor =
+    "#72ef6a";
 
 
-  /* pot */
+  /*
+    Pot.
+  */
 
   ctx.fillStyle =
-    "#ff766e";
+    "#c66a45";
 
   ctx.beginPath();
 
   ctx.roundRect(
-    -24,
-    18,
-    48,
+    -18,
+    5,
+    36,
     25,
     7
   );
@@ -4063,53 +3174,56 @@ function drawBigPlant(
   ctx.fill();
 
 
-  /* stem */
+  /*
+    Stem.
+  */
 
   ctx.strokeStyle =
-    "#5cff91";
+    "#72ef6a";
 
-  ctx.lineWidth = 8;
-
-  ctx.lineCap = "round";
+  ctx.lineWidth =
+    5;
 
   ctx.beginPath();
 
   ctx.moveTo(
     0,
-    22
+    8
   );
 
   ctx.lineTo(
     0,
-    -8
+    -18
   );
 
   ctx.stroke();
 
 
-  /* leaves */
+  /*
+    Leaves.
+  */
 
   ctx.fillStyle =
-    "#43e985";
+    "#72ef6a";
 
   ctx.beginPath();
 
   ctx.ellipse(
-    -19,
-    -8,
-    18,
-    9,
-    -.5,
+    -12,
+    -18,
+    14,
+    7,
+    -0.45,
     0,
     Math.PI * 2
   );
 
   ctx.ellipse(
-    19,
-    -16,
-    18,
-    9,
-    .5,
+    12,
+    -28,
+    14,
+    7,
+    0.45,
     0,
     Math.PI * 2
   );
@@ -4117,59 +3231,36 @@ function drawBigPlant(
   ctx.fill();
 
 
-  /* flower head */
+  /*
+    Face.
+  */
+
+  ctx.shadowBlur =
+    0;
 
   ctx.fillStyle =
-    "#ff7fc4";
-
-  for (
-    let i = 0;
-    i < 6;
-    i++
-  ) {
-
-    const angle =
-      i *
-      Math.PI /
-      3;
-
-    ctx.beginPath();
-
-    ctx.arc(
-      Math.cos(angle) * 18,
-      Math.sin(angle) * 18 - 24,
-      12,
-      0,
-      Math.PI * 2
-    );
-
-    ctx.fill();
-  }
-
-
-  ctx.fillStyle =
-    "#ffd94d";
+    "#1b3020";
 
   ctx.beginPath();
 
   ctx.arc(
+    -7,
+    15,
+    2.5,
     0,
-    -24,
-    13,
+    Math.PI * 2
+  );
+
+  ctx.arc(
+    7,
+    15,
+    2.5,
     0,
     Math.PI * 2
   );
 
   ctx.fill();
 
-
-  ctx.shadowBlur = 0;
-
-  drawSimpleFace(
-    "#34202c",
-    0,
-    -24
-  );
 
   ctx.restore();
 }
@@ -4177,52 +3268,61 @@ function drawBigPlant(
 
 /* =========================================================
    ROBOT
-========================================================= */
+   ========================================================= */
 
-function drawBigRobot(
+function drawRobot(
   x,
   y
 ) {
 
   ctx.save();
 
-  ctx.translate(x, y);
+  ctx.translate(
+    x,
+    y
+  );
 
-  ctx.shadowBlur = 28;
-  ctx.shadowColor = "#46eaff";
+  ctx.shadowBlur =
+    22;
+
+  ctx.shadowColor =
+    "#9baaff";
 
 
-  /* antenna */
+  /*
+    Antenna.
+  */
 
   ctx.strokeStyle =
-    "#53eaff";
+    "#9baaff";
 
-  ctx.lineWidth = 4;
+  ctx.lineWidth =
+    4;
 
   ctx.beginPath();
 
   ctx.moveTo(
     0,
-    -36
+    -24
   );
 
   ctx.lineTo(
     0,
-    -48
+    -34
   );
 
   ctx.stroke();
 
 
   ctx.fillStyle =
-    "#ff5d9f";
+    "#ff6b6b";
 
   ctx.beginPath();
 
   ctx.arc(
     0,
-    -51,
-    5,
+    -38,
+    4,
     0,
     Math.PI * 2
   );
@@ -4230,123 +3330,115 @@ function drawBigRobot(
   ctx.fill();
 
 
-  /* head */
+  /*
+    Head.
+  */
 
   ctx.fillStyle =
-    "#63e9f6";
-
-  ctx.beginPath();
-
-  ctx.roundRect(
-    -29,
-    -32,
-    58,
-    49,
-    12
-  );
-
-  ctx.fill();
-
-
-  /* face screen */
-
-  ctx.shadowBlur = 0;
-
-  ctx.fillStyle =
-    "#071523";
-
-  ctx.beginPath();
-
-  ctx.roundRect(
-    -22,
-    -22,
-    44,
-    27,
-    8
-  );
-
-  ctx.fill();
-
-
-  /* eyes */
-
-  ctx.shadowBlur = 12;
-  ctx.shadowColor = "#63faff";
-
-  ctx.fillStyle =
-    "#63faff";
-
-  ctx.beginPath();
-
-  ctx.roundRect(
-    -14,
-    -13,
-    8,
-    7,
-    2
-  );
-
-  ctx.roundRect(
-    6,
-    -13,
-    8,
-    7,
-    2
-  );
-
-  ctx.fill();
-
-
-  /* body */
-
-  ctx.shadowBlur = 24;
-  ctx.shadowColor = "#46eaff";
-
-  ctx.fillStyle =
-    "#3bc9dc";
+    "#aebcff";
 
   ctx.beginPath();
 
   ctx.roundRect(
     -23,
-    22,
+    -24,
     46,
-    27,
+    39,
     9
   );
 
   ctx.fill();
 
 
-  /* arms */
+  /*
+    Face.
+  */
+
+  ctx.shadowBlur =
+    0;
+
+  ctx.fillStyle =
+    "#141827";
+
+  ctx.beginPath();
+
+  ctx.arc(
+    -9,
+    -5,
+    4,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.arc(
+    9,
+    -5,
+    4,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+
+  ctx.fillRect(
+    -10,
+    7,
+    20,
+    3
+  );
+
+
+  /*
+    Body.
+  */
+
+  ctx.fillStyle =
+    "#6d7aa9";
+
+  ctx.beginPath();
+
+  ctx.roundRect(
+    -18,
+    15,
+    36,
+    20,
+    6
+  );
+
+  ctx.fill();
+
+
+  /*
+    Legs.
+  */
 
   ctx.strokeStyle =
-    "#65edff";
+    "#9baaff";
 
-  ctx.lineWidth = 7;
-
-  ctx.lineCap = "round";
+  ctx.lineWidth =
+    5;
 
   ctx.beginPath();
 
   ctx.moveTo(
-    -23,
-    27
+    -9,
+    34
   );
 
   ctx.lineTo(
-    -35,
-    39
+    -12,
+    44
   );
 
   ctx.moveTo(
-    23,
-    27
+    9,
+    34
   );
 
   ctx.lineTo(
-    35,
-    39
+    12,
+    44
   );
 
   ctx.stroke();
@@ -4358,144 +3450,139 @@ function drawBigRobot(
 
 /* =========================================================
    ICE CUBE
-========================================================= */
+   ========================================================= */
 
-function drawBigIceCube(
+function drawIceCube(
   x,
   y
 ) {
 
   ctx.save();
 
-  ctx.translate(x, y);
+  ctx.translate(
+    x,
+    y
+  );
 
-  ctx.shadowBlur = 30;
-  ctx.shadowColor = "#69eaff";
+  ctx.shadowBlur =
+    22;
+
+  ctx.shadowColor =
+    "#79d7ff";
+
+
+  /*
+    Main cube.
+  */
 
   ctx.fillStyle =
-    "#9aeaff";
+    "#bcefff";
 
   ctx.beginPath();
 
   ctx.roundRect(
-    -31,
-    -31,
-    62,
-    62,
-    12
+    -23,
+    -23,
+    46,
+    46,
+    10
   );
 
   ctx.fill();
 
 
-  /* inner glass */
+  /*
+    Inner blue facets.
+  */
 
-  ctx.shadowBlur = 0;
+  ctx.shadowBlur =
+    0;
 
-  ctx.strokeStyle =
-    "rgba(255,255,255,.65)";
-
-  ctx.lineWidth = 3;
-
-  ctx.beginPath();
-
-  ctx.roundRect(
-    -22,
-    -22,
-    44,
-    44,
-    8
-  );
-
-  ctx.stroke();
-
-
-  /* highlight */
-
-  ctx.strokeStyle =
-    "rgba(255,255,255,.85)";
-
-  ctx.lineWidth = 5;
+  ctx.fillStyle =
+    "rgba(90,190,235,0.35)";
 
   ctx.beginPath();
 
   ctx.moveTo(
-    -18,
-    -17
+    -20,
+    -5
   );
 
   ctx.lineTo(
-    -5,
-    -24
+    0,
+    -18
+  );
+
+  ctx.lineTo(
+    18,
+    -5
+  );
+
+  ctx.lineTo(
+    0,
+    5
+  );
+
+  ctx.closePath();
+
+  ctx.fill();
+
+
+  /*
+    Face.
+  */
+
+  ctx.fillStyle =
+    "#173344";
+
+  ctx.beginPath();
+
+  ctx.arc(
+    -8,
+    2,
+    3,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.arc(
+    8,
+    2,
+    3,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+
+  ctx.strokeStyle =
+    "#173344";
+
+  ctx.lineWidth =
+    2;
+
+  ctx.beginPath();
+
+  ctx.arc(
+    0,
+    8,
+    7,
+    0.15,
+    Math.PI - 0.15
   );
 
   ctx.stroke();
 
-
-  drawSimpleFace(
-    "#123148"
-  );
 
   ctx.restore();
 }
 
 
 /* =========================================================
-   SIMPLE FACE
-========================================================= */
-
-function drawSimpleFace(
-  color,
-  cx = 0,
-  cy = 0
-) {
-
-  ctx.fillStyle =
-    color;
-
-  ctx.beginPath();
-
-  ctx.arc(
-    cx - 8,
-    cy - 4,
-    3,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.arc(
-    cx + 8,
-    cy - 4,
-    3,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-
-  ctx.strokeStyle =
-    color;
-
-  ctx.lineWidth = 3;
-
-  ctx.beginPath();
-
-  ctx.arc(
-    cx,
-    cy + 5,
-    7,
-    0,
-    Math.PI
-  );
-
-  ctx.stroke();
-}
-
-
-/* =========================================================
-   OBSTACLES
-========================================================= */
+   OBSTACLE DRAWING
+   SAME SIMPLE ARCADE LANGUAGE
+   ========================================================= */
 
 function drawObstacle(
   obstacle
@@ -4520,18 +3607,21 @@ function drawObstacle(
     y
   );
 
+  ctx.shadowBlur =
+    18;
 
-  if (
-    settings.obstacle ===
-    "neon-block"
-  ) {
+  ctx.shadowColor =
+    settings.obstacleColor;
 
-    ctx.shadowBlur = 25;
-    ctx.shadowColor =
-      "#ff3f91";
+  ctx.fillStyle =
+    settings.obstacleColor;
 
-    ctx.fillStyle =
-      "#ff3f91";
+
+  /*
+    Level 1 block.
+  */
+
+  if (level === 1) {
 
     ctx.beginPath();
 
@@ -4540,206 +3630,100 @@ function drawObstacle(
       -size / 2,
       size,
       size,
-      9
+      8
     );
 
     ctx.fill();
-
-
-    ctx.shadowBlur = 0;
-
-    ctx.fillStyle =
-      "rgba(255,255,255,.45)";
-
-    ctx.fillRect(
-      -size * .22,
-      -size * .32,
-      size * .16,
-      size * .16
-    );
   }
 
 
-  else if (
-    settings.obstacle ===
-    "diamond"
-  ) {
+  /*
+    Level 2 diamond.
+  */
+
+  else if (level === 2) {
 
     ctx.rotate(
       Math.PI / 4
     );
 
-    ctx.shadowBlur = 25;
-    ctx.shadowColor =
-      "#ff4f70";
-
-    ctx.fillStyle =
-      "#ff4f70";
-
-    ctx.beginPath();
-
-    ctx.roundRect(
-      -size / 2,
-      -size / 2,
-      size,
-      size,
-      7
-    );
-
-    ctx.fill();
-
-    ctx.shadowBlur = 0;
-
-    ctx.fillStyle =
-      "rgba(255,255,255,.45)";
-
     ctx.fillRect(
-      -size * .2,
-      -size * .2,
-      size * .18,
-      size * .18
+      -size / 2,
+      -size / 2,
+      size,
+      size
     );
   }
 
 
+  /*
+    Animal rocks.
+  */
+
   else if (
-    settings.obstacle === "rock" ||
-    settings.obstacle === "rock-fast"
+    level === 3 ||
+    level === 4
   ) {
-
-    const rockColor =
-      settings.obstacle === "rock-fast"
-        ? "#e4874f"
-        : "#b77a50";
-
-    ctx.shadowBlur = 18;
-
-    ctx.shadowColor =
-      rockColor;
-
-    ctx.fillStyle =
-      rockColor;
 
     drawRock(
       size
     );
-
-
-    ctx.shadowBlur = 0;
-
-    ctx.fillStyle =
-      "rgba(255,220,180,.28)";
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-      -size * .25,
-      -size * .3
-    );
-
-    ctx.lineTo(
-      size * .1,
-      -size * .42
-    );
-
-    ctx.lineTo(
-      size * .25,
-      -size * .1
-    );
-
-    ctx.closePath();
-
-    ctx.fill();
   }
 
 
-  else if (
-    settings.obstacle ===
-    "fruit-hazard"
-  ) {
+  /*
+    Fruit hazards.
+  */
 
-    drawHazardFruit(
+  else if (level === 5) {
+
+    drawFruitHazard(
       size
     );
   }
 
 
-  else if (
-    settings.obstacle ===
-    "coral"
-  ) {
+  /*
+    Ocean coral.
+  */
 
-    drawCoralObstacle(
+  else if (level === 6) {
+
+    drawCoral(
       size
     );
   }
 
 
-  else if (
-    settings.obstacle ===
-    "sand"
-  ) {
+  /*
+    Desert rock / sand.
+  */
 
-    ctx.shadowBlur = 18;
+  else if (level === 7) {
 
-    ctx.shadowColor =
-      "#ffb64c";
-
-    ctx.fillStyle =
-      "#e69b42";
-
-    ctx.beginPath();
-
-    ctx.arc(
-      0,
-      8,
-      size / 2,
-      Math.PI,
-      0
-    );
-
-    ctx.fill();
-
-    ctx.fillStyle =
-      "#ffc966";
-
-    ctx.beginPath();
-
-    ctx.arc(
-      -8,
-      3,
-      5,
-      0,
-      Math.PI * 2
-    );
-
-    ctx.arc(
-      8,
-      7,
-      4,
-      0,
-      Math.PI * 2
-    );
-
-    ctx.fill();
-  }
-
-
-  else if (
-    settings.obstacle ===
-    "tree"
-  ) {
-
-    drawTreeObstacle(
+    drawSandPile(
       size
     );
   }
 
 
-  else if (
-    settings.obstacle ===
-    "comet"
-  ) {
+  /*
+    Forest tree.
+  */
+
+  else if (level === 8) {
+
+    drawForestObstacle(
+      size
+    );
+  }
+
+
+  /*
+    Space comet.
+  */
+
+  else if (level === 9) {
 
     drawComet(
       size
@@ -4747,10 +3731,11 @@ function drawObstacle(
   }
 
 
-  else if (
-    settings.obstacle ===
-    "iceberg"
-  ) {
+  /*
+    Iceberg.
+  */
+
+  else if (level === 10) {
 
     drawIceberg(
       size
@@ -4764,7 +3749,7 @@ function drawObstacle(
 
 /* =========================================================
    ROCK
-========================================================= */
+   ========================================================= */
 
 function drawRock(
   size
@@ -4773,33 +3758,33 @@ function drawRock(
   ctx.beginPath();
 
   ctx.moveTo(
-    -size * .5,
-    size * .15
+    -size * 0.5,
+    size * 0.15
   );
 
   ctx.lineTo(
-    -size * .25,
-    -size * .45
+    -size * 0.25,
+    -size * 0.45
   );
 
   ctx.lineTo(
-    size * .25,
-    -size * .55
+    size * 0.25,
+    -size * 0.55
   );
 
   ctx.lineTo(
-    size * .55,
+    size * 0.55,
     0
   );
 
   ctx.lineTo(
-    size * .25,
-    size * .48
+    size * 0.25,
+    size * 0.48
   );
 
   ctx.lineTo(
-    -size * .4,
-    size * .4
+    -size * 0.4,
+    size * 0.4
   );
 
   ctx.closePath();
@@ -4810,67 +3795,44 @@ function drawRock(
 
 /* =========================================================
    FRUIT HAZARD
-========================================================= */
+   ========================================================= */
 
-function drawHazardFruit(
+function drawFruitHazard(
   size
 ) {
-
-  ctx.shadowBlur = 20;
-  ctx.shadowColor =
-    "#ff477a";
-
-  ctx.fillStyle =
-    "#ff547f";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    0,
-    4,
-    size * .48,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-
-  ctx.fillStyle =
-    "#64ee91";
-
-  ctx.beginPath();
-
-  ctx.ellipse(
-    9,
-    -size * .42,
-    10,
-    5,
-    -.5,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-
-  ctx.fillStyle =
-    "#ffe7a5";
 
   ctx.beginPath();
 
   ctx.arc(
     -7,
-    -2,
-    2,
+    3,
+    size * 0.38,
     0,
     Math.PI * 2
   );
 
   ctx.arc(
     7,
-    6,
-    2,
+    3,
+    size * 0.38,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+
+  ctx.fillStyle =
+    "#72df69";
+
+  ctx.beginPath();
+
+  ctx.ellipse(
+    8,
+    -size * 0.45,
+    8,
+    4,
+    -0.5,
     0,
     Math.PI * 2
   );
@@ -4880,168 +3842,21 @@ function drawHazardFruit(
 
 
 /* =========================================================
-   CORAL OBSTACLE
-========================================================= */
+   CORAL
+   ========================================================= */
 
-function drawCoralObstacle(
+function drawCoral(
   size
 ) {
-
-  ctx.shadowBlur = 20;
-
-  ctx.shadowColor =
-    "#ff5f9c";
 
   ctx.strokeStyle =
-    "#ff6da8";
-
-  ctx.lineWidth = 8;
-
-  ctx.lineCap = "round";
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    0,
-    size / 2
-  );
-
-  ctx.lineTo(
-    0,
-    -size / 2
-  );
-
-  ctx.moveTo(
-    0,
-    -2
-  );
-
-  ctx.lineTo(
-    -size / 2,
-    -size / 3
-  );
-
-  ctx.moveTo(
-    0,
-    8
-  );
-
-  ctx.lineTo(
-    size / 2,
-    -size / 4
-  );
-
-  ctx.stroke();
-
-
-  ctx.fillStyle =
-    "#ff9bc3";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    -size / 2,
-    -size / 3,
-    5,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.arc(
-    size / 2,
-    -size / 4,
-    5,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.arc(
-    0,
-    -size / 2,
-    5,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-}
-
-
-/* =========================================================
-   TREE OBSTACLE
-========================================================= */
-
-function drawTreeObstacle(
-  size
-) {
-
-  ctx.shadowBlur = 20;
-  ctx.shadowColor =
-    "#42ff88";
-
-  ctx.fillStyle =
-    "#49d978";
-
-  ctx.beginPath();
-
-  ctx.arc(
-    0,
-    -size * .2,
-    size * .48,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.arc(
-    -size * .28,
-    size * .05,
-    size * .32,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.arc(
-    size * .28,
-    size * .05,
-    size * .32,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fill();
-
-
-  ctx.shadowBlur = 0;
-
-  ctx.fillStyle =
-    "#75472b";
-
-  ctx.fillRect(
-    -7,
-    size * .15,
-    14,
-    size * .58
-  );
-}
-
-
-/* =========================================================
-   COMET
-========================================================= */
-
-function drawComet(
-  size
-) {
-
-  ctx.shadowBlur = 25;
-  ctx.shadowColor =
-    "#80baff";
-
-  ctx.strokeStyle =
-    "#718cff";
+    settings.obstacleColor;
 
   ctx.lineWidth =
-    size * .28;
+    Math.max(
+      5,
+      size * 0.18
+    );
 
   ctx.lineCap =
     "round";
@@ -5049,27 +3864,129 @@ function drawComet(
   ctx.beginPath();
 
   ctx.moveTo(
-    size * .9,
-    size * .8
+    0,
+    size * 0.5
   );
 
   ctx.lineTo(
-    -size * 1.4,
-    -size * 1.4
+    0,
+    -size * 0.35
+  );
+
+  ctx.moveTo(
+    0,
+    -size * 0.05
+  );
+
+  ctx.lineTo(
+    -size * 0.35,
+    -size * 0.4
+  );
+
+  ctx.moveTo(
+    0,
+    -size * 0.18
+  );
+
+  ctx.lineTo(
+    size * 0.38,
+    -size * 0.48
+  );
+
+  ctx.stroke();
+}
+
+
+/* =========================================================
+   SAND PILE
+   ========================================================= */
+
+function drawSandPile(
+  size
+) {
+
+  ctx.beginPath();
+
+  ctx.arc(
+    0,
+    size * 0.2,
+    size * 0.58,
+    Math.PI,
+    0
+  );
+
+  ctx.fill();
+}
+
+
+/* =========================================================
+   FOREST OBSTACLE
+   ========================================================= */
+
+function drawForestObstacle(
+  size
+) {
+
+  ctx.fillRect(
+    -size * 0.16,
+    -size * 0.15,
+    size * 0.32,
+    size * 0.8
+  );
+
+
+  ctx.beginPath();
+
+  ctx.arc(
+    0,
+    -size * 0.25,
+    size * 0.55,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+}
+
+
+/* =========================================================
+   COMET
+   ========================================================= */
+
+function drawComet(
+  size
+) {
+
+  ctx.strokeStyle =
+    "rgba(255,120,100,0.55)";
+
+  ctx.lineWidth =
+    size * 0.22;
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    -size * 0.85,
+    size * 0.55
+  );
+
+  ctx.lineTo(
+    -size * 0.15,
+    size * 0.1
   );
 
   ctx.stroke();
 
 
   ctx.fillStyle =
-    "#d8f5ff";
+    settings.obstacleColor;
 
   ctx.beginPath();
 
   ctx.arc(
     0,
     0,
-    size / 2,
+    size * 0.42,
     0,
     Math.PI * 2
   );
@@ -5080,67 +3997,37 @@ function drawComet(
 
 /* =========================================================
    ICEBERG
-========================================================= */
+   ========================================================= */
 
 function drawIceberg(
   size
 ) {
 
-  ctx.shadowBlur = 22;
-
-  ctx.shadowColor =
-    "#5ce7ff";
-
-  ctx.fillStyle =
-    "#86ddf3";
-
   ctx.beginPath();
 
   ctx.moveTo(
+    -size * 0.55,
+    size * 0.45
+  );
+
+  ctx.lineTo(
+    -size * 0.25,
+    -size * 0.5
+  );
+
+  ctx.lineTo(
     0,
-    -size
+    -size * 0.75
   );
 
   ctx.lineTo(
-    size * .72,
-    size * .6
+    size * 0.3,
+    -size * 0.25
   );
 
   ctx.lineTo(
-    size * .25,
-    size * .48
-  );
-
-  ctx.lineTo(
-    -size * .7,
-    size * .6
-  );
-
-  ctx.closePath();
-
-  ctx.fill();
-
-
-  ctx.shadowBlur = 0;
-
-  ctx.fillStyle =
-    "rgba(255,255,255,.5)";
-
-  ctx.beginPath();
-
-  ctx.moveTo(
-    0,
-    -size + 7
-  );
-
-  ctx.lineTo(
-    size * .25,
-    size * .15
-  );
-
-  ctx.lineTo(
-    -size * .05,
-    size * .05
+    size * 0.58,
+    size * 0.45
   );
 
   ctx.closePath();
@@ -5150,8 +4037,8 @@ function drawIceberg(
 
 
 /* =========================================================
-   EXPLOSION
-========================================================= */
+   PARTICLES
+   ========================================================= */
 
 function createExplosion(
   x,
@@ -5161,8 +4048,8 @@ function createExplosion(
 
   const count =
     perfect
-      ? 28
-      : 18;
+      ? 20
+      : 14;
 
 
   for (
@@ -5196,9 +4083,9 @@ function createExplosion(
         speed,
 
       life:
-        .35 +
+        0.35 +
         Math.random() *
-        .45,
+        0.45,
 
       size:
         2 +
@@ -5208,10 +4095,6 @@ function createExplosion(
   }
 }
 
-
-/* =========================================================
-   PARTICLE
-========================================================= */
 
 function drawParticle(
   particle
@@ -5225,13 +4108,9 @@ function drawParticle(
       particle.life * 2
     );
 
-  ctx.shadowBlur = 10;
-
-  ctx.shadowColor =
-    "#ffffff";
-
   ctx.fillStyle =
     "#ffffff";
+
 
   ctx.beginPath();
 
@@ -5250,8 +4129,8 @@ function drawParticle(
 
 
 /* =========================================================
-   LANE
-========================================================= */
+   HELPERS
+   ========================================================= */
 
 function laneX(
   laneValue
@@ -5268,9 +4147,65 @@ function laneX(
 }
 
 
+function roundedRect(
+  context,
+  x,
+  y,
+  width,
+  height,
+  radius
+) {
+
+  context.beginPath();
+
+  context.roundRect(
+    x,
+    y,
+    width,
+    height,
+    radius
+  );
+
+  context.fill();
+}
+
+
+function triangle(
+  context,
+  x1,
+  y1,
+  x2,
+  y2,
+  x3,
+  y3
+) {
+
+  context.beginPath();
+
+  context.moveTo(
+    x1,
+    y1
+  );
+
+  context.lineTo(
+    x2,
+    y2
+  );
+
+  context.lineTo(
+    x3,
+    y3
+  );
+
+  context.closePath();
+
+  context.fill();
+}
+
+
 /* =========================================================
-   CONTROLS
-========================================================= */
+   BUTTON CONTROLS
+   ========================================================= */
 
 leftButton.addEventListener(
   "pointerdown",
@@ -5313,7 +4248,7 @@ startButton.addEventListener(
 
 /* =========================================================
    KEYBOARD
-========================================================= */
+   ========================================================= */
 
 window.addEventListener(
   "keydown",
@@ -5356,7 +4291,7 @@ window.addEventListener(
 
 /* =========================================================
    SWIPE
-========================================================= */
+   ========================================================= */
 
 let touchStartX = 0;
 let touchStartY = 0;
@@ -5374,7 +4309,6 @@ canvas.addEventListener(
 
     touchStartY =
       touch.clientY;
-
   },
   {
     passive: true
@@ -5418,6 +4352,10 @@ canvas.addEventListener(
     }
 
 
+    /*
+      Tap = attack.
+    */
+
     if (
       Math.abs(dx) < 25 &&
       Math.abs(dy) < 25
@@ -5425,7 +4363,6 @@ canvas.addEventListener(
 
       attack();
     }
-
   },
   {
     passive: true
@@ -5435,11 +4372,11 @@ canvas.addEventListener(
 
 /* =========================================================
    INITIALIZE
-========================================================= */
+   ========================================================= */
 
 resizeCanvas();
 
-setupUI();
+setupLevelUI();
 
 updateHUD();
 
