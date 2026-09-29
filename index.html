@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -10,121 +12,232 @@
 
     <title>1M</title>
 
-    <link rel="stylesheet" href="css/game.css">
+    <link
+        rel="stylesheet"
+        href="css/game.css"
+    >
+
 </head>
+
 
 <body>
 
-    <main class="game-shell">
+<main class="game-shell">
 
-        <header class="game-header">
 
-            <div>
-                <div class="game-name">
-                    1M<span>.</span>
-                </div>
+    <!-- HEADER -->
 
-                <div
-                    id="levelSubtitle"
-                    class="game-subtitle"
-                >
-                    LEVEL 1 · NEON RUN
-                </div>
+    <header class="game-header">
+
+        <div>
+
+            <div class="game-name">
+                1M<span>.</span>
             </div>
-
-            <div class="best-score">
-                <div>BEST</div>
-                <strong id="bestScore">0</strong>
-            </div>
-
-        </header>
-
-
-        <section class="game-container">
-
-            <canvas
-                id="gameCanvas"
-                width="360"
-                height="490"
-            ></canvas>
-
 
             <div
-                id="scoreDisplay"
-                class="score-display"
+                id="levelSubtitle"
+                class="game-subtitle"
             >
-                <small>SCORE</small>
-                <strong id="score">0</strong>
+                LEVEL 1 · NEON RUN
             </div>
 
-
-            <div
-                id="multiplierDisplay"
-                class="multiplier-display"
-            >
-                ×1
-            </div>
-
-
-            <div
-                id="gameOverlay"
-                class="game-overlay"
-            >
-
-                <div class="overlay-label">
-                    JUST ONE MORE RUN
-                </div>
-
-                <h1 id="overlayTitle">
-                    1M<span>.</span>
-                </h1>
-
-                <p id="overlayText">
-                    Dodge. Survive.<br>
-                    Beat your best.
-                </p>
-
-                <button id="startButton">
-                    ▶ START RUN
-                </button>
-
-                <div class="instructions">
-                    ← → MOVE
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <section class="controls">
-
-            <button id="leftButton">
-                ←
-            </button>
-
-            <button id="rightButton">
-                →
-            </button>
-
-        </section>
-
-
-        <div
-            id="gameMessage"
-            class="game-message"
-        >
-            Ready when you are.
         </div>
 
-    </main>
+
+        <div class="best-score">
+
+            <div>BEST</div>
+
+            <strong id="bestScore">
+                0
+            </strong>
+
+        </div>
+
+    </header>
 
 
-    <!--
-        Version number forces the browser
-        to load the newest game.js.
-    -->
-    <script src="js/game.js?v=20"></script>
+    <!-- GAME AREA -->
+
+    <section class="game-container">
+
+        <canvas
+            id="gameCanvas"
+            width="360"
+            height="490"
+        ></canvas>
+
+
+        <!-- SCORE -->
+
+        <div
+            id="scoreDisplay"
+            class="score-display"
+        >
+
+            <small>
+                SCORE
+            </small>
+
+            <strong id="score">
+                0
+            </strong>
+
+        </div>
+
+
+        <!-- MULTIPLIER -->
+
+        <div
+            id="multiplierDisplay"
+            class="multiplier-display"
+        >
+            ×1
+        </div>
+
+
+        <!-- STRIKES -->
+
+        <div
+            id="strikeDisplay"
+            class="strike-display"
+        >
+            STRIKES ×3
+        </div>
+
+
+        <!-- START / GAME OVER SCREEN -->
+
+        <div
+            id="gameOverlay"
+            class="game-overlay"
+        >
+
+            <div class="overlay-label">
+                JUST ONE MORE RUN
+            </div>
+
+
+            <h1 id="overlayTitle">
+                1M<span>.</span>
+            </h1>
+
+
+            <p id="overlayText">
+                Dodge. Survive.<br>
+                Beat your best.
+            </p>
+
+
+            <!-- ANIMAL SELECTOR -->
+
+            <div
+                id="animalChooser"
+                class="animal-chooser"
+            >
+
+                <button
+                    type="button"
+                    class="animal-button selected"
+                    data-animal="BUNNY"
+                >
+                    <span class="animal-emoji">🐰</span>
+                    <span class="animal-name">BUNNY</span>
+                </button>
+
+
+                <button
+                    type="button"
+                    class="animal-button"
+                    data-animal="FOX"
+                >
+                    <span class="animal-emoji">🦊</span>
+                    <span class="animal-name">FOX</span>
+                </button>
+
+
+                <button
+                    type="button"
+                    class="animal-button"
+                    data-animal="CAT"
+                >
+                    <span class="animal-emoji">🐱</span>
+                    <span class="animal-name">CAT</span>
+                </button>
+
+
+                <button
+                    type="button"
+                    class="animal-button"
+                    data-animal="PANDA"
+                >
+                    <span class="animal-emoji">🐼</span>
+                    <span class="animal-name">PANDA</span>
+                </button>
+
+            </div>
+
+
+            <button
+                id="startButton"
+            >
+                ▶ START RUN
+            </button>
+
+
+            <div class="instructions">
+                ← → MOVE
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- CONTROLS -->
+
+    <section class="controls">
+
+        <button
+            id="leftButton"
+        >
+            ←
+        </button>
+
+
+        <button
+            id="attackButton"
+            class="attack-button"
+        >
+            💥
+        </button>
+
+
+        <button
+            id="rightButton"
+        >
+            →
+        </button>
+
+    </section>
+
+
+    <div
+        id="gameMessage"
+        class="game-message"
+    >
+        Ready when you are.
+    </div>
+
+
+</main>
+
+
+<!-- Version number forces newest JavaScript -->
+
+<script src="js/game.js?v=40"></script>
 
 </body>
+
 </html>
