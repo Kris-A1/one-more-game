@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -9,47 +10,57 @@
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     >
 
-    <title>1M — One More</title>
+    <title>1M.</title>
 
-    <link rel="stylesheet" href="css/game.css?v=60">
+    <link
+        rel="stylesheet"
+        href="css/game.css?v=50"
+    >
+
 </head>
+
 
 <body>
 
-<div class="game-shell">
+<main class="game-shell">
 
-    <!-- =====================================================
-         HEADER
-         ===================================================== -->
+
+    <!-- HEADER -->
 
     <header class="game-header">
 
         <div>
+
             <div class="game-name">
-                1<span>M</span>.
+                1M<span>.</span>
             </div>
 
-            <div class="game-subtitle">
-                ONE MORE
+            <div
+                id="levelSubtitle"
+                class="game-subtitle"
+            >
+                LEVEL 1 · NEON RUN
             </div>
+
         </div>
 
+
         <div class="best-score">
-            BEST
-            <strong id="bestScore">0</strong>
+
+            <div>BEST</div>
+
+            <strong id="bestScore">
+                0
+            </strong>
+
         </div>
 
     </header>
 
 
-    <!-- =====================================================
-         GAME
-         ===================================================== -->
+    <!-- GAME -->
 
-    <main
-        class="game-container"
-        id="gameContainer"
-    >
+    <section class="game-container">
 
         <canvas
             id="gameCanvas"
@@ -60,7 +71,10 @@
 
         <!-- SCORE -->
 
-        <div class="score-display">
+        <div
+            id="scoreDisplay"
+            class="score-display"
+        >
 
             <small>SCORE</small>
 
@@ -74,56 +88,54 @@
         <!-- MULTIPLIER -->
 
         <div
+            id="multiplierDisplay"
             class="multiplier-display"
-            id="multiplier"
         >
-            x1
+            ×1
         </div>
 
 
         <!-- STRIKES -->
 
         <div
-            class="strike-display"
             id="strikeDisplay"
+            class="strike-display"
         >
-            STRIKES 0
+            💥 ×3
         </div>
 
 
-        <!-- =================================================
-             OVERLAY
-             ================================================= -->
+        <!-- OVERLAY -->
 
         <div
+            id="gameOverlay"
             class="game-overlay"
-            id="overlay"
         >
 
             <div
-                class="overlay-label"
                 id="overlayLabel"
+                class="overlay-label"
             >
-                LEVEL 1
+                JUST ONE MORE RUN
             </div>
 
 
             <h1 id="overlayTitle">
-                NEON <span>RUN</span>
+                1M<span>.</span>
             </h1>
 
 
             <p id="overlayText">
-                Dodge everything.<br>
-                How long can you survive?
+                Dodge. Survive.<br>
+                Beat your best.
             </p>
 
 
-            <!-- CHARACTER SELECTOR -->
+            <!-- ANIMALS -->
 
             <div
-                class="animal-chooser"
                 id="animalChooser"
+                class="animal-chooser"
             >
 
                 <div class="animal-title">
@@ -133,127 +145,178 @@
 
                 <div class="animal-grid">
 
+
                     <button
+                        type="button"
                         class="animal-button selected"
                         data-animal="BUNNY"
-                        type="button"
                     >
-                        <span class="animal-emoji">🐰</span>
-                        <span class="animal-name">BUNNY</span>
+
+                        <span class="animal-emoji">
+                            🐰
+                        </span>
+
+                        <span class="animal-name">
+                            BUNNY
+                        </span>
+
                     </button>
 
 
                     <button
+                        type="button"
                         class="animal-button"
                         data-animal="FOX"
-                        type="button"
                     >
-                        <span class="animal-emoji">🦊</span>
-                        <span class="animal-name">FOX</span>
+
+                        <span class="animal-emoji">
+                            🦊
+                        </span>
+
+                        <span class="animal-name">
+                            FOX
+                        </span>
+
                     </button>
 
 
                     <button
+                        type="button"
                         class="animal-button"
                         data-animal="CAT"
-                        type="button"
                     >
-                        <span class="animal-emoji">🐱</span>
-                        <span class="animal-name">CAT</span>
+
+                        <span class="animal-emoji">
+                            🐱
+                        </span>
+
+                        <span class="animal-name">
+                            CAT
+                        </span>
+
                     </button>
 
 
                     <button
+                        type="button"
                         class="animal-button"
                         data-animal="PANDA"
-                        type="button"
                     >
-                        <span class="animal-emoji">🐼</span>
-                        <span class="animal-name">PANDA</span>
+
+                        <span class="animal-emoji">
+                            🐼
+                        </span>
+
+                        <span class="animal-name">
+                            PANDA
+                        </span>
+
                     </button>
+
 
                 </div>
 
             </div>
 
 
-            <!-- START -->
+            <!-- START / NEXT / RETRY -->
 
             <button
-                class="start-button"
                 id="startButton"
+                class="start-button"
                 type="button"
             >
-                ▶ START
+                ▶ START RUN
             </button>
 
 
-            <div
-                class="instructions"
-                id="attackInstruction"
+            <button
+                id="nextButton"
+                class="start-button next-button"
+                type="button"
             >
-                ← → MOVE &nbsp;&nbsp; • &nbsp;&nbsp; SPACE ATTACK
+                ▶ NEXT LEVEL
+            </button>
+
+
+            <button
+                id="retryButton"
+                class="secondary-button"
+                type="button"
+            >
+                TRY AGAIN
+            </button>
+
+
+            <div class="instructions">
+                ← → MOVE
+                <span id="attackInstruction">
+                    · SPACE / 💥 STRIKE
+                </span>
             </div>
 
         </div>
 
-    </main>
+    </section>
 
 
-    <!-- =====================================================
-         CONTROLS
-         ===================================================== -->
+    <!-- CONTROLS -->
 
-    <div class="controls">
+    <section
+        id="controls"
+        class="controls"
+    >
 
         <button
-            class="control-button move-button"
             id="leftButton"
-            type="button"
-            aria-label="Move left"
-        >
-            ‹
-        </button>
-
-
-        <button
-            class="control-button attack-button"
-            id="attackButton"
-            type="button"
-            aria-label="Attack"
-        >
-            <span>⚡</span>
-            <small>ATTACK</small>
-        </button>
-
-
-        <button
             class="control-button move-button"
-            id="rightButton"
             type="button"
-            aria-label="Move right"
         >
-            ›
+            ←
         </button>
 
-    </div>
+
+        <button
+            id="attackButton"
+            class="control-button attack-button"
+            type="button"
+        >
+
+            <span>
+                💥
+            </span>
+
+            <small>
+                STRIKE
+            </small>
+
+        </button>
 
 
-    <!-- =====================================================
-         MESSAGE
-         ===================================================== -->
+        <button
+            id="rightButton"
+            class="control-button move-button"
+            type="button"
+        >
+            →
+        </button>
+
+    </section>
+
 
     <div
-        class="game-message"
         id="gameMessage"
+        class="game-message"
     >
-        ONE MORE.
+        Ready when you are.
     </div>
 
-</div>
+
+</main>
 
 
-<script src="js/game.js?v=60"></script>
+<script src="js/game.js?v=50"></script>
 
 </body>
+
 </html>
