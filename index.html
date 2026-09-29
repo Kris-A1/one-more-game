@@ -10,11 +10,11 @@
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     >
 
-    <title>1M.</title>
+    <title>1M</title>
 
     <link
         rel="stylesheet"
-        href="css/game.css?v=50"
+        href="css/game.css"
     >
 
 </head>
@@ -58,7 +58,7 @@
     </header>
 
 
-    <!-- GAME -->
+    <!-- GAME AREA -->
 
     <section class="game-container">
 
@@ -76,7 +76,9 @@
             class="score-display"
         >
 
-            <small>SCORE</small>
+            <small>
+                SCORE
+            </small>
 
             <strong id="score">
                 0
@@ -101,7 +103,7 @@
             id="strikeDisplay"
             class="strike-display"
         >
-            💥 ×3
+            STRIKES ×3
         </div>
 
 
@@ -131,7 +133,7 @@
             </p>
 
 
-            <!-- ANIMALS -->
+            <!-- ANIMAL SELECTOR -->
 
             <div
                 id="animalChooser"
@@ -219,7 +221,7 @@
             </div>
 
 
-            <!-- START / NEXT / RETRY -->
+            <!-- START / NEXT LEVEL -->
 
             <button
                 id="startButton"
@@ -230,29 +232,8 @@
             </button>
 
 
-            <button
-                id="nextButton"
-                class="start-button next-button"
-                type="button"
-            >
-                ▶ NEXT LEVEL
-            </button>
-
-
-            <button
-                id="retryButton"
-                class="secondary-button"
-                type="button"
-            >
-                TRY AGAIN
-            </button>
-
-
             <div class="instructions">
                 ← → MOVE
-                <span id="attackInstruction">
-                    · SPACE / 💥 STRIKE
-                </span>
             </div>
 
         </div>
@@ -262,10 +243,7 @@
 
     <!-- CONTROLS -->
 
-    <section
-        id="controls"
-        class="controls"
-    >
+    <section class="controls">
 
         <button
             id="leftButton"
@@ -287,7 +265,7 @@
             </span>
 
             <small>
-                STRIKE
+                STRIKE ×3
             </small>
 
         </button>
