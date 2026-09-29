@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     >
 
-    <title>ONE MORE</title>
+    <title>1M</title>
 
     <link rel="stylesheet" href="css/game.css">
 </head>
@@ -17,16 +18,27 @@
     <main class="game-shell">
 
         <header class="game-header">
+
             <div>
-                <div class="game-name">ONE MORE<span>.</span></div>
-                <div class="game-subtitle">LEVEL 1 · NEON RUN</div>
+                <div class="game-name">
+                    1M<span>.</span>
+                </div>
+
+                <div
+                    id="levelSubtitle"
+                    class="game-subtitle"
+                >
+                    LEVEL 1 · NEON RUN
+                </div>
             </div>
 
             <div class="best-score">
                 <div>BEST</div>
                 <strong id="bestScore">0</strong>
             </div>
+
         </header>
+
 
         <section class="game-container">
 
@@ -36,23 +48,35 @@
                 height="490"
             ></canvas>
 
-            <div id="scoreDisplay" class="score-display">
+
+            <div
+                id="scoreDisplay"
+                class="score-display"
+            >
                 <small>SCORE</small>
                 <strong id="score">0</strong>
             </div>
 
-            <div id="multiplierDisplay" class="multiplier-display">
+
+            <div
+                id="multiplierDisplay"
+                class="multiplier-display"
+            >
                 ×1
             </div>
 
-            <div id="gameOverlay" class="game-overlay">
+
+            <div
+                id="gameOverlay"
+                class="game-overlay"
+            >
 
                 <div class="overlay-label">
                     JUST ONE MORE RUN
                 </div>
 
                 <h1 id="overlayTitle">
-                    ONE<br>MORE<span>.</span>
+                    1M<span>.</span>
                 </h1>
 
                 <p id="overlayText">
@@ -72,6 +96,7 @@
 
         </section>
 
+
         <section class="controls">
 
             <button id="leftButton">
@@ -84,13 +109,22 @@
 
         </section>
 
-        <div id="gameMessage" class="game-message">
+
+        <div
+            id="gameMessage"
+            class="game-message"
+        >
             Ready when you are.
         </div>
 
     </main>
 
-    <script src="js/game.js?v=3"></script>
+
+    <!--
+        Version number forces the browser
+        to load the newest game.js.
+    -->
+    <script src="js/game.js?v=20"></script>
 
 </body>
 </html>
