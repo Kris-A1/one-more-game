@@ -330,7 +330,309 @@ button {
 
     .game-shell {
         min-height: 100vh;
+/* ==================================================
+   1M UI UPGRADE
+   ================================================== */
 
+
+/* --------------------------------------------------
+   MOBILE CONTROL BAR
+   -------------------------------------------------- */
+
+.controls {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 14px;
+    padding: 0 12px;
+    box-sizing: border-box;
+}
+
+
+.control-button {
+    height: 64px;
+    border-radius: 18px;
+    border: 2px solid rgba(255,255,255,0.16);
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    transition:
+        transform 0.08s ease,
+        background 0.15s ease,
+        border-color 0.15s ease;
+}
+
+
+.control-button:active {
+    transform: scale(0.94);
+}
+
+
+/* LEFT + RIGHT */
+
+.move-button {
+    width: 92px;
+    flex: 1;
+    max-width: 120px;
+
+    background: rgba(255,255,255,0.07);
+    color: white;
+
+    font-size: 34px;
+    font-weight: 800;
+}
+
+
+.move-button:hover {
+    background: rgba(255,255,255,0.12);
+}
+
+
+/* STRIKE */
+
+.attack-button {
+    width: 116px;
+    flex: 0 0 116px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+
+    background: rgba(255,70,110,0.18);
+    border-color: rgba(255,90,125,0.55);
+
+    color: white;
+}
+
+
+.attack-button span {
+    font-size: 24px;
+    line-height: 1;
+}
+
+
+.attack-button small {
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 0.8px;
+}
+
+
+.attack-button:hover {
+    background: rgba(255,70,110,0.28);
+}
+
+
+/* --------------------------------------------------
+   ANIMAL SELECTOR
+   -------------------------------------------------- */
+
+.animal-chooser {
+    width: 100%;
+    max-width: 340px;
+    margin: 14px auto 16px;
+}
+
+
+.animal-title {
+    margin-bottom: 10px;
+
+    color: rgba(255,255,255,0.75);
+
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+
+.animal-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+
+/* INDIVIDUAL ANIMAL CARD */
+
+.animal-button {
+    min-width: 0;
+    min-height: 82px;
+
+    padding: 8px 4px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+
+    border-radius: 14px;
+
+    border: 2px solid rgba(255,255,255,0.12);
+
+    background: rgba(255,255,255,0.055);
+
+    color: white;
+
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+
+    transition:
+        transform 0.15s ease,
+        background 0.15s ease,
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+
+.animal-button:hover {
+    transform: translateY(-2px);
+    background: rgba(255,255,255,0.10);
+}
+
+
+.animal-button:active {
+    transform: scale(0.95);
+}
+
+
+/* SELECTED ANIMAL */
+
+.animal-button.selected {
+    background: rgba(70,220,255,0.16);
+
+    border-color: rgba(80,225,255,0.9);
+
+    box-shadow:
+        0 0 0 2px rgba(80,225,255,0.08),
+        0 0 18px rgba(80,225,255,0.18);
+
+    transform: translateY(-2px);
+}
+
+
+.animal-emoji {
+    font-size: 30px;
+    line-height: 1;
+}
+
+
+.animal-name {
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: 0.7px;
+}
+
+
+/* --------------------------------------------------
+   START BUTTON
+   -------------------------------------------------- */
+
+.start-button {
+    width: min(300px, 90%);
+    min-height: 58px;
+
+    margin-top: 4px;
+
+    border: 0;
+    border-radius: 17px;
+
+    background: linear-gradient(
+        135deg,
+        #ffffff,
+        #dfe8ff
+    );
+
+    color: #111827;
+
+    font-size: 15px;
+    font-weight: 950;
+    letter-spacing: 0.8px;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,0.25);
+
+    transition:
+        transform 0.12s ease,
+        box-shadow 0.12s ease;
+}
+
+
+.start-button:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 11px 30px rgba(0,0,0,0.32);
+}
+
+
+.start-button:active {
+    transform: scale(0.97);
+}
+
+
+/* --------------------------------------------------
+   STRIKE DISPLAY
+   -------------------------------------------------- */
+
+.strike-display {
+    padding: 7px 11px;
+
+    border-radius: 10px;
+
+    background: rgba(255,70,110,0.14);
+
+    border: 1px solid rgba(255,90,125,0.35);
+
+    color: white;
+
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+
+/* --------------------------------------------------
+   SMALL SCREEN
+   -------------------------------------------------- */
+
+@media (max-width: 380px) {
+
+    .controls {
+        gap: 8px;
+    }
+
+    .move-button {
+        height: 60px;
+    }
+
+    .attack-button {
+        height: 60px;
+        flex-basis: 105px;
+        width: 105px;
+    }
+
+    .animal-grid {
+        gap: 5px;
+    }
+
+    .animal-button {
+        min-height: 76px;
+    }
+
+    .animal-emoji {
+        font-size: 26px;
+    }
+
+}
         border-radius: 0;
     }
 
