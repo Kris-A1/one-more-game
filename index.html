@@ -107,7 +107,7 @@
         </div>
 
 
-        <!-- START / GAME OVER SCREEN -->
+        <!-- START / GAME OVER -->
 
         <div
             id="gameOverlay"
@@ -130,57 +130,99 @@
             </p>
 
 
-            <!-- ANIMAL SELECTOR -->
+            <!-- LEVEL 3 ANIMAL SELECTOR -->
 
             <div
                 id="animalChooser"
                 class="animal-chooser"
             >
 
-                <button
-                    type="button"
-                    class="animal-button selected"
-                    data-animal="BUNNY"
-                >
-                    <span class="animal-emoji">🐰</span>
-                    <span class="animal-name">BUNNY</span>
-                </button>
+                <div class="animal-title">
+                    CHOOSE YOUR RUNNER
+                </div>
 
 
-                <button
-                    type="button"
-                    class="animal-button"
-                    data-animal="FOX"
-                >
-                    <span class="animal-emoji">🦊</span>
-                    <span class="animal-name">FOX</span>
-                </button>
+                <div class="animal-grid">
 
 
-                <button
-                    type="button"
-                    class="animal-button"
-                    data-animal="CAT"
-                >
-                    <span class="animal-emoji">🐱</span>
-                    <span class="animal-name">CAT</span>
-                </button>
+                    <button
+                        type="button"
+                        class="animal-button selected"
+                        data-animal="BUNNY"
+                    >
+
+                        <span class="animal-emoji">
+                            🐰
+                        </span>
+
+                        <span class="animal-name">
+                            BUNNY
+                        </span>
+
+                    </button>
 
 
-                <button
-                    type="button"
-                    class="animal-button"
-                    data-animal="PANDA"
-                >
-                    <span class="animal-emoji">🐼</span>
-                    <span class="animal-name">PANDA</span>
-                </button>
+                    <button
+                        type="button"
+                        class="animal-button"
+                        data-animal="FOX"
+                    >
+
+                        <span class="animal-emoji">
+                            🦊
+                        </span>
+
+                        <span class="animal-name">
+                            FOX
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="animal-button"
+                        data-animal="CAT"
+                    >
+
+                        <span class="animal-emoji">
+                            🐱
+                        </span>
+
+                        <span class="animal-name">
+                            CAT
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="animal-button"
+                        data-animal="PANDA"
+                    >
+
+                        <span class="animal-emoji">
+                            🐼
+                        </span>
+
+                        <span class="animal-name">
+                            PANDA
+                        </span>
+
+                    </button>
+
+
+                </div>
 
             </div>
 
 
+            <!-- START -->
+
             <button
                 id="startButton"
+                class="start-button"
             >
                 ▶ START RUN
             </button>
@@ -195,12 +237,14 @@
     </section>
 
 
-    <!-- CONTROLS -->
+    <!-- MOBILE CONTROLS -->
 
     <section class="controls">
 
         <button
             id="leftButton"
+            class="control-button move-button"
+            type="button"
         >
             ←
         </button>
@@ -208,14 +252,18 @@
 
         <button
             id="attackButton"
-            class="attack-button"
+            class="control-button attack-button"
+            type="button"
         >
-            💥
+            <span>💥</span>
+            <small>STRIKE ×3</small>
         </button>
 
 
         <button
             id="rightButton"
+            class="control-button move-button"
+            type="button"
         >
             →
         </button>
@@ -234,9 +282,9 @@
 </main>
 
 
-<!-- Version number forces newest JavaScript -->
+<!-- CACHE VERSION -->
 
-<script src="js/game.js?v=40"></script>
+<script src="js/game.js?v=41"></script>
 
 </body>
 
