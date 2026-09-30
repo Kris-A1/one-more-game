@@ -1,383 +1,490 @@
-/* =========================================================
-   1M — COMPLETE GAME
-   10 LEVEL PROGRESSION
-   ========================================================= */
+// ============================================================
+// 1M GAME
+// LEVEL 1 = NEON RUN
+// LEVEL 2 = NEON RUSH
+// LEVEL 3 = ANIMAL RUN
+// LEVEL 4 = OCEAN RUN
+// LEVEL 5 = DESERT RUN
+// LEVEL 6 = FOREST RUN
+// LEVEL 7 = SPACE RUN
+// LEVEL 8 = ICE RUN
+// LEVEL 9 = FRUIT RUN
+// LEVEL 10 = CHAOS RUN
+// ============================================================
 
 
-/* ---------------------------------------------------------
-   LEVEL DATA
-   --------------------------------------------------------- */
+// ------------------------------------------------------------
+// ELEMENTS
+// ------------------------------------------------------------
 
-const LEVELS = {
+const canvas =
+    document.getElementById("gameCanvas");
 
-    1: {
-        name: "NEON RUN",
-        world: "NEON",
-        target: 500,
-
-        bg: "#07111f",
-        grid: "#12324b",
-        obstacle: "#ff4f9a",
-        obstacle2: "#ff75b5",
-        player: "#55e8ff",
-
-        startSpeed: 175,
-        maxSpeed: 205,
-
-        strikes: false
-    },
-
-    2: {
-        name: "NEON RUSH",
-        world: "RUSH",
-        target: 700,
-
-        bg: "#12091e",
-        grid: "#34204a",
-        obstacle: "#ff405f",
-        obstacle2: "#ff7890",
-        player: "#66b8ff",
-
-        startSpeed: 205,
-        maxSpeed: 240,
-
-        strikes: false
-    },
-
-    3: {
-        name: "ANIMAL RUN",
-        world: "ANIMAL",
-        target: 900,
-
-        bg: "#0b1710",
-        grid: "#1c3824",
-        obstacle: "#9b6a3d",
-        obstacle2: "#c28b55",
-        player: "#ffd95a",
-
-        startSpeed: 220,
-        maxSpeed: 255,
-
-        strikes: false
-    },
-
-    4: {
-        name: "OCEAN RUN",
-        world: "OCEAN",
-        target: 1100,
-
-        bg: "#061a27",
-        grid: "#0c3b4d",
-        obstacle: "#ff5f7e",
-        obstacle2: "#ff9a62",
-        player: "#58e7ff",
-
-        startSpeed: 225,
-        maxSpeed: 270,
-
-        strikes: true
-    },
-
-    5: {
-        name: "DESERT RUN",
-        world: "DESERT",
-        target: 1300,
-
-        bg: "#241508",
-        grid: "#54361c",
-        obstacle: "#e89b42",
-        obstacle2: "#f2c05e",
-        player: "#72e6ff",
-
-        startSpeed: 235,
-        maxSpeed: 280,
-
-        strikes: true
-    },
-
-    6: {
-        name: "FOREST RUN",
-        world: "FOREST",
-        target: 1500,
-
-        bg: "#07180d",
-        grid: "#17351f",
-        obstacle: "#4da35d",
-        obstacle2: "#9a633e",
-        player: "#ffe16a",
-
-        startSpeed: 245,
-        maxSpeed: 290,
-
-        strikes: true
-    },
-
-    7: {
-        name: "SPACE RUN",
-        world: "SPACE",
-        target: 1750,
-
-        bg: "#070817",
-        grid: "#20244b",
-        obstacle: "#d95cff",
-        obstacle2: "#ff7dca",
-        player: "#67f4ff",
-
-        startSpeed: 255,
-        maxSpeed: 305,
-
-        strikes: true
-    },
-
-    8: {
-        name: "ICE RUN",
-        world: "ICE",
-        target: 2000,
-
-        bg: "#071923",
-        grid: "#214858",
-        obstacle: "#8fe8ff",
-        obstacle2: "#d4fbff",
-        player: "#ffd45e",
-
-        startSpeed: 265,
-        maxSpeed: 320,
-
-        strikes: true
-    },
-
-    9: {
-        name: "FRUIT RUN",
-        world: "FRUIT",
-        target: 2250,
-
-        bg: "#190914",
-        grid: "#47203a",
-        obstacle: "#ff4d69",
-        obstacle2: "#7fe06a",
-        player: "#61e9ff",
-
-        startSpeed: 275,
-        maxSpeed: 335,
-
-        strikes: true
-    },
-
-    10: {
-        name: "CHAOS RUN",
-        world: "CHAOS",
-        target: 2600,
-
-        bg: "#100817",
-        grid: "#38204a",
-        obstacle: "#ff456d",
-        obstacle2: "#b66aff",
-        player: "#58f2ff",
-
-        startSpeed: 290,
-        maxSpeed: 350,
-
-        strikes: true
-    }
-
-};
+const ctx =
+    canvas.getContext("2d");
 
 
-/* ---------------------------------------------------------
-   URL / LEVEL
-   --------------------------------------------------------- */
+const scoreEl =
+    document.getElementById("score");
+
+const bestScoreEl =
+    document.getElementById("bestScore");
+
+const overlay =
+    document.getElementById("gameOverlay");
+
+const overlayTitle =
+    document.getElementById("overlayTitle");
+
+const overlayText =
+    document.getElementById("overlayText");
+
+const startButton =
+    document.getElementById("startButton");
+
+const levelSubtitle =
+    document.getElementById("levelSubtitle");
+
+const gameMessage =
+    document.getElementById("gameMessage");
+
+const multiplierDisplay =
+    document.getElementById("multiplierDisplay");
+
+const strikeDisplay =
+    document.getElementById("strikeDisplay");
+
+const animalChooser =
+    document.getElementById("animalChooser");
+
+const attackButton =
+    document.getElementById("attackButton");
+
+const leftButton =
+    document.getElementById("leftButton");
+
+const rightButton =
+    document.getElementById("rightButton");
+
+const gameContainer =
+    document.querySelector(".game-container");
+
+
+// ------------------------------------------------------------
+// LEVEL
+// ------------------------------------------------------------
 
 const params =
     new URLSearchParams(
         window.location.search
     );
 
-
-let requestedLevel =
-    Number(
-        params.get("level")
-    ) || 1;
-
-
-requestedLevel =
+let level =
     Math.min(
         10,
         Math.max(
             1,
-            requestedLevel
+            Number(
+                params.get("level")
+            ) || 1
         )
     );
 
 
-let currentLevel =
-    requestedLevel;
+// ------------------------------------------------------------
+// LEVEL SETTINGS
+// ------------------------------------------------------------
+
+const LEVELS = {
+
+    1: {
+
+        name: "NEON RUN",
+
+        target: 500,
+
+        backgroundTop: "#07111f",
+
+        backgroundBottom: "#10243d",
+
+        playerColor: "#31e6d1",
+
+        obstacleColor: "#ff4fa3",
+
+        startSpeed: 175,
+
+        maxSpeed: 195,
+
+        spawnDelay: 0.95,
+
+        spawnMinimum: 0.40,
+
+        sameLaneChance: 0.30,
+
+        attacks: false
+
+    },
 
 
-/* ---------------------------------------------------------
-   DOM
-   --------------------------------------------------------- */
+    2: {
 
-const canvas =
-    document.getElementById(
-        "gameCanvas"
-    );
+        name: "NEON RUSH",
 
-const ctx =
-    canvas.getContext("2d");
+        target: 700,
 
+        backgroundTop: "#12051d",
 
-const levelSubtitle =
-    document.getElementById(
-        "levelSubtitle"
-    );
+        backgroundBottom: "#3b092f",
 
+        playerColor: "#4ba7ff",
 
-const bestScore =
-    document.getElementById(
-        "bestScore"
-    );
+        obstacleColor: "#ff304f",
 
+        startSpeed: 205,
 
-const scoreElement =
-    document.getElementById(
-        "score"
-    );
+        maxSpeed: 240,
+
+        spawnDelay: 0.78,
+
+        spawnMinimum: 0.29,
+
+        sameLaneChance: 0.48,
+
+        attacks: true
+
+    },
 
 
-const multiplierDisplay =
-    document.getElementById(
-        "multiplierDisplay"
-    );
+    3: {
+
+        name: "ANIMAL RUN",
+
+        target: 900,
+
+        backgroundTop: "#0d2517",
+
+        backgroundBottom: "#2c5a32",
+
+        playerColor: "#ffd84a",
+
+        obstacleColor: "#9a6538",
+
+        startSpeed: 220,
+
+        maxSpeed: 255,
+
+        spawnDelay: 0.70,
+
+        spawnMinimum: 0.27,
+
+        sameLaneChance: 0.53,
+
+        attacks: true
+
+    },
 
 
-const strikeDisplay =
-    document.getElementById(
-        "strikeDisplay"
-    );
+    4: {
+
+        name: "OCEAN RUN",
+
+        target: 1100,
+
+        backgroundTop: "#061c2a",
+
+        backgroundBottom: "#073f57",
+
+        playerColor: "#55e8ff",
+
+        obstacleColor: "#ff5c91",
+
+        startSpeed: 235,
+
+        maxSpeed: 275,
+
+        spawnDelay: 0.66,
+
+        spawnMinimum: 0.25,
+
+        sameLaneChance: 0.56,
+
+        attacks: true,
+
+        world: "ocean"
+
+    },
 
 
-const gameOverlay =
-    document.getElementById(
-        "gameOverlay"
-    );
+    5: {
+
+        name: "DESERT RUN",
+
+        target: 1300,
+
+        backgroundTop: "#291306",
+
+        backgroundBottom: "#704019",
+
+        playerColor: "#ffe36b",
+
+        obstacleColor: "#d28a43",
+
+        startSpeed: 250,
+
+        maxSpeed: 295,
+
+        spawnDelay: 0.62,
+
+        spawnMinimum: 0.235,
+
+        sameLaneChance: 0.59,
+
+        attacks: true,
+
+        world: "desert"
+
+    },
 
 
-const overlayLabel =
-    document.getElementById(
-        "overlayLabel"
-    );
+    6: {
+
+        name: "FOREST RUN",
+
+        target: 1500,
+
+        backgroundTop: "#07180c",
+
+        backgroundBottom: "#194d27",
+
+        playerColor: "#76ff72",
+
+        obstacleColor: "#754629",
+
+        startSpeed: 265,
+
+        maxSpeed: 315,
+
+        spawnDelay: 0.58,
+
+        spawnMinimum: 0.22,
+
+        sameLaneChance: 0.61,
+
+        attacks: true,
+
+        world: "forest"
+
+    },
 
 
-const overlayTitle =
-    document.getElementById(
-        "overlayTitle"
-    );
+    7: {
+
+        name: "SPACE RUN",
+
+        target: 1750,
+
+        backgroundTop: "#05061c",
+
+        backgroundBottom: "#16174a",
+
+        playerColor: "#c78cff",
+
+        obstacleColor: "#ff5b72",
+
+        startSpeed: 280,
+
+        maxSpeed: 335,
+
+        spawnDelay: 0.54,
+
+        spawnMinimum: 0.205,
+
+        sameLaneChance: 0.63,
+
+        attacks: true,
+
+        world: "space"
+
+    },
 
 
-const overlayText =
-    document.getElementById(
-        "overlayText"
-    );
+    8: {
+
+        name: "ICE RUN",
+
+        target: 2000,
+
+        backgroundTop: "#071925",
+
+        backgroundBottom: "#326d86",
+
+        playerColor: "#b9f5ff",
+
+        obstacleColor: "#b9e9ff",
+
+        startSpeed: 295,
+
+        maxSpeed: 355,
+
+        spawnDelay: 0.51,
+
+        spawnMinimum: 0.19,
+
+        sameLaneChance: 0.65,
+
+        attacks: true,
+
+        world: "ice"
+
+    },
 
 
-const animalChooser =
-    document.getElementById(
-        "animalChooser"
-    );
+    9: {
+
+        name: "FRUIT RUN",
+
+        target: 2250,
+
+        backgroundTop: "#250b0b",
+
+        backgroundBottom: "#5a2014",
+
+        playerColor: "#ffed66",
+
+        obstacleColor: "#ff674d",
+
+        startSpeed: 310,
+
+        maxSpeed: 375,
+
+        spawnDelay: 0.48,
+
+        spawnMinimum: 0.18,
+
+        sameLaneChance: 0.67,
+
+        attacks: true,
+
+        world: "fruit"
+
+    },
 
 
-const animalButtons =
-    document.querySelectorAll(
-        ".animal-button"
-    );
+    10: {
+
+        name: "CHAOS RUN",
+
+        target: 2600,
+
+        backgroundTop: "#120719",
+
+        backgroundBottom: "#39143c",
+
+        playerColor: "#ffffff",
+
+        obstacleColor: "#ff4fa3",
+
+        startSpeed: 330,
+
+        maxSpeed: 410,
+
+        spawnDelay: 0.44,
+
+        spawnMinimum: 0.16,
+
+        sameLaneChance: 0.70,
+
+        attacks: true,
+
+        world: "chaos"
+
+    }
+
+};
 
 
-const startButton =
-    document.getElementById(
-        "startButton"
-    );
+// ------------------------------------------------------------
+// CURRENT SETTINGS
+// ------------------------------------------------------------
+
+let settings =
+    LEVELS[level];
 
 
-const leftButton =
-    document.getElementById(
-        "leftButton"
-    );
+// ------------------------------------------------------------
+// GAME STATE
+// ------------------------------------------------------------
+
+let gameRunning =
+    false;
+
+let score =
+    0;
+
+let bestScore =
+    Number(
+        localStorage.getItem(
+            `1M_best_level_${level}`
+        )
+    ) || 0;
+
+let elapsed =
+    0;
+
+let multiplier =
+    1;
+
+let strikes =
+    3;
+
+let spawnTimer =
+    0;
+
+let attackCooldown =
+    0;
+
+let lastTime =
+    0;
+
+let selectedAnimal =
+    "BUNNY";
+
+let playerLane =
+    1;
+
+let targetLane =
+    1;
+
+let obstacles =
+    [];
+
+let particles =
+    [];
+
+let levelComplete =
+    false;
 
 
-const rightButton =
-    document.getElementById(
-        "rightButton"
-    );
+// ------------------------------------------------------------
+// PLAYER
+// ------------------------------------------------------------
+
+const player = {
+
+    x: 180,
+
+    y: 410,
+
+    width: 30,
+
+    height: 30
+
+};
 
 
-const attackButton =
-    document.getElementById(
-        "attackButton"
-    );
-
-
-const gameMessage =
-    document.getElementById(
-        "gameMessage"
-    );
-
-
-/* ---------------------------------------------------------
-   GAME STATE
-   --------------------------------------------------------- */
-
-let running = false;
-
-let gameComplete = false;
-
-let animationId = null;
-
-let lastTime = 0;
-
-let elapsed = 0;
-
-let score = 0;
-
-let multiplier = 1;
-
-let strikes = 3;
-
-let selectedAnimal = "BUNNY";
-
-let playerX = 180;
-
-let playerY = 420;
-
-let playerWidth = 28;
-
-let playerHeight = 34;
-
-let moveDirection = 0;
-
-let obstacleTimer = 0;
-
-let obstacleInterval = 850;
-
-let obstacles = [];
-
-let particles = [];
-
-let flash = 0;
-
-let shake = 0;
-
-let laneCenters = [
-    90,
-    180,
-    270
-];
-
-let playerLane = 1;
-
-
-/* ---------------------------------------------------------
-   STORAGE
-   --------------------------------------------------------- */
+// ------------------------------------------------------------
+// PROGRESS STORAGE
+// ------------------------------------------------------------
 
 const UNLOCK_KEY =
     "1M_unlocked_level";
@@ -385,940 +492,1731 @@ const UNLOCK_KEY =
 
 function getUnlockedLevel() {
 
-    const stored =
-        Number(
-            localStorage.getItem(
-                UNLOCK_KEY
-            )
-        );
-
-
-    if (!stored || stored < 1) {
-
-        localStorage.setItem(
-            UNLOCK_KEY,
-            "1"
-        );
-
-        return 1;
-    }
-
-
     return Math.min(
         10,
-        stored
+        Math.max(
+            1,
+            Number(
+                localStorage.getItem(
+                    UNLOCK_KEY
+                )
+            ) || 1
+        )
     );
+
 }
 
 
-function unlockLevel(level) {
+function setUnlockedLevel(value) {
 
     const current =
         getUnlockedLevel();
 
-
-    if (level > current) {
+    if (value > current) {
 
         localStorage.setItem(
             UNLOCK_KEY,
             String(
                 Math.min(
                     10,
-                    level
+                    value
                 )
             )
         );
+
     }
+
 }
 
 
-/* ---------------------------------------------------------
-   BEST SCORE
-   --------------------------------------------------------- */
-
-function getBestScore() {
-
-    return Number(
-        localStorage.getItem(
-            `1M_best_level_${currentLevel}`
-        )
-    ) || 0;
-}
-
-
-function saveBestScore() {
-
-    const best =
-        getBestScore();
-
-
-    if (score > best) {
-
-        localStorage.setItem(
-            `1M_best_level_${currentLevel}`,
-            String(
-                Math.floor(score)
-            )
-        );
-    }
-}
-
-
-/* ---------------------------------------------------------
-   LEVEL UI
-   --------------------------------------------------------- */
+// ------------------------------------------------------------
+// LEVEL UI
+// ------------------------------------------------------------
 
 function applyLevelUI() {
 
-    const config =
-        LEVELS[currentLevel];
-
+    settings =
+        LEVELS[level];
 
     levelSubtitle.textContent =
-        `LEVEL ${currentLevel} · ${config.name}`;
+        `LEVEL ${level} · ${settings.name}`;
+
+    bestScore =
+        Number(
+            localStorage.getItem(
+                `1M_best_level_${level}`
+            )
+        ) || 0;
+
+    bestScoreEl.textContent =
+        bestScore;
+
+    gameContainer.className =
+        `game-container level-${level}`;
 
 
-    bestScore.textContent =
-        getBestScore();
+    /*
+       LEVEL 1–3 UI IS PRESERVED
+    */
 
+    if (level === 1) {
 
-    strikeDisplay.style.display =
-        config.strikes
-            ? "block"
-            : "none";
+        animalChooser.style.display =
+            "none";
 
+        strikeDisplay.style.display =
+            "none";
 
-    attackButton.style.display =
-        config.strikes
-            ? "flex"
-            : "none";
-
-
-    animalChooser.style.display =
-        currentLevel === 3
-            ? "block"
-            : "none";
-
-
-    if (currentLevel === 3) {
-
-        startButton.textContent =
-            `▶ START AS ${selectedAnimal}`;
-
-    } else {
-
-        startButton.textContent =
-            "▶ START RUN";
-    }
-
-
-    strikeDisplay.textContent =
-        `STRIKES ×${strikes}`;
-
-
-    document.body.style.background =
-        config.bg;
-}
-
-
-/* ---------------------------------------------------------
-   OVERLAY
-   --------------------------------------------------------- */
-
-function showStartScreen() {
-
-    running = false;
-
-    gameComplete = false;
-
-    gameOverlay.style.display =
-        "flex";
-
-
-    overlayLabel.textContent =
-        currentLevel === 1
-            ? "JUST ONE MORE RUN"
-            : `LEVEL ${currentLevel}`;
-
-
-    overlayTitle.innerHTML =
-        currentLevel === 1
-            ? '1M<span>.</span>'
-            : `LEVEL ${currentLevel}`;
-
-
-    const config =
-        LEVELS[currentLevel];
-
-
-    if (currentLevel === 1) {
+        attackButton.style.display =
+            "none";
 
         overlayText.innerHTML =
             "Dodge. Survive.<br>Beat your best.";
 
-    } else if (currentLevel === 2) {
-
-        overlayText.innerHTML =
-            "Faster. Cleaner.<br>Beat your target.";
-
-    } else if (currentLevel === 3) {
-
-        overlayText.innerHTML =
-            "Choose your runner.<br>Dodge. Survive.";
-
-    } else {
-
-        overlayText.innerHTML =
-            `${config.world} world.<br>Reach ${config.target} points.`;
+        startButton.textContent =
+            "▶ START RUN";
 
     }
 
 
-    if (currentLevel >= 4) {
+    if (level === 2) {
 
-        gameMessage.textContent =
-            "💥 You have 3 strikes.";
+        animalChooser.style.display =
+            "none";
 
-    } else {
+        strikeDisplay.style.display =
+            "block";
 
-        gameMessage.textContent =
-            "Ready when you are.";
-
-    }
-
-
-    applyLevelUI();
-}
-
-
-function showGameOver() {
-
-    running = false;
-
-    cancelAnimationFrame(
-        animationId
-    );
-
-
-    saveBestScore();
-
-
-    gameOverlay.style.display =
-        "flex";
-
-
-    overlayLabel.textContent =
-        "RUN OVER";
-
-
-    overlayTitle.innerHTML =
-        `SCORE ${Math.floor(score)}`;
-
-
-    overlayText.innerHTML =
-        `BEST ${getBestScore()}<br>One more run?`;
-
-
-    startButton.textContent =
-        currentLevel === 3
-            ? `▶ TRY AS ${selectedAnimal}`
-            : "▶ TRY AGAIN";
-
-
-    gameMessage.textContent =
-        "You almost had it.";
-
-
-    applyLevelUI();
-}
-
-
-/* ---------------------------------------------------------
-   LEVEL COMPLETE
-   --------------------------------------------------------- */
-
-function completeLevel() {
-
-    if (gameComplete) {
-        return;
-    }
-
-
-    gameComplete = true;
-
-    running = false;
-
-
-    cancelAnimationFrame(
-        animationId
-    );
-
-
-    saveBestScore();
-
-
-    const nextLevel =
-        currentLevel + 1;
-
-
-    if (nextLevel <= 10) {
-
-        unlockLevel(
-            nextLevel
-        );
-
-
-        overlayLabel.textContent =
-            "LEVEL COMPLETE";
-
-
-        overlayTitle.innerHTML =
-            `LEVEL ${currentLevel}`;
-
+        attackButton.style.display =
+            "flex";
 
         overlayText.innerHTML =
-            `
-            TARGET REACHED<br>
-            LEVEL ${nextLevel} UNLOCKED
-            `;
-
+            "Dodge. Destroy.<br>You have 3 strikes.";
 
         startButton.textContent =
-            `▶ START LEVEL ${nextLevel}`;
+            "▶ START RUSH";
 
-
-        gameMessage.textContent =
-            `Nice run. Level ${nextLevel} is ready.`;
-
-    } else {
-
-        overlayLabel.textContent =
-            "YOU DID IT";
-
-
-        overlayTitle.innerHTML =
-            "1M<span>.</span>";
-
-
-        overlayText.innerHTML =
-            `
-            ALL 10 LEVELS COMPLETE<br>
-            FINAL SCORE ${Math.floor(score)}
-            `;
-
-
-        startButton.textContent =
-            "▶ PLAY AGAIN";
-
-
-        gameMessage.textContent =
-            "You completed the full run.";
     }
 
 
-    gameOverlay.style.display =
-        "flex";
-}
+    if (level === 3) {
 
+        animalChooser.style.display =
+            "flex";
 
-/* ---------------------------------------------------------
-   START GAME
-   --------------------------------------------------------- */
+        strikeDisplay.style.display =
+            "block";
 
-function startGame() {
+        attackButton.style.display =
+            "flex";
+
+        overlayText.innerHTML =
+            "Choose your animal.<br>Dodge. Destroy. Survive.";
+
+        startButton.textContent =
+            `▶ START AS ${selectedAnimal}`;
+
+    }
+
 
     /*
-       If the previous screen was a completed level,
-       move automatically to the next level.
+       NEW LEVELS
     */
 
-    if (
-        gameComplete &&
-        currentLevel < 10
-    ) {
+    if (level >= 4) {
 
-        currentLevel++;
+        animalChooser.style.display =
+            "none";
 
-        gameComplete = false;
+        strikeDisplay.style.display =
+            "block";
+
+        attackButton.style.display =
+            "flex";
+
+        overlayText.innerHTML =
+            `${settings.name}<br>Reach ${settings.target}.<br>You have 3 strikes.`;
+
+        startButton.textContent =
+            `▶ START ${settings.name}`;
+
     }
 
+}
 
-    score = 0;
 
-    elapsed = 0;
+applyLevelUI();
 
-    multiplier = 1;
+
+// ------------------------------------------------------------
+// ANIMAL BUTTONS
+// ------------------------------------------------------------
+
+const animalButtons =
+    document.querySelectorAll(
+        ".animal-button"
+    );
+
+
+animalButtons.forEach(
+    function(button) {
+
+        button.addEventListener(
+            "click",
+            function(event) {
+
+                event.preventDefault();
+
+                selectedAnimal =
+                    button.dataset.animal;
+
+                animalButtons.forEach(
+                    function(other) {
+
+                        other.classList.remove(
+                            "selected"
+                        );
+
+                    }
+                );
+
+                button.classList.add(
+                    "selected"
+                );
+
+                if (level === 3) {
+
+                    startButton.textContent =
+                        `▶ START AS ${selectedAnimal}`;
+
+                }
+
+            }
+        );
+
+    }
+);
+
+
+// ------------------------------------------------------------
+// CANVAS ROUNDED RECTANGLE
+// ------------------------------------------------------------
+
+function roundedRect(
+    x,
+    y,
+    width,
+    height,
+    radius
+) {
+
+    radius =
+        Math.min(
+            radius,
+            width / 2,
+            height / 2
+        );
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        x + radius,
+        y
+    );
+
+    ctx.lineTo(
+        x + width - radius,
+        y
+    );
+
+    ctx.quadraticCurveTo(
+        x + width,
+        y,
+        x + width,
+        y + radius
+    );
+
+    ctx.lineTo(
+        x + width,
+        y + height - radius
+    );
+
+    ctx.quadraticCurveTo(
+        x + width,
+        y + height,
+        x + width - radius,
+        y + height
+    );
+
+    ctx.lineTo(
+        x + radius,
+        y + height
+    );
+
+    ctx.quadraticCurveTo(
+        x,
+        y + height,
+        x,
+        y + height - radius
+    );
+
+    ctx.lineTo(
+        x,
+        y + radius
+    );
+
+    ctx.quadraticCurveTo(
+        x,
+        y,
+        x + radius,
+        y
+    );
+
+    ctx.closePath();
+
+}
+
+
+// ------------------------------------------------------------
+// LANE POSITION
+// ------------------------------------------------------------
+
+function laneX(lane) {
+
+    return 90 + lane * 90;
+
+}
+
+
+// ------------------------------------------------------------
+// RESET GAME
+// ------------------------------------------------------------
+
+function resetGame() {
+
+    score =
+        0;
+
+    elapsed =
+        0;
+
+    multiplier =
+        1;
 
     strikes =
-        LEVELS[currentLevel].strikes
-            ? 3
-            : 0;
+        3;
 
+    spawnTimer =
+        0;
 
-    obstacles = [];
+    attackCooldown =
+        0;
 
-    particles = [];
+    obstacles =
+        [];
 
-    flash = 0;
+    particles =
+        [];
 
-    shake = 0;
+    playerLane =
+        1;
 
-    obstacleTimer = 0;
+    targetLane =
+        1;
 
-    obstacleInterval =
-        850;
+    player.x =
+        laneX(1);
 
+    levelComplete =
+        false;
 
-    playerLane = 1;
-
-    playerX =
-        laneCenters[playerLane];
-
-
-    playerY =
-        420;
-
-
-    running = true;
-
-    gameComplete = false;
-
-    gameOverlay.style.display =
-        "none";
-
-
-    scoreElement.textContent =
+    scoreEl.textContent =
         "0";
-
 
     multiplierDisplay.textContent =
         "×1";
 
+    updateStrikeDisplay();
+
+}
+
+
+// ------------------------------------------------------------
+// STRIKE DISPLAY
+// ------------------------------------------------------------
+
+function updateStrikeDisplay() {
+
+    if (level === 1) {
+        return;
+    }
 
     strikeDisplay.textContent =
         `STRIKES ×${strikes}`;
 
+    if (strikes === 0) {
 
-    applyLevelUI();
+        strikeDisplay.style.opacity =
+            "0.45";
 
+    } else {
+
+        strikeDisplay.style.opacity =
+            "1";
+
+    }
+
+}
+
+
+// ------------------------------------------------------------
+// START GAME
+// ------------------------------------------------------------
+
+function startGame() {
+
+    resetGame();
+
+    gameRunning =
+        true;
+
+    overlay.style.display =
+        "none";
 
     gameMessage.textContent =
-        currentLevel >= 4
-            ? "Dodge or strike."
-            : "Dodge and survive.";
-
+        "GO!";
 
     lastTime =
         performance.now();
 
-
-    cancelAnimationFrame(
-        animationId
+    requestAnimationFrame(
+        gameLoop
     );
 
-
-    animationId =
-        requestAnimationFrame(
-            gameLoop
-        );
 }
 
 
-/* ---------------------------------------------------------
-   PLAYER MOVEMENT
-   --------------------------------------------------------- */
+// ------------------------------------------------------------
+// SAVE BEST
+// ------------------------------------------------------------
 
-function moveLeft() {
+function saveBest() {
 
-    if (!running) {
-        return;
-    }
+    if (score > bestScore) {
 
+        bestScore =
+            score;
 
-    playerLane =
-        Math.max(
-            0,
-            playerLane - 1
+        localStorage.setItem(
+            `1M_best_level_${level}`,
+            bestScore
         );
 
+        bestScoreEl.textContent =
+            bestScore;
 
-    playerX =
-        laneCenters[playerLane];
+    }
+
 }
 
 
-function moveRight() {
+// ------------------------------------------------------------
+// LEVEL COMPLETE
+// ------------------------------------------------------------
 
-    if (!running) {
+function completeLevel() {
+
+    if (!gameRunning) {
         return;
     }
 
+    gameRunning =
+        false;
 
-    playerLane =
-        Math.min(
-            2,
-            playerLane + 1
+    levelComplete =
+        true;
+
+    saveBest();
+
+
+    if (level < 10) {
+
+        setUnlockedLevel(
+            level + 1
         );
 
+        overlay.style.display =
+            "flex";
 
-    playerX =
-        laneCenters[playerLane];
-}
+        overlayTitle.textContent =
+            "LEVEL COMPLETE";
 
+        overlayText.innerHTML =
+            `SCORE <strong>${score}</strong><br>` +
+            `${LEVELS[level + 1].name} UNLOCKED`;
 
-/* ---------------------------------------------------------
-   ATTACK
-   --------------------------------------------------------- */
-
-function attack() {
-
-    const config =
-        LEVELS[currentLevel];
-
-
-    if (
-        !running ||
-        !config.strikes ||
-        strikes <= 0
-    ) {
-        return;
-    }
-
-
-    let target = null;
-
-    let closestDistance =
-        Infinity;
-
-
-    for (const obstacle of obstacles) {
-
-        if (
-            obstacle.lane !==
-            playerLane
-        ) {
-            continue;
-        }
-
-
-        const distance =
-            Math.abs(
-                obstacle.y -
-                playerY
-            );
-
-
-        if (
-            obstacle.y > 250 &&
-            obstacle.y < 430 &&
-            distance < closestDistance
-        ) {
-
-            closestDistance =
-                distance;
-
-            target =
-                obstacle;
-        }
-    }
-
-
-    if (!target) {
+        startButton.textContent =
+            `▶ START LEVEL ${level + 1}`;
 
         gameMessage.textContent =
-            "No target.";
+            "ONE MORE LEVEL!";
 
-        return;
+    } else {
+
+        setUnlockedLevel(10);
+
+        overlay.style.display =
+            "flex";
+
+        overlayTitle.textContent =
+            "1M COMPLETE";
+
+        overlayText.innerHTML =
+            `FINAL SCORE <strong>${score}</strong><br>` +
+            `YOU BEAT ALL 10 LEVELS`;
+
+        startButton.textContent =
+            "▶ PLAY AGAIN";
+
+        gameMessage.textContent =
+            "THE RUN NEVER ENDS";
+
+    }
+
+}
+
+
+// ------------------------------------------------------------
+// GAME OVER
+// ------------------------------------------------------------
+
+function endGame() {
+
+    gameRunning =
+        false;
+
+    saveBest();
+
+    overlay.style.display =
+        "flex";
+
+    overlayTitle.textContent =
+        "RUN OVER";
+
+    overlayText.innerHTML =
+        `SCORE <strong>${score}</strong><br>BEST <strong>${bestScore}</strong>`;
+
+
+    if (level === 1) {
+
+        startButton.textContent =
+            "▶ TRY AGAIN";
+
     }
 
 
-    const perfect =
-        closestDistance < 48;
+    if (level === 2) {
+
+        startButton.textContent =
+            "▶ TRY AGAIN";
+
+    }
 
 
-    createParticles(
-        target.x,
-        target.y,
-        config.obstacle
-    );
+    if (level === 3) {
+
+        startButton.textContent =
+            `▶ RUN AS ${selectedAnimal}`;
+
+    }
 
 
-    obstacles =
-        obstacles.filter(
-            item =>
-                item !== target
-        );
+    if (level >= 4) {
 
+        startButton.textContent =
+            "▶ TRY AGAIN";
 
-    strikes--;
-
-
-    score +=
-        perfect
-            ? 70 * multiplier
-            : 40 * multiplier;
-
-
-    flash =
-        perfect
-            ? 0.35
-            : 0.18;
-
-
-    shake =
-        perfect
-            ? 8
-            : 4;
-
-
-    strikeDisplay.textContent =
-        `STRIKES ×${strikes}`;
-
-
-    scoreElement.textContent =
-        Math.floor(score);
+    }
 
 
     gameMessage.textContent =
-        perfect
-            ? "PERFECT HIT! +70"
-            : "OBSTACLE DESTROYED! +40";
+        "ONE MORE RUN?";
 
-
-    checkLevelComplete();
 }
 
 
-/* ---------------------------------------------------------
-   SPAWN OBSTACLES
-   --------------------------------------------------------- */
+// ------------------------------------------------------------
+// SCORE
+// ------------------------------------------------------------
+
+function addScore(amount) {
+
+    score +=
+        Math.floor(
+            amount * multiplier
+        );
+
+    scoreEl.textContent =
+        score;
+
+}
+
+
+// ------------------------------------------------------------
+// SPAWN OBSTACLE
+// ------------------------------------------------------------
 
 function spawnObstacle() {
 
-    const config =
-        LEVELS[currentLevel];
+    let lane;
 
 
-    const lane =
-        Math.floor(
-            Math.random() * 3
-        );
+    if (
+        obstacles.length > 0 &&
+        Math.random() <
+        settings.sameLaneChance
+    ) {
 
+        const previous =
+            obstacles[
+                obstacles.length - 1
+            ];
 
-    const size =
-        24 +
-        Math.random() * 12;
+        lane =
+            previous.lane;
+
+    } else {
+
+        lane =
+            Math.floor(
+                Math.random() * 3
+            );
+
+    }
 
 
     obstacles.push({
 
-        lane,
+        lane: lane,
 
-        x: laneCenters[lane],
+        x: laneX(lane),
 
-        y: -40,
+        y: -60,
 
-        size,
+        width: 54,
+
+        height: 34,
+
+        rotation:
+            Math.random() *
+            Math.PI,
 
         type:
             Math.floor(
                 Math.random() * 4
-            ),
-
-        rotation:
-            Math.random() * Math.PI,
-
-        color:
-            Math.random() > 0.5
-                ? config.obstacle
-                : config.obstacle2
-    });
-}
-
-
-/* ---------------------------------------------------------
-   COLLISION
-   --------------------------------------------------------- */
-
-function checkCollision(
-    obstacle
-) {
-
-    const ox =
-        obstacle.x;
-
-    const oy =
-        obstacle.y;
-
-    const half =
-        obstacle.size / 2;
-
-
-    const playerLeft =
-        playerX -
-        playerWidth / 2;
-
-
-    const playerRight =
-        playerX +
-        playerWidth / 2;
-
-
-    const playerTop =
-        playerY -
-        playerHeight / 2;
-
-
-    const playerBottom =
-        playerY +
-        playerHeight / 2;
-
-
-    const obstacleLeft =
-        ox - half;
-
-
-    const obstacleRight =
-        ox + half;
-
-
-    const obstacleTop =
-        oy - half;
-
-
-    const obstacleBottom =
-        oy + half;
-
-
-    return (
-        playerRight > obstacleLeft &&
-        playerLeft < obstacleRight &&
-        playerBottom > obstacleTop &&
-        playerTop < obstacleBottom
-    );
-}
-
-
-/* ---------------------------------------------------------
-   SCORE / LEVEL PROGRESSION
-   --------------------------------------------------------- */
-
-function updateScore(delta) {
-
-    score +=
-        delta *
-        0.06 *
-        multiplier;
-
-
-    multiplier =
-        Math.min(
-            9,
-            1 +
-            Math.floor(
-                elapsed / 10
             )
-        );
 
+    });
 
-    scoreElement.textContent =
-        Math.floor(score);
-
-
-    multiplierDisplay.textContent =
-        `×${multiplier}`;
-
-
-    checkLevelComplete();
 }
 
 
-function checkLevelComplete() {
+// ------------------------------------------------------------
+// DRAW OBSTACLE
+// ------------------------------------------------------------
 
-    const target =
-        LEVELS[currentLevel].target;
+function drawObstacle(obstacle) {
 
+    ctx.save();
 
-    if (
-        running &&
-        score >= target
-    ) {
-
-        completeLevel();
-    }
-}
-
-
-/* ---------------------------------------------------------
-   PARTICLES
-   --------------------------------------------------------- */
-
-function createParticles(
-    x,
-    y,
-    color
-) {
-
-    for (
-        let i = 0;
-        i < 18;
-        i++
-    ) {
-
-        particles.push({
-
-            x,
-
-            y,
-
-            vx:
-                (Math.random() - 0.5)
-                * 180,
-
-            vy:
-                (Math.random() - 0.5)
-                * 180,
-
-            life:
-                0.4 +
-                Math.random() * 0.35,
-
-            size:
-                2 +
-                Math.random() * 4,
-
-            color
-        });
-    }
-}
-
-
-function updateParticles(delta) {
-
-    for (
-        const particle
-        of particles
-    ) {
-
-        particle.x +=
-            particle.vx *
-            delta;
-
-        particle.y +=
-            particle.vy *
-            delta;
-
-        particle.vy +=
-            240 *
-            delta;
-
-        particle.life -=
-            delta;
-    }
-
-
-    particles =
-        particles.filter(
-            particle =>
-                particle.life > 0
-        );
-}
-
-
-/* ---------------------------------------------------------
-   DRAW BACKGROUND
-   --------------------------------------------------------- */
-
-function drawBackground() {
-
-    const config =
-        LEVELS[currentLevel];
-
-
-    ctx.fillStyle =
-        config.bg;
-
-    ctx.fillRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
+    ctx.translate(
+        obstacle.x,
+        obstacle.y
     );
 
 
-    /* grid */
+    // --------------------------------------------------------
+    // LEVEL 1
+    // Pink neon blocks
+    // --------------------------------------------------------
 
-    ctx.strokeStyle =
-        config.grid;
+    if (level === 1) {
 
-    ctx.lineWidth =
-        1;
+        ctx.shadowBlur =
+            20;
+
+        ctx.shadowColor =
+            "#ff4fa3";
+
+        ctx.fillStyle =
+            "#ff4fa3";
+
+        roundedRect(
+            -27,
+            -17,
+            54,
+            34,
+            9
+        );
+
+        ctx.fill();
 
 
-    for (
-        let x = 0;
-        x <= canvas.width;
-        x += 45
-    ) {
+        ctx.shadowBlur =
+            0;
+
+        ctx.fillStyle =
+            "rgba(255,255,255,.45)";
+
+        roundedRect(
+            -18,
+            -4,
+            36,
+            5,
+            2
+        );
+
+        ctx.fill();
+
+    }
+
+
+    // --------------------------------------------------------
+    // LEVEL 2
+    // Red warning diamonds
+    // --------------------------------------------------------
+
+    if (level === 2) {
+
+        ctx.rotate(
+            obstacle.rotation
+        );
+
+        ctx.shadowBlur =
+            24;
+
+        ctx.shadowColor =
+            "#ff304f";
+
+        ctx.fillStyle =
+            "#ff304f";
 
         ctx.beginPath();
 
         ctx.moveTo(
-            x,
+            0,
+            -27
+        );
+
+        ctx.lineTo(
+            32,
             0
         );
 
         ctx.lineTo(
-            x,
-            canvas.height
+            0,
+            27
         );
 
-        ctx.stroke();
+        ctx.lineTo(
+            -32,
+            0
+        );
+
+        ctx.closePath();
+
+        ctx.fill();
+
+
+        ctx.shadowBlur =
+            0;
+
+        ctx.fillStyle =
+            "#ffb7c0";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            0,
+            5,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
     }
 
 
-    for (
-        let y = 0;
-        y <= canvas.height;
-        y += 45
-    ) {
+    // --------------------------------------------------------
+    // LEVEL 3
+    // Forest rocks
+    // --------------------------------------------------------
+
+    if (level === 3) {
+
+        ctx.shadowBlur =
+            10;
+
+        ctx.shadowColor =
+            "rgba(0,0,0,.6)";
+
+        ctx.fillStyle =
+            "#87562f";
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            -28,
+            12
+        );
+
+        ctx.quadraticCurveTo(
+            -27,
+            -12,
+            -10,
+            -20
+        );
+
+        ctx.quadraticCurveTo(
+            10,
+            -29,
+            27,
+            -5
+        );
+
+        ctx.quadraticCurveTo(
+            31,
+            18,
+            9,
+            21
+        );
+
+        ctx.lineTo(
+            -17,
+            20
+        );
+
+        ctx.closePath();
+
+        ctx.fill();
+
+
+        ctx.shadowBlur =
+            0;
+
+        ctx.fillStyle =
+            "#c38a50";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            -8,
+            -5,
+            5,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+    }
+
+
+    // --------------------------------------------------------
+    // LEVEL 4 — OCEAN
+    // Coral
+    // --------------------------------------------------------
+
+    if (level === 4) {
+
+        ctx.shadowBlur =
+            18;
+
+        ctx.shadowColor =
+            "#ff5c91";
+
+        ctx.fillStyle =
+            "#ff5c91";
+
+        ctx.lineWidth =
+            9;
+
+        ctx.lineCap =
+            "round";
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            -20,
+            20
+        );
+
+        ctx.lineTo(
+            -20,
+            -4
+        );
+
+        ctx.lineTo(
+            -30,
+            -17
+        );
+
+        ctx.moveTo(
+            -20,
+            0
+        );
+
+        ctx.lineTo(
+            -5,
+            -15
+        );
+
+        ctx.lineTo(
+            0,
+            -29
+        );
+
+        ctx.moveTo(
+            -5,
+            -15
+        );
+
+        ctx.lineTo(
+            14,
+            -25
+        );
+
+        ctx.moveTo(
+            0,
+            2
+        );
+
+        ctx.lineTo(
+            19,
+            -7
+        );
+
+        ctx.lineTo(
+            28,
+            -22
+        );
+
+        ctx.stroke();
+
+    }
+
+
+    // --------------------------------------------------------
+    // LEVEL 5 — DESERT
+    // Sand rock
+    // --------------------------------------------------------
+
+    if (level === 5) {
+
+        ctx.shadowBlur =
+            8;
+
+        ctx.shadowColor =
+            "#9a5b25";
+
+        ctx.fillStyle =
+            "#d28a43";
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            -31,
+            17
+        );
+
+        ctx.quadraticCurveTo(
+            -27,
+            -15,
+            -10,
+            -19
+        );
+
+        ctx.quadraticCurveTo(
+            8,
+            -29,
+            27,
+            -9
+        );
+
+        ctx.quadraticCurveTo(
+            34,
+            10,
+            22,
+            20
+        );
+
+        ctx.closePath();
+
+        ctx.fill();
+
+        ctx.fillStyle =
+            "#f2bd65";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            -8,
+            -6,
+            5,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+    }
+
+
+    // --------------------------------------------------------
+    // LEVEL 6 — FOREST
+    // Tree obstacle
+    // --------------------------------------------------------
+
+    if (level === 6) {
+
+        ctx.fillStyle =
+            "#754629";
+
+        ctx.fillRect(
+            -7,
+            -3,
+            14,
+            29
+        );
+
+        ctx.shadowBlur =
+            13;
+
+        ctx.shadowColor =
+            "#35a94b";
+
+        ctx.fillStyle =
+            "#28783a";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            -13,
+            -12,
+            18,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+        ctx.beginPath();
+
+        ctx.arc(
+            12,
+            -13,
+            18,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            -22,
+            20,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+    }
+
+
+    // --------------------------------------------------------
+    // LEVEL 7 — SPACE
+    // Comet
+    // --------------------------------------------------------
+
+    if (level === 7) {
+
+        ctx.rotate(
+            obstacle.rotation
+        );
+
+        ctx.shadowBlur =
+            22;
+
+        ctx.shadowColor =
+            "#ff5b72";
+
+        ctx.fillStyle =
+            "#ff5b72";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            9,
+            0,
+            18,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+        ctx.shadowBlur =
+            0;
+
+        ctx.strokeStyle =
+            "rgba(255,180,200,.75)";
+
+        ctx.lineWidth =
+            7;
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            -35,
+            0
+        );
+
+        ctx.lineTo(
+            -6,
+            0
+        );
+
+        ctx.stroke();
+
+    }
+
+
+    // --------------------------------------------------------
+    // LEVEL 8 — ICE
+    // Iceberg
+    // --------------------------------------------------------
+
+    if (level === 8) {
+
+        ctx.shadowBlur =
+            17;
+
+        ctx.shadowColor =
+            "#9eeeff";
+
+        ctx.fillStyle =
+            "#b9e9ff";
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            -30,
+            18
+        );
+
+        ctx.lineTo(
+            -19,
+            -8
+        );
+
+        ctx.lineTo(
+            -8,
+            -28
+        );
+
+        ctx.lineTo(
+            4,
+            -8
+        );
+
+        ctx.lineTo(
+            15,
+            -22
+        );
+
+        ctx.lineTo(
+            30,
+            18
+        );
+
+        ctx.closePath();
+
+        ctx.fill();
+
+        ctx.fillStyle =
+            "rgba(255,255,255,.65)";
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            -8,
+            -26
+        );
+
+        ctx.lineTo(
+            4,
+            -8
+        );
+
+        ctx.lineTo(
+            -3,
+            4
+        );
+
+        ctx.closePath();
+
+        ctx.fill();
+
+    }
+
+
+    // --------------------------------------------------------
+    // LEVEL 9 — FRUIT
+    // Fruit
+    // --------------------------------------------------------
+
+    if (level === 9) {
+
+        const fruits = [
+            "#ff4d4d",
+            "#ffb52e",
+            "#7be35b",
+            "#d86bff"
+        ];
+
+        ctx.shadowBlur =
+            17;
+
+        ctx.shadowColor =
+            fruits[obstacle.type];
+
+        ctx.fillStyle =
+            fruits[obstacle.type];
+
+        ctx.beginPath();
+
+        ctx.arc(
+            -8,
+            5,
+            17,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+        ctx.beginPath();
+
+        ctx.arc(
+            10,
+            5,
+            17,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+        ctx.shadowBlur =
+            0;
+
+        ctx.strokeStyle =
+            "#72c34a";
+
+        ctx.lineWidth =
+            5;
 
         ctx.beginPath();
 
         ctx.moveTo(
             0,
-            y
+            -9
         );
 
-        ctx.lineTo(
-            canvas.width,
-            y
+        ctx.quadraticCurveTo(
+            3,
+            -20,
+            13,
+            -22
         );
 
         ctx.stroke();
+
     }
 
 
-    /* horizon glow */
+    // --------------------------------------------------------
+    // LEVEL 10 — CHAOS
+    // Random neon shapes
+    // --------------------------------------------------------
+
+    if (level === 10) {
+
+        const chaosColors = [
+            "#ff4fa3",
+            "#55e8ff",
+            "#ffd84a",
+            "#9cff62"
+        ];
+
+        ctx.shadowBlur =
+            24;
+
+        ctx.shadowColor =
+            chaosColors[obstacle.type];
+
+        ctx.fillStyle =
+            chaosColors[obstacle.type];
+
+        if (obstacle.type === 0) {
+
+            roundedRect(
+                -27,
+                -17,
+                54,
+                34,
+                9
+            );
+
+            ctx.fill();
+
+        }
+
+        if (obstacle.type === 1) {
+
+            ctx.rotate(
+                obstacle.rotation
+            );
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                0,
+                -29
+            );
+
+            ctx.lineTo(
+                31,
+                0
+            );
+
+            ctx.lineTo(
+                0,
+                29
+            );
+
+            ctx.lineTo(
+                -31,
+                0
+            );
+
+            ctx.closePath();
+
+            ctx.fill();
+
+        }
+
+        if (obstacle.type === 2) {
+
+            ctx.beginPath();
+
+            ctx.arc(
+                0,
+                0,
+                25,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fill();
+
+        }
+
+        if (obstacle.type === 3) {
+
+            ctx.rotate(
+                obstacle.rotation
+            );
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                0,
+                -30
+            );
+
+            ctx.lineTo(
+                27,
+                22
+            );
+
+            ctx.lineTo(
+                -27,
+                22
+            );
+
+            ctx.closePath();
+
+            ctx.fill();
+
+        }
+
+    }
+
+
+    ctx.restore();
+
+}
+
+
+// ------------------------------------------------------------
+// DRAW PLAYER
+// ------------------------------------------------------------
+
+function drawPlayer() {
+
+    ctx.save();
+
+    ctx.translate(
+        player.x,
+        player.y
+    );
+
+
+    if (level === 3) {
+
+        drawAnimal();
+
+    } else {
+
+        ctx.shadowBlur =
+            22;
+
+        ctx.shadowColor =
+            settings.playerColor;
+
+        ctx.fillStyle =
+            settings.playerColor;
+
+        roundedRect(
+            -15,
+            -15,
+            30,
+            30,
+            9
+        );
+
+        ctx.fill();
+
+
+        ctx.shadowBlur =
+            0;
+
+        ctx.fillStyle =
+            "#ffffff";
+
+        roundedRect(
+            -7,
+            -5,
+            14,
+            5,
+            2
+        );
+
+        ctx.fill();
+
+    }
+
+
+    ctx.restore();
+
+}
+
+
+// ------------------------------------------------------------
+// DRAW ANIMAL
+// ------------------------------------------------------------
+
+function drawAnimal() {
+
+    ctx.shadowBlur =
+        18;
+
+    ctx.shadowColor =
+        "#ffd84a";
+
+
+    // BUNNY
+
+    if (selectedAnimal === "BUNNY") {
+
+        ctx.fillStyle =
+            "#f0f0f0";
+
+
+        roundedRect(
+            -12,
+            -31,
+            8,
+            22,
+            4
+        );
+
+        ctx.fill();
+
+
+        roundedRect(
+            4,
+            -31,
+            8,
+            22,
+            4
+        );
+
+        ctx.fill();
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            3,
+            18,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+    }
+
+
+    // FOX
+
+    if (selectedAnimal === "FOX") {
+
+        ctx.fillStyle =
+            "#e87922";
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            -20,
+            -9
+        );
+
+        ctx.lineTo(
+            -12,
+            -27
+        );
+
+        ctx.lineTo(
+            0,
+            -18
+        );
+
+        ctx.lineTo(
+            12,
+            -27
+        );
+
+        ctx.lineTo(
+            20,
+            -9
+        );
+
+        ctx.lineTo(
+            16,
+            15
+        );
+
+        ctx.lineTo(
+            -16,
+            15
+        );
+
+        ctx.closePath();
+
+        ctx.fill();
+
+    }
+
+
+    // CAT
+
+    if (selectedAnimal === "CAT") {
+
+        ctx.fillStyle =
+            "#b9bac5";
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            -20,
+            -8
+        );
+
+        ctx.lineTo(
+            -16,
+            -25
+        );
+
+        ctx.lineTo(
+            -4,
+            -16
+        );
+
+        ctx.lineTo(
+            4,
+            -16
+        );
+
+        ctx.lineTo(
+            16,
+            -25
+        );
+
+        ctx.lineTo(
+            20,
+            -8
+        );
+
+        ctx.lineTo(
+            16,
+            15
+        );
+
+        ctx.lineTo(
+            -16,
+            15
+        );
+
+        ctx.closePath();
+
+        ctx.fill();
+
+    }
+
+
+    // PANDA
+
+    if (selectedAnimal === "PANDA") {
+
+        ctx.fillStyle =
+            "#f1f1f1";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            0,
+            0,
+            20,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+
+        ctx.fillStyle =
+            "#151515";
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+            -12,
+            -9,
+            7,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+            12,
+            -9,
+            7,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+    }
+
+
+    // EYES
+
+    ctx.shadowBlur =
+        0;
+
+    ctx.fillStyle =
+        "#111";
+
+
+    ctx.beginPath();
+
+    ctx.arc(
+        -7,
+        -4,
+        3,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+
+    ctx.beginPath();
+
+    ctx.arc(
+        7,
+        -4,
+        3,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+}
+
+
+// ------------------------------------------------------------
+// BACKGROUND
+// ------------------------------------------------------------
+
+function drawBackground() {
 
     const gradient =
         ctx.createLinearGradient(
             0,
-            240,
             0,
-            490
+            0,
+            canvas.height
         );
 
 
     gradient.addColorStop(
         0,
-        "rgba(255,255,255,0)"
+        settings.backgroundTop
     );
 
 
     gradient.addColorStop(
         1,
-        "rgba(255,255,255,0.035)"
+        settings.backgroundBottom
     );
 
 
@@ -1331,830 +2229,1401 @@ function drawBackground() {
         canvas.width,
         canvas.height
     );
-}
 
 
-/* ---------------------------------------------------------
-   DRAW OBSTACLE
-   --------------------------------------------------------- */
-
-function drawObstacle(
-    obstacle
-) {
-
-    const config =
-        LEVELS[currentLevel];
-
-
-    ctx.save();
-
-
-    ctx.translate(
-        obstacle.x,
-        obstacle.y
-    );
-
-
-    ctx.rotate(
-        obstacle.rotation
-    );
-
+    // Road
 
     ctx.fillStyle =
-        obstacle.color;
+        "rgba(255,255,255,.035)";
+
+    ctx.fillRect(
+        45,
+        0,
+        270,
+        canvas.height
+    );
 
 
-    ctx.shadowBlur =
-        14;
+    // Lane lines
+
+    ctx.strokeStyle =
+        "rgba(255,255,255,.09)";
+
+    ctx.lineWidth =
+        2;
+
+    ctx.setLineDash(
+        [8, 15]
+    );
 
 
-    ctx.shadowColor =
-        obstacle.color;
-
-
-    const s =
-        obstacle.size;
-
-
-    /*
-       World-specific shapes
-    */
-
-    if (
-        currentLevel === 4
+    for (
+        let i = 1;
+        i < 3;
+        i++
     ) {
 
-        /* coral */
+        const x =
+            45 + i * 90;
 
         ctx.beginPath();
 
         ctx.moveTo(
-            -s / 2,
-            s / 2
-        );
-
-        ctx.lineTo(
-            -s / 4,
-            -s / 3
-        );
-
-        ctx.lineTo(
-            0,
-            -s / 2
-        );
-
-        ctx.lineTo(
-            s / 4,
-            -s / 4
-        );
-
-        ctx.lineTo(
-            s / 2,
-            s / 2
-        );
-
-        ctx.closePath();
-
-        ctx.fill();
-
-    } else if (
-        currentLevel === 5
-    ) {
-
-        /* sand pile */
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            -s / 2,
-            s / 2
-        );
-
-        ctx.quadraticCurveTo(
-            0,
-            -s / 2,
-            s / 2,
-            s / 2
-        );
-
-        ctx.closePath();
-
-        ctx.fill();
-
-    } else if (
-        currentLevel === 6
-    ) {
-
-        /* tree */
-
-        ctx.fillRect(
-            -5,
-            -s / 2,
-            10,
-            s
-        );
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            0,
-            -s
-        );
-
-        ctx.lineTo(
-            -s / 2,
+            x,
             0
         );
 
         ctx.lineTo(
-            s / 2,
-            0
+            x,
+            canvas.height
         );
 
-        ctx.closePath();
+        ctx.stroke();
 
-        ctx.fill();
-
-    } else if (
-        currentLevel === 7
-    ) {
-
-        /* comet */
-
-        ctx.beginPath();
-
-        ctx.arc(
-            0,
-            0,
-            s / 2,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-        ctx.globalAlpha =
-            0.35;
-
-        ctx.fillRect(
-            -s * 1.7,
-            -4,
-            s * 1.5,
-            8
-        );
-
-    } else if (
-        currentLevel === 8
-    ) {
-
-        /* iceberg */
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            -s / 2,
-            s / 2
-        );
-
-        ctx.lineTo(
-            -s / 3,
-            -s / 3
-        );
-
-        ctx.lineTo(
-            0,
-            -s / 2
-        );
-
-        ctx.lineTo(
-            s / 3,
-            -s / 3
-        );
-
-        ctx.lineTo(
-            s / 2,
-            s / 2
-        );
-
-        ctx.closePath();
-
-        ctx.fill();
-
-    } else if (
-        currentLevel === 9
-    ) {
-
-        /* fruit */
-
-        ctx.beginPath();
-
-        ctx.arc(
-            0,
-            0,
-            s / 2,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-        ctx.fillStyle =
-            "#6de05f";
-
-        ctx.fillRect(
-            -2,
-            -s / 2 - 5,
-            4,
-            8
-        );
-
-    } else {
-
-        /* classic diamond */
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            0,
-            -s / 2
-        );
-
-        ctx.lineTo(
-            s / 2,
-            0
-        );
-
-        ctx.lineTo(
-            0,
-            s / 2
-        );
-
-        ctx.lineTo(
-            -s / 2,
-            0
-        );
-
-        ctx.closePath();
-
-        ctx.fill();
     }
 
 
-    ctx.restore();
+    ctx.setLineDash([]);
+
+
+    // LEVEL 2 SPEED STREAKS
+
+    if (level === 2) {
+
+        ctx.strokeStyle =
+            "rgba(255,70,100,.30)";
+
+        ctx.lineWidth =
+            2;
+
+
+        for (
+            let i = 0;
+            i < 14;
+            i++
+        ) {
+
+            const x =
+                (
+                    i * 47 +
+                    elapsed * 100
+                ) %
+                canvas.width;
+
+            const y =
+                (
+                    i * 79 +
+                    elapsed * 180
+                ) %
+                canvas.height;
+
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+                x,
+                y
+            );
+
+            ctx.lineTo(
+                x,
+                y + 30
+            );
+
+            ctx.stroke();
+
+        }
+
+    }
+
+
+    // LEVEL 3 TREES
+
+    if (level === 3) {
+
+        drawTree(
+            18,
+            100,
+            0.8
+        );
+
+        drawTree(
+            342,
+            145,
+            0.7
+        );
+
+        drawTree(
+            18,
+            300,
+            0.55
+        );
+
+        drawTree(
+            342,
+            350,
+            0.8
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // LEVEL 4 — OCEAN
+    // --------------------------------------------------------
+
+    if (level === 4) {
+
+        drawBubbles();
+
+        ctx.fillStyle =
+            "rgba(85,232,255,.08)";
+
+        for (
+            let i = 0;
+            i < 7;
+            i++
+        ) {
+
+            const y =
+                (
+                    i * 83 +
+                    elapsed * 35
+                ) %
+                canvas.height;
+
+            ctx.fillRect(
+                48,
+                y,
+                264,
+                1
+            );
+
+        }
+
+    }
+
+
+    // --------------------------------------------------------
+    // LEVEL 5 — DESERT
+    // --------------------------------------------------------
+
+    if (level === 5) {
+
+        for (
+            let i = 0;
+            i < 12;
+            i++
+        ) {
+
+            const x =
+                (i * 67) % 360;
+
+            const y =
+                (
+                    i * 93 +
+                    elapsed * 25
+                ) %
+                490;
+
+            ctx.fillStyle =
+                "rgba(255,210,120,.18)";
+
+            ctx.fillRect(
+                x,
+                y,
+                2,
+                2
+            );
+
+        }
+
+    }
+
+
+    // --------------------------------------------------------
+    // LEVEL 6 — FOREST
+    // --------------------------------------------------------
+
+    if (level === 6) {
+
+        drawTree(
+            12,
+            90,
+            0.65
+        );
+
+        drawTree(
+            348,
+            125,
+            0.75
+        );
+
+        drawTree(
+            15,
+            285,
+            0.55
+        );
+
+        drawTree(
+            345,
+            350,
+            0.65
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // LEVEL 7 — SPACE
+    // --------------------------------------------------------
+
+    if (level === 7) {
+
+        drawStars();
+
+    }
+
+
+    // --------------------------------------------------------
+    // LEVEL 8 — ICE
+    // --------------------------------------------------------
+
+    if (level === 8) {
+
+        drawSnow();
+
+    }
+
+
+    // --------------------------------------------------------
+    // LEVEL 9 — FRUIT
+    // --------------------------------------------------------
+
+    if (level === 9) {
+
+        drawFruitBackground();
+
+    }
+
+
+    // --------------------------------------------------------
+    // LEVEL 10 — CHAOS
+    // --------------------------------------------------------
+
+    if (level === 10) {
+
+        drawChaosBackground();
+
+    }
+
 }
 
 
-/* ---------------------------------------------------------
-   DRAW ANIMAL
-   --------------------------------------------------------- */
+// ------------------------------------------------------------
+// OCEAN BUBBLES
+// ------------------------------------------------------------
 
-function drawAnimal() {
+function drawBubbles() {
 
-    const x =
-        playerX;
+    for (
+        let i = 0;
+        i < 12;
+        i++
+    ) {
 
-    const y =
-        playerY;
+        const x =
+            (i * 71 + 25) % 350;
 
+        const y =
+            (
+                i * 61 -
+                elapsed * (18 + i)
+            ) % 500;
+
+        ctx.strokeStyle =
+            "rgba(120,235,255,.25)";
+
+        ctx.lineWidth =
+            2;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            x,
+            y < 0 ? y + 500 : y,
+            3 + (i % 3),
+            0,
+            Math.PI * 2
+        );
+
+        ctx.stroke();
+
+    }
+
+}
+
+
+// ------------------------------------------------------------
+// STARS
+// ------------------------------------------------------------
+
+function drawStars() {
+
+    for (
+        let i = 0;
+        i < 35;
+        i++
+    ) {
+
+        const x =
+            (i * 83) % 360;
+
+        const y =
+            (
+                i * 47 +
+                elapsed * (8 + i % 4)
+            ) % 490;
+
+        const size =
+            1 + (i % 3);
+
+        ctx.fillStyle =
+            "rgba(255,255,255,.65)";
+
+        ctx.fillRect(
+            x,
+            y,
+            size,
+            size
+        );
+
+    }
+
+}
+
+
+// ------------------------------------------------------------
+// SNOW
+// ------------------------------------------------------------
+
+function drawSnow() {
+
+    for (
+        let i = 0;
+        i < 22;
+        i++
+    ) {
+
+        const x =
+            (i * 53) % 360;
+
+        const y =
+            (
+                i * 71 +
+                elapsed * (25 + i % 5)
+            ) % 490;
+
+        ctx.fillStyle =
+            "rgba(220,250,255,.55)";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            x,
+            y,
+            2 + i % 2,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+    }
+
+}
+
+
+// ------------------------------------------------------------
+// FRUIT BACKGROUND
+// ------------------------------------------------------------
+
+function drawFruitBackground() {
+
+    const dots = [
+        "#ff5757",
+        "#ffd34d",
+        "#70e45b",
+        "#d46bff"
+    ];
+
+    for (
+        let i = 0;
+        i < 14;
+        i++
+    ) {
+
+        const x =
+            (i * 61 + 20) % 350;
+
+        const y =
+            (i * 89 + elapsed * 12) % 490;
+
+        ctx.fillStyle =
+            dots[i % dots.length];
+
+        ctx.globalAlpha =
+            0.18;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            x,
+            y,
+            3 + (i % 3),
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+    }
+
+    ctx.globalAlpha =
+        1;
+
+}
+
+
+// ------------------------------------------------------------
+// CHAOS BACKGROUND
+// ------------------------------------------------------------
+
+function drawChaosBackground() {
+
+    const colors = [
+        "#ff4fa3",
+        "#55e8ff",
+        "#ffd84a",
+        "#9cff62"
+    ];
+
+    for (
+        let i = 0;
+        i < 18;
+        i++
+    ) {
+
+        const x =
+            (i * 47) % 360;
+
+        const y =
+            (
+                i * 91 +
+                elapsed * (20 + i)
+            ) % 490;
+
+        ctx.fillStyle =
+            colors[i % colors.length];
+
+        ctx.globalAlpha =
+            0.18;
+
+        ctx.fillRect(
+            x,
+            y,
+            3,
+            3
+        );
+
+    }
+
+    ctx.globalAlpha =
+        1;
+
+}
+
+
+// ------------------------------------------------------------
+// DRAW TREE
+// ------------------------------------------------------------
+
+function drawTree(
+    x,
+    y,
+    scale
+) {
 
     ctx.save();
-
 
     ctx.translate(
         x,
         y
     );
 
-
-    ctx.shadowBlur =
-        18;
-
-    ctx.shadowColor =
-        "#55e8ff";
-
-
-    /* body */
-
-    ctx.fillStyle =
-        "#ffd95a";
-
-
-    ctx.beginPath();
-
-    ctx.roundRect(
-        -13,
-        -10,
-        26,
-        25,
-        10
+    ctx.scale(
+        scale,
+        scale
     );
-
-    ctx.fill();
-
-
-    /* animal variations */
-
-    if (
-        selectedAnimal === "BUNNY"
-    ) {
-
-        ctx.fillRect(
-            -10,
-            -28,
-            7,
-            18
-        );
-
-        ctx.fillRect(
-            3,
-            -28,
-            7,
-            18
-        );
-
-    } else if (
-        selectedAnimal === "FOX"
-    ) {
-
-        ctx.fillStyle =
-            "#ff9b4a";
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            -14,
-            -10
-        );
-
-        ctx.lineTo(
-            -9,
-            -27
-        );
-
-        ctx.lineTo(
-            0,
-            -17
-        );
-
-        ctx.lineTo(
-            9,
-            -27
-        );
-
-        ctx.lineTo(
-            14,
-            -10
-        );
-
-        ctx.closePath();
-
-        ctx.fill();
-
-    } else if (
-        selectedAnimal === "CAT"
-    ) {
-
-        ctx.fillStyle =
-            "#d5d9e5";
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            -14,
-            -9
-        );
-
-        ctx.lineTo(
-            -10,
-            -27
-        );
-
-        ctx.lineTo(
-            -1,
-            -17
-        );
-
-        ctx.lineTo(
-            10,
-            -27
-        );
-
-        ctx.lineTo(
-            14,
-            -9
-        );
-
-        ctx.closePath();
-
-        ctx.fill();
-
-    } else if (
-        selectedAnimal === "PANDA"
-    ) {
-
-        ctx.fillStyle =
-            "#ffffff";
-
-        ctx.beginPath();
-
-        ctx.arc(
-            0,
-            -8,
-            15,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-
-        ctx.fillStyle =
-            "#111";
-
-        ctx.beginPath();
-
-        ctx.arc(
-            -6,
-            -9,
-            4,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.arc(
-            6,
-            -9,
-            4,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-    }
-
-
-    /* eyes */
-
-    ctx.shadowBlur =
-        0;
-
-    ctx.fillStyle =
-        "#111";
-
-
-    ctx.beginPath();
-
-    ctx.arc(
-        -5,
-        -5,
-        2,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.arc(
-        5,
-        -5,
-        2,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    ctx.restore();
-}
-
-
-/* ---------------------------------------------------------
-   DRAW STANDARD PLAYER
-   --------------------------------------------------------- */
-
-function drawPlayer() {
-
-    if (
-        currentLevel === 3
-    ) {
-
-        drawAnimal();
-
-        return;
-    }
-
-
-    const config =
-        LEVELS[currentLevel];
-
-
-    ctx.save();
-
-
-    ctx.translate(
-        playerX,
-        playerY
-    );
-
-
-    ctx.shadowBlur =
-        18;
-
-    ctx.shadowColor =
-        config.player;
 
 
     ctx.fillStyle =
-        config.player;
-
-
-    ctx.beginPath();
-
-    ctx.roundRect(
-        -14,
-        -17,
-        28,
-        34,
-        8
-    );
-
-    ctx.fill();
-
-
-    ctx.shadowBlur =
-        0;
-
-
-    ctx.fillStyle =
-        "#061018";
-
+        "#5b3823";
 
     ctx.fillRect(
         -6,
-        -5,
-        4,
-        4
+        12,
+        12,
+        38
     );
 
-    ctx.fillRect(
-        2,
-        -5,
-        4,
-        4
+
+    ctx.fillStyle =
+        "#286b35";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        0,
+        3,
+        25,
+        0,
+        Math.PI * 2
     );
+
+    ctx.fill();
+
+
+    ctx.fillStyle =
+        "#3d8a45";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        -14,
+        -4,
+        17,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+
+
+    ctx.beginPath();
+
+    ctx.arc(
+        14,
+        -4,
+        17,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
 
 
     ctx.restore();
+
 }
 
 
-/* ---------------------------------------------------------
-   DRAW PARTICLES
-   --------------------------------------------------------- */
+// ------------------------------------------------------------
+// PARTICLES
+// ------------------------------------------------------------
+
+function createParticles(
+    x,
+    y
+) {
+
+    for (
+        let i = 0;
+        i < 16;
+        i++
+    ) {
+
+        particles.push({
+
+            x: x,
+
+            y: y,
+
+            vx:
+                (Math.random() - 0.5) *
+                240,
+
+            vy:
+                (Math.random() - 0.5) *
+                240,
+
+            life:
+                0.55,
+
+            size:
+                3 +
+                Math.random() * 4
+
+        });
+
+    }
+
+}
+
+
+function updateParticles(dt) {
+
+    for (
+        let i = particles.length - 1;
+        i >= 0;
+        i--
+    ) {
+
+        const particle =
+            particles[i];
+
+
+        particle.x +=
+            particle.vx * dt;
+
+
+        particle.y +=
+            particle.vy * dt;
+
+
+        particle.vy +=
+            350 * dt;
+
+
+        particle.life -=
+            dt;
+
+
+        if (
+            particle.life <= 0
+        ) {
+
+            particles.splice(
+                i,
+                1
+            );
+
+        }
+
+    }
+
+}
+
 
 function drawParticles() {
 
-    for (
-        const particle
-        of particles
-    ) {
+    particles.forEach(
+        function(particle) {
 
-        ctx.globalAlpha =
-            Math.max(
+            ctx.globalAlpha =
+                Math.max(
+                    0,
+                    particle.life * 2
+                );
+
+            ctx.fillStyle =
+                "#ffffff";
+
+
+            ctx.beginPath();
+
+            ctx.arc(
+                particle.x,
+                particle.y,
+                particle.size,
                 0,
-                particle.life
+                Math.PI * 2
             );
 
+            ctx.fill();
 
-        ctx.fillStyle =
-            particle.color;
-
-
-        ctx.beginPath();
-
-        ctx.arc(
-            particle.x,
-            particle.y,
-            particle.size,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-    }
+        }
+    );
 
 
     ctx.globalAlpha =
         1;
+
 }
 
 
-/* ---------------------------------------------------------
-   UPDATE
-   --------------------------------------------------------- */
+// ------------------------------------------------------------
+// ATTACK
+// ------------------------------------------------------------
 
-function update(delta) {
+function attack() {
 
-    elapsed +=
-        delta;
-
-
-    const config =
-        LEVELS[currentLevel];
-
-
-    const progress =
-        Math.min(
-            1,
-            elapsed / 60
-        );
-
-
-    const speed =
-        config.startSpeed +
-        (
-            config.maxSpeed -
-            config.startSpeed
-        ) *
-        progress;
-
-
-    obstacleTimer +=
-        delta * 1000;
-
-
-    /*
-       Obstacles become more frequent
-       as the run progresses.
-    */
-
-    obstacleInterval =
-        Math.max(
-            390,
-            850 -
-            elapsed * 7
-        );
-
-
-    if (
-        obstacleTimer >=
-        obstacleInterval
-    ) {
-
-        obstacleTimer = 0;
-
-        spawnObstacle();
+    if (!gameRunning) {
+        return;
     }
+
+
+    if (!settings.attacks) {
+        return;
+    }
+
+
+    if (strikes <= 0) {
+
+        gameMessage.textContent =
+            "NO STRIKES LEFT";
+
+        return;
+
+    }
+
+
+    if (attackCooldown > 0) {
+        return;
+    }
+
+
+    attackCooldown =
+        0.25;
+
+
+    let targetIndex =
+        -1;
+
+    let closest =
+        Infinity;
 
 
     for (
-        const obstacle
-        of obstacles
+        let i = 0;
+        i < obstacles.length;
+        i++
     ) {
 
-        obstacle.y +=
-            speed *
-            delta;
-
-
-        obstacle.rotation +=
-            delta * 1.4;
+        const obstacle =
+            obstacles[i];
 
 
         if (
-            checkCollision(
-                obstacle
-            )
+            obstacle.lane !==
+            playerLane
         ) {
 
-            createParticles(
-                playerX,
-                playerY,
-                config.obstacle
-            );
+            continue;
 
-
-            flash =
-                0.4;
-
-            shake =
-                10;
-
-
-            showGameOver();
-
-            return;
         }
+
+
+        const distance =
+            player.y -
+            obstacle.y;
+
+
+        if (
+            obstacle.y > 245 &&
+            obstacle.y < 405 &&
+            distance >= 0 &&
+            distance < closest
+        ) {
+
+            closest =
+                distance;
+
+            targetIndex =
+                i;
+
+        }
+
     }
 
 
-    obstacles =
-        obstacles.filter(
-            obstacle =>
-                obstacle.y <
-                canvas.height + 60
-        );
+    // No target = no strike lost
+
+    if (
+        targetIndex === -1
+    ) {
+
+        gameMessage.textContent =
+            "NO TARGET";
+
+        return;
+
+    }
 
 
-    updateParticles(
-        delta
+    const target =
+        obstacles[targetIndex];
+
+
+    obstacles.splice(
+        targetIndex,
+        1
     );
 
 
-    updateScore(
-        delta
+    strikes--;
+
+
+    createParticles(
+        target.x,
+        target.y
     );
 
 
-    flash =
-        Math.max(
-            0,
-            flash - delta
-        );
+    const perfect =
+        target.y > 335 &&
+        target.y < 395;
 
 
-    shake =
-        Math.max(
-            0,
-            shake - delta * 20
-        );
+    if (perfect) {
+
+        addScore(70);
+
+        gameMessage.textContent =
+            "💥 PERFECT HIT!";
+
+    } else {
+
+        addScore(40);
+
+        gameMessage.textContent =
+            "💥 HIT!";
+
+    }
+
+
+    updateStrikeDisplay();
+
 }
 
 
-/* ---------------------------------------------------------
-   DRAW
-   --------------------------------------------------------- */
+// ------------------------------------------------------------
+// COLLISION
+// ------------------------------------------------------------
+
+function collision(
+    obstacle
+) {
+
+    const playerLeft =
+        player.x -
+        player.width / 2;
+
+    const playerRight =
+        player.x +
+        player.width / 2;
+
+    const playerTop =
+        player.y -
+        player.height / 2;
+
+    const playerBottom =
+        player.y +
+        player.height / 2;
+
+
+    const obstacleLeft =
+        obstacle.x -
+        obstacle.width / 2;
+
+    const obstacleRight =
+        obstacle.x +
+        obstacle.width / 2;
+
+    const obstacleTop =
+        obstacle.y -
+        obstacle.height / 2;
+
+    const obstacleBottom =
+        obstacle.y +
+        obstacle.height / 2;
+
+
+    return (
+
+        playerLeft <
+        obstacleRight &&
+
+        playerRight >
+        obstacleLeft &&
+
+        playerTop <
+        obstacleBottom &&
+
+        playerBottom >
+        obstacleTop
+
+    );
+
+}
+
+
+// ------------------------------------------------------------
+// MOVE LEFT
+// ------------------------------------------------------------
+
+function moveLeft() {
+
+    if (!gameRunning) {
+        return;
+    }
+
+
+    targetLane =
+        Math.max(
+            0,
+            targetLane - 1
+        );
+
+}
+
+
+// ------------------------------------------------------------
+// MOVE RIGHT
+// ------------------------------------------------------------
+
+function moveRight() {
+
+    if (!gameRunning) {
+        return;
+    }
+
+
+    targetLane =
+        Math.min(
+            2,
+            targetLane + 1
+        );
+
+}
+
+
+// ------------------------------------------------------------
+// BUTTON CONTROLS
+// ------------------------------------------------------------
+
+leftButton.addEventListener(
+    "pointerdown",
+    function(event) {
+
+        event.preventDefault();
+
+        moveLeft();
+
+    }
+);
+
+
+rightButton.addEventListener(
+    "pointerdown",
+    function(event) {
+
+        event.preventDefault();
+
+        moveRight();
+
+    }
+);
+
+
+attackButton.addEventListener(
+    "pointerdown",
+    function(event) {
+
+        event.preventDefault();
+
+        attack();
+
+    }
+);
+
+
+// ------------------------------------------------------------
+// KEYBOARD CONTROLS
+// ------------------------------------------------------------
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.key ===
+            "ArrowLeft"
+        ) {
+
+            moveLeft();
+
+        }
+
+
+        if (
+            event.key ===
+            "ArrowRight"
+        ) {
+
+            moveRight();
+
+        }
+
+
+        if (
+            event.code ===
+            "Space" ||
+            event.key ===
+            "ArrowUp"
+        ) {
+
+            event.preventDefault();
+
+            attack();
+
+        }
+
+    }
+);
+
+
+// ------------------------------------------------------------
+// TOUCH SWIPE
+// ------------------------------------------------------------
+
+let touchStartX =
+    0;
+
+
+canvas.addEventListener(
+    "touchstart",
+    function(event) {
+
+        if (
+            event.touches.length !== 1
+        ) {
+
+            return;
+
+        }
+
+
+        touchStartX =
+            event.touches[0].clientX;
+
+    },
+    {
+        passive: true
+    }
+);
+
+
+canvas.addEventListener(
+    "touchend",
+    function(event) {
+
+        if (
+            !gameRunning ||
+            event.changedTouches.length !== 1
+        ) {
+
+            return;
+
+        }
+
+
+        const touchEndX =
+            event.changedTouches[0].clientX;
+
+
+        const distance =
+            touchEndX -
+            touchStartX;
+
+
+        if (
+            Math.abs(distance) <
+            30
+        ) {
+
+            return;
+
+        }
+
+
+        if (distance < 0) {
+
+            moveLeft();
+
+        } else {
+
+            moveRight();
+
+        }
+
+    },
+    {
+        passive: true
+    }
+);
+
+
+// ------------------------------------------------------------
+// START / NEXT LEVEL BUTTON
+// ------------------------------------------------------------
+
+startButton.addEventListener(
+    "click",
+    function() {
+
+        /*
+           If the current level has been completed,
+           move directly to the next level.
+        */
+
+        if (
+            levelComplete &&
+            level < 10
+        ) {
+
+            level++;
+
+            levelComplete =
+                false;
+
+            history.replaceState(
+                null,
+                "",
+                `?level=${level}`
+            );
+
+            applyLevelUI();
+
+        }
+
+
+        /*
+           Level 10 is the final level.
+           After completion, PLAY AGAIN
+           restarts Level 1.
+        */
+
+        else if (
+            levelComplete &&
+            level === 10
+        ) {
+
+            level =
+                1;
+
+            levelComplete =
+                false;
+
+            history.replaceState(
+                null,
+                "",
+                "?level=1"
+            );
+
+            applyLevelUI();
+
+        }
+
+
+        startGame();
+
+    }
+);
+
+
+// ------------------------------------------------------------
+// UPDATE
+// ------------------------------------------------------------
+
+function update(dt) {
+
+    elapsed +=
+        dt;
+
+
+    attackCooldown =
+        Math.max(
+            0,
+            attackCooldown - dt
+        );
+
+
+    // Multiplier every 10 seconds
+
+    multiplier =
+        Math.min(
+            9,
+            1 +
+            Math.floor(
+                elapsed / 10
+            )
+        );
+
+
+    multiplierDisplay.textContent =
+        `×${multiplier}`;
+
+
+    // Smooth player movement
+
+    const targetX =
+        laneX(targetLane);
+
+
+    player.x +=
+        (
+            targetX -
+            player.x
+        ) *
+        Math.min(
+            1,
+            12 * dt
+        );
+
+
+    // Increasing speed
+
+    const speed =
+        Math.min(
+            settings.maxSpeed,
+            settings.startSpeed +
+            elapsed * 1.6
+        );
+
+
+    // Spawn
+
+    spawnTimer -=
+        dt;
+
+
+    if (
+        spawnTimer <= 0
+    ) {
+
+        spawnObstacle();
+
+
+        const nextSpawn =
+            Math.max(
+                settings.spawnMinimum,
+                settings.spawnDelay -
+                elapsed * 0.004
+            );
+
+
+        spawnTimer =
+            nextSpawn +
+            Math.random() * 0.22;
+
+    }
+
+
+    // Obstacles
+
+    for (
+        let i = obstacles.length - 1;
+        i >= 0;
+        i--
+    ) {
+
+        const obstacle =
+            obstacles[i];
+
+
+        obstacle.y +=
+            speed * dt;
+
+
+        if (
+            collision(obstacle)
+        ) {
+
+            endGame();
+
+            return;
+
+        }
+
+
+        if (
+            obstacle.y >
+            canvas.height + 70
+        ) {
+
+            obstacles.splice(
+                i,
+                1
+            );
+
+
+            addScore(10);
+
+        }
+
+    }
+
+
+    updateParticles(dt);
+
+
+    // --------------------------------------------------------
+    // LEVEL COMPLETION
+    // --------------------------------------------------------
+
+    if (
+        score >= settings.target
+    ) {
+
+        completeLevel();
+
+        return;
+
+    }
+
+}
+
+
+// ------------------------------------------------------------
+// DRAW
+// ------------------------------------------------------------
 
 function draw() {
 
     drawBackground();
 
 
-    ctx.save();
+    obstacles.forEach(
+        function(obstacle) {
 
+            drawObstacle(
+                obstacle
+            );
 
-    if (shake > 0) {
+        }
+    );
 
-        ctx.translate(
-            (Math.random() - 0.5) *
-            shake,
-
-            (Math.random() - 0.5) *
-            shake
-        );
-    }
-
-
-    for (
-        const obstacle
-        of obstacles
-    ) {
-
-        drawObstacle(
-            obstacle
-        );
-    }
-
-
-    drawPlayer();
 
     drawParticles();
 
+    drawPlayer();
 
-    ctx.restore();
-
-
-    if (flash > 0) {
-
-        ctx.fillStyle =
-            `rgba(255,255,255,${flash})`;
-
-        ctx.fillRect(
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
-    }
 }
 
 
-/* ---------------------------------------------------------
-   GAME LOOP
-   --------------------------------------------------------- */
+// ------------------------------------------------------------
+// GAME LOOP
+// ------------------------------------------------------------
 
-function gameLoop(
-    timestamp
-) {
+function gameLoop(timestamp) {
 
-    if (!running) {
-
-        draw();
-
+    if (!gameRunning) {
         return;
     }
 
 
-    const delta =
+    const dt =
         Math.min(
             0.033,
             (
@@ -2168,273 +3637,26 @@ function gameLoop(
         timestamp;
 
 
-    update(
-        delta
-    );
-
+    update(dt);
 
     draw();
 
 
-    if (running) {
+    if (gameRunning) {
 
-        animationId =
-            requestAnimationFrame(
-                gameLoop
-            );
+        requestAnimationFrame(
+            gameLoop
+        );
+
     }
+
 }
 
 
-/* ---------------------------------------------------------
-   ANIMAL SELECTION
-   --------------------------------------------------------- */
-
-animalButtons.forEach(
-    button => {
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                selectedAnimal =
-                    button.dataset.animal;
-
-
-                animalButtons.forEach(
-                    other =>
-                        other.classList.remove(
-                            "selected"
-                        )
-                );
-
-
-                button.classList.add(
-                    "selected"
-                );
-
-
-                if (
-                    currentLevel === 3
-                ) {
-
-                    startButton.textContent =
-                        `▶ START AS ${selectedAnimal}`;
-                }
-            }
-        );
-    }
-);
-
-
-/* ---------------------------------------------------------
-   START BUTTON
-   --------------------------------------------------------- */
-
-startButton.addEventListener(
-    "click",
-    () => {
-
-        /*
-           If Level 10 is complete,
-           return to Level 1 for replay.
-        */
-
-        if (
-            gameComplete &&
-            currentLevel === 10
-        ) {
-
-            currentLevel = 1;
-
-            unlockLevel(10);
-
-            history.replaceState(
-                null,
-                "",
-                "?level=1"
-            );
-        }
-
-
-        /*
-           Completed levels automatically
-           move to the next level.
-        */
-
-        startGame();
-    }
-);
-
-
-/* ---------------------------------------------------------
-   MOVEMENT BUTTONS
-   --------------------------------------------------------- */
-
-leftButton.addEventListener(
-    "pointerdown",
-    event => {
-
-        event.preventDefault();
-
-        moveLeft();
-    }
-);
-
-
-rightButton.addEventListener(
-    "pointerdown",
-    event => {
-
-        event.preventDefault();
-
-        moveRight();
-    }
-);
-
-
-/* ---------------------------------------------------------
-   ATTACK BUTTON
-   --------------------------------------------------------- */
-
-attackButton.addEventListener(
-    "pointerdown",
-    event => {
-
-        event.preventDefault();
-
-        attack();
-    }
-);
-
-
-/* ---------------------------------------------------------
-   KEYBOARD
-   --------------------------------------------------------- */
-
-window.addEventListener(
-    "keydown",
-    event => {
-
-        if (
-            event.key === "ArrowLeft" ||
-            event.key.toLowerCase() === "a"
-        ) {
-
-            event.preventDefault();
-
-            moveLeft();
-        }
-
-
-        if (
-            event.key === "ArrowRight" ||
-            event.key.toLowerCase() === "d"
-        ) {
-
-            event.preventDefault();
-
-            moveRight();
-        }
-
-
-        if (
-            event.key === " " ||
-            event.key === "ArrowUp"
-        ) {
-
-            event.preventDefault();
-
-            attack();
-        }
-    }
-);
-
-
-/* ---------------------------------------------------------
-   SWIPE
-   --------------------------------------------------------- */
-
-let touchStartX = 0;
-
-let touchStartY = 0;
-
-
-canvas.addEventListener(
-    "touchstart",
-    event => {
-
-        const touch =
-            event.changedTouches[0];
-
-
-        touchStartX =
-            touch.clientX;
-
-        touchStartY =
-            touch.clientY;
-    },
-    {
-        passive: true
-    }
-);
-
-
-canvas.addEventListener(
-    "touchend",
-    event => {
-
-        const touch =
-            event.changedTouches[0];
-
-
-        const dx =
-            touch.clientX -
-            touchStartX;
-
-
-        const dy =
-            touch.clientY -
-            touchStartY;
-
-
-        if (
-            Math.abs(dx) <
-            25
-        ) {
-            return;
-        }
-
-
-        if (
-            Math.abs(dx) >
-            Math.abs(dy)
-        ) {
-
-            if (dx < 0) {
-
-                moveLeft();
-
-            } else {
-
-                moveRight();
-            }
-        }
-    },
-    {
-        passive: true
-    }
-);
-
-
-/* ---------------------------------------------------------
-   INITIALISE
-   --------------------------------------------------------- */
-
-getUnlockedLevel();
-
-applyLevelUI();
-
-showStartScreen();
+// ------------------------------------------------------------
+// INITIAL DRAW
+// ------------------------------------------------------------
+
+updateStrikeDisplay();
 
 draw();
